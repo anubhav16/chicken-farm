@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden; }
+
+#game { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+
+/* Sky — changes with farm level */
+#sky { position: absolute; inset: 0; transition: background 2s; }
+#sky.farm0 { background: linear-gradient(180deg, #87CEEB 0%, #B0E0FF 40%, #FFE4B5 70%, #FFB347 85%, #52b788 90%, #2d6a4f 100%); }
+#sky.farm1 { background: linear-gradient(180deg, #7EC8E3 0%, #A8D8EA 40%, #FFDEAD 70%, #DEB887 85%, #66BB6A 90%, #388E3C 100%); }
+#sky.farm2 { background: linear-gradient(180deg, #64B5F6 0%, #90CAF9 40%, #FFE0B2 70%, #FFCC80 85%, #81C784 90%, #4CAF50 100%); }
+#sky.farm3 { background: linear-gradient(180deg, #42A5F5 0%, #64B5F6 35%, #E1F5FE 60%, #C8E6C9 80%, #66BB6A 90%, #2E7D32 100%); }
+#sky.farm4 { background: linear-gradient(180deg, #1E88E5 0%, #42A5F5 30%, #BBDEFB 55%, #C8E6C9 75%, #4CAF50 88%, #1B5E20 100%); }
+#sky.farm5 { background: linear-gradient(180deg, #0D47A1 0%, #1565C0 25%, #90CAF9 50%, #E8F5E9 70%, #43A047 85%, #1B5E20 100%); }
+.cloud { position: absolute; border-radius: 50px; background: rgba(255,255,255,0.6); pointer-events: none; }
+
+/* Ground — changes with farm level */
+#ground { position: absolute; bottom: 0; left: 0; right: 0; height: 200px; transition: background 1s; }
+#ground::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.3); }
+#ground.farm0 { background: linear-gradient(180deg, #52b788 0%, #40916c 40%, #2d6a4f 80%, #1b4332 100%); }
+#ground.farm1 { background: linear-gradient(180deg, #66BB6A 0%, #4CAF50 40%, #388E3C 80%, #1B5E20 100%); }
+#ground.farm2 { background: linear-gradient(180deg, #81C784 0%, #66BB6A 30%, #A1887F 60%, #8D6E63 100%); }
+#ground.farm3 { background: linear-gradient(180deg, #A5D6A7 0%, #81C784 30%, #BCAAA4 60%, #8D6E63 100%); }
+#ground.farm4 { background: linear-gradient(180deg, #C8E6C9 0%, #A5D6A7 25%, #D7CCC8 55%, #A1887F 80%, #6D4C41 100%); }
+#ground.farm5 { background: linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 20%, #EFEBE9 50%, #BCAAA4 75%, #5D4037 100%); }
+
+/* Fence — scales with farm */
+#fence-container { position: absolute; bottom: 200px; left: 0; right: 0; z-index: 5; height: 55px; pointer-events: none; transition: all 1s; }
+
+/* Farm structures */
+#farm-structures { position: absolute; bottom: 200px; left: 0; right: 0; z-index: 3; pointer-events: none; }
+.barn-structure { position: absolute; bottom: 0; }
+
+/* No top HUD bar — info goes in left panel */
+#hud { display: none; }
+
+/* LEFT panel — all info/numbers */
+#panel-info { position: absolute; top: 0; left: 0; bottom: 0; width: 260px; z-index: 45; background: linear-gradient(180deg, rgba(20,0,50,0.96), rgba(10,0,30,0.98)); border-right: 3px solid #7b2ff7; display: none; overflow-y: auto; overflow-x: hidden; }
+#panel-info::-webkit-scrollbar { width: 4px; }
+#panel-info::-webkit-scrollbar-thumb { background: #7b2ff7; border-radius: 4px; }
+
+/* RIGHT panel — all buttons/controls */
+#panel-controls { position: absolute; top: 0; right: 0; bottom: 0; width: 240px; z-index: 45; background: linear-gradient(180deg, rgba(30,0,80,0.96), rgba(20,0,50,0.98)); border-left: 3px solid #ff6fd8; display: none; overflow-y: auto; overflow-x: hidden; }
+#panel-controls::-webkit-scrollbar { width: 4px; }
+#panel-controls::-webkit-scrollbar-thumb { background: #ff6fd8; border-radius: 4px; }
+
+/* Shared panel styles — BIG fonts for 7 year old */
+.panel-section { padding: 10px 12px; border-bottom: 2px solid rgba(255,255,255,0.08); }
+.panel-title { font-family: 'Bangers', cursive; font-size: 18px; letter-spacing: 1px; margin-bottom: 6px; }
+
+/* Big money display at top of info panel */
+#money-hero { text-align: center; padding: 14px 8px 8px; background: rgba(0,0,0,0.2); }
+#money-hero .money-amount { font-family: 'Bangers', cursive; font-size: 42px; color: #FFD700; text-shadow: 0 0 20px rgba(255,179,71,0.5); }
+#money-hero .money-label { font-family: 'Bangers', cursive; font-size: 14px; color: #ff6fd8; letter-spacing: 2px; }
+#money-hero .day-display { font-family: 'Bangers', cursive; font-size: 24px; color: #ff6fd8; }
+
+/* Quick stats row */
+.quick-stats { display: flex; justify-content: space-around; padding: 8px 4px; background: rgba(0,0,0,0.15); }
+.quick-stat { text-align: center; }
+.quick-stat .qs-val { font-family: 'Bangers', cursive; font-size: 28px; color: #fff; }
+.quick-stat .qs-label { font-family: 'Bangers', cursive; font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+
+/* Farm area — center, between panels, MUST contain children */
+#farm-area { position: absolute; bottom: 0; left: 260px; right: 240px; top: 0; z-index: 10; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Hen grid — organized tiles, MUST scroll not overflow */
+#hen-grid { flex: 1; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 3px; padding: 6px; overflow-y: auto; overflow-x: hidden; position: relative; min-height: 0; }
+#hen-grid::-webkit-scrollbar { width: 4px; }
+#hen-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+/* Hen tiles auto-size — smooth transition */
+.hen-tile { background: rgba(255,255,255,0.06); border: 3px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: width 0.5s, height 0.5s, padding 0.5s, border-width 0.3s; position: relative; }
+.hen-tile:hover { border-color: #FFD700; background: rgba(255,255,255,0.12); transform: scale(1.05); }
+.hen-tile .ht-body { transition: width 0.5s, height 0.5s; }
+.hen-tile .ht-body svg { width: 100%; height: 100%; }
+/* 1-5 hens: extra large */
+.hen-grid-xs .hen-tile { width: 110px; height: 120px; padding: 6px; }
+.hen-grid-xs .ht-body { width: 60px; height: 54px; }
+.hen-grid-xs .ht-age { font-size: 15px; }
+.hen-grid-xs .ht-status { font-size: 13px; }
+/* 6-15 hens */
+.hen-grid-sm .hen-tile { width: 82px; height: 90px; padding: 4px; }
+.hen-grid-sm .ht-body { width: 44px; height: 40px; }
+.hen-grid-sm .ht-age { font-size: 12px; }
+.hen-grid-sm .ht-status { font-size: 10px; }
+/* 16-35 hens */
+.hen-grid-md .hen-tile { width: 64px; height: 72px; padding: 3px; }
+.hen-grid-md .ht-body { width: 34px; height: 30px; }
+.hen-grid-md .ht-age { font-size: 10px; }
+.hen-grid-md .ht-status { font-size: 8px; }
+/* 36-70 hens */
+.hen-grid-lg .hen-tile { width: 48px; height: 56px; padding: 2px; border-width: 2px; }
+.hen-grid-lg .ht-body { width: 26px; height: 24px; }
+.hen-grid-lg .ht-age { font-size: 8px; }
+.hen-grid-lg .ht-status { font-size: 6px; }
+/* 71+ hens */
+.hen-grid-xl .hen-tile { width: 36px; height: 42px; padding: 1px; border-width: 1px; border-radius: 5px; }
+.hen-grid-xl .ht-body { width: 20px; height: 18px; }
+.hen-grid-xl .ht-age { font-size: 7px; }
+.hen-grid-xl .ht-status { font-size: 5px; }
+.ht-age { font-family: 'Bangers', cursive; color: #ddd; }
+.ht-status { font-family: 'Bangers', cursive; padding: 1px 4px; border-radius: 4px; font-weight: 900; }
+.hen-tile.young .ht-status { color: #86efac; text-shadow: 0 0 4px rgba(74,222,128,0.5); }
+.hen-tile.young { border-color: rgba(74,222,128,0.4); }
+.hen-tile.declining .ht-status { color: #ffaa44; }
+.hen-tile.declining { border-color: rgba(255,170,68,0.4); }
+.hen-tile.old .ht-status { color: #ff4444; }
+.hen-tile.old { border-color: rgba(255,68,68,0.4); background: rgba(255,0,0,0.05); }
+.hen-tile.old .ht-body svg { filter: grayscale(0.7) brightness(0.6); }
+.hen-tile.sick .ht-status { color: #c084fc; }
+.hen-tile.sick { border-color: rgba(192,132,252,0.5); background: rgba(192,132,252,0.08); }
+.hen-tile.sick .ht-body { animation: sickShake 0.5s ease-in-out infinite; }
+@keyframes sickShake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
+.hen-tile.hungry { border-color: rgba(255,100,100,0.5); }
+.hen-tile.hungry .ht-body svg { filter: saturate(0.3); }
+
+/* Egg tray — bottom strip */
+#egg-tray { height: 80px; background: rgba(0,0,0,0.25); border-top: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; padding: 4px 10px; gap: 3px; overflow-x: auto; flex-shrink: 0; }
+#egg-tray::-webkit-scrollbar { height: 3px; }
+#egg-tray::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+#egg-tray .tray-label { font-family: 'Bangers', cursive; font-size: 12px; color: #FFD700; writing-mode: vertical-rl; margin-right: 6px; letter-spacing: 1px; flex-shrink: 0; }
+.tray-egg { width: 22px; height: 28px; flex-shrink: 0; cursor: pointer; transition: transform 0.2s; animation: eggPop 0.3s ease-out; }
+.tray-egg:hover { transform: scale(1.2); }
+.tray-egg svg { width: 100%; height: 100%; }
+.tray-egg.hatching { opacity: 0.6; filter: hue-rotate(40deg); cursor: default; }
+.tray-egg .te-timer { font-family: 'Bangers', cursive; font-size: 7px; color: #ff6fd8; text-align: center; margin-top: -2px; }
+
+/* Sick bay */
+#sick-bay { position: absolute; top: 8px; right: 8px; background: rgba(192,132,252,0.1); border: 2px solid rgba(192,132,252,0.3); border-radius: 12px; padding: 6px; min-width: 90px; z-index: 12; }
+#sick-bay .sb-label { font-family: 'Bangers', cursive; font-size: 10px; color: #c084fc; text-align: center; letter-spacing: 1px; }
+#sick-bay .sb-hens { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
+
+/* Ground dirt/mess — visual particles */
+#dirt-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: background 2s; }
+#dirt-overlay.dirty { background: rgba(101,67,33,0.06); }
+#dirt-overlay.very-dirty { background: rgba(101,67,33,0.14); }
+#dirt-overlay.filthy { background: rgba(101,67,33,0.25); }
+.dirt-particle { position: absolute; pointer-events: none; z-index: 2; font-size: 14px; opacity: 0.6; }
+
+/* Sick bay — compact fixed-size tiles */
+#sick-bay { background: rgba(192,132,252,0.06); border: 2px dashed rgba(192,132,252,0.4); border-radius: 10px; padding: 4px 6px; margin: 4px 8px; display: none; flex-shrink: 0; }
+#sick-bay .sb-label { font-family: 'Bangers', cursive; font-size: 12px; color: #c084fc; text-align: center; letter-spacing: 1px; margin-bottom: 3px; }
+#sick-bay .sb-hens { display: flex; flex-wrap: wrap; gap: 3px; justify-content: flex-start; }
+/* Sick bay tiles are always small regardless of grid size */
+#sick-bay .hen-tile { width: 44px !important; height: 52px !important; padding: 2px !important; border-width: 2px !important; border-radius: 6px !important; }
+#sick-bay .ht-body { width: 24px !important; height: 22px !important; }
+#sick-bay .ht-age { font-size: 8px !important; }
+#sick-bay .ht-status { font-size: 7px !important; }
+.hen-tile.unwell { border-color: rgba(251,191,36,0.6) !important; background: rgba(251,191,36,0.08) !important; }
+.hen-tile.unwell .ht-body { animation: unwellPulse 1s ease-in-out infinite; }
+@keyframes unwellPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+.hen-tile.in-sick-bay { border-color: rgba(255,80,80,0.6) !important; background: rgba(255,80,80,0.1) !important; }
+.hen-tile.in-sick-bay .ht-body { animation: sickShake 0.5s ease-in-out infinite; }
+.hen-tile.healing { border-color: rgba(96,165,250,0.5) !important; background: rgba(96,165,250,0.08) !important; }
+.hen-tile.healing .ht-body { animation: healPulse 1.5s ease-in-out infinite; }
+@keyframes healPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+.hen-tile.vaccinated { position: relative; }
+.hen-tile.vaccinated::after { content: '💉'; position: absolute; top: 1px; right: 1px; font-size: 8px; }
+
+/* Hen sprite — 2D SVG style */
+.hen { position: absolute; bottom: 0; cursor: pointer; transition: left 2s ease-in-out, bottom 0.3s; z-index: 12; display: flex; flex-direction: column; align-items: center; }
+.hen-body { width: 60px; height: 50px; position: relative; animation: henWalk 0.8s ease-in-out infinite; }
+.hen-body svg { width: 100%; height: 100%; }
+@keyframes henWalk { 0%,100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-6px) rotate(-2deg); } 50% { transform: translateY(0) rotate(0); } 75% { transform: translateY(-6px) rotate(2deg); } }
+.hen.eating .hen-body { animation: henPeck 0.4s ease-in-out infinite; }
+@keyframes henPeck { 0%,100% { transform: rotate(0); } 50% { transform: rotate(20deg) translateY(8px); } }
+.hen.hungry .hen-body { animation: henShake 0.3s ease-in-out infinite; }
+.hen.hungry .hen-body svg { filter: saturate(0.3) brightness(0.6); }
+@keyframes henShake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+.hen.declining .hen-body svg { filter: brightness(0.85); }
+.hen.declining .hen-status { display: block; }
+.hen.old .hen-body svg { filter: grayscale(0.7) brightness(0.6); }
+.hen.old .hen-body { animation: henOldWalk 1.5s ease-in-out infinite; }
+@keyframes henOldWalk { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.hen.old .hen-status { display: block; color: #ff4444; }
+.hen.dead { opacity: 0.3; pointer-events: none; }
+.hen.dead .hen-body { animation: none; transform: rotate(90deg); }
+.hen-status { font-family: 'Bangers', cursive; font-size: 14px; color: #fff; text-shadow: 0 1px 4px #000; background: rgba(0,0,0,0.4); border-radius: 6px; padding: 1px 6px; white-space: nowrap; margin-top: -4px; }
+
+/* Egg — smaller, neat */
+.egg { position: absolute; z-index: 13; cursor: pointer; animation: eggPop 0.3s ease-out; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+@keyframes eggPop { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+.egg:hover { transform: scale(1.1); filter: brightness(1.2); }
+.egg .egg-icon { width: 24px; height: 30px; }
+.egg .egg-icon svg { width: 100%; height: 100%; }
+.egg .egg-label { font-family: 'Bangers', cursive; font-size: 13px; color: #FFD700; text-shadow: 0 1px 3px #000; white-space: nowrap; background: rgba(0,0,0,0.5); border-radius: 6px; padding: 1px 6px; }
+.egg .egg-label.sell { color: #4ade80; border: 1px solid #4ade80; }
+.egg .egg-label.hatch { color: #ff6fd8; }
+.egg .egg-label.ready { color: #FFD700; animation: pulseLabel 0.5s ease-in-out infinite alternate; border: 1px solid #FFD700; }
+@keyframes pulseLabel { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+/* Egg sell animation */
+@keyframes eggSellFly { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5) translateY(-60px); opacity: 0.8; } 100% { transform: scale(0.3) translateY(-200px); opacity: 0; } }
+.egg.selling { animation: eggSellFly 0.6s ease-in forwards !important; pointer-events: none; }
+
+/* Chick — 2D SVG style */
+.chick { position: absolute; bottom: 0; z-index: 11; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1px; transition: left 2s ease-in-out; }
+.chick .chick-icon { width: 36px; height: 32px; animation: chickHop 0.6s ease-in-out infinite; }
+.chick .chick-icon svg { width: 100%; height: 100%; }
+@keyframes chickHop { 0%,100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-8px) rotate(-4deg); } 60% { transform: translateY(-8px) rotate(4deg); } }
+.chick .chick-label { font-family: 'Bangers', cursive; font-size: 13px; color: #ffb347; text-shadow: 0 1px 4px #000; background: rgba(0,0,0,0.5); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+
+
+/* Shop panel — inside sidebar */
+#shop { padding: 0; }
+#shop h3 { font-family: 'Bangers', cursive; font-size: 20px; color: #FFD700; letter-spacing: 2px; margin-bottom: 8px; text-align: center; }
+.shop-item { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,179,71,0.3); border-radius: 10px; padding: 8px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+.shop-item:hover { border-color: #FFD700; background: rgba(255,255,255,0.15); transform: scale(1.02); }
+.shop-item.disabled { opacity: 0.4; cursor: not-allowed; }
+.shop-item .icon { font-size: 32px; }
+.shop-item .info { flex: 1; }
+.shop-item .info .name { font-family: 'Bangers', cursive; font-size: 16px; color: #fff; letter-spacing: 1px; }
+.shop-item .info .cost { font-family: 'Nunito', sans-serif; font-size: 14px; color: #FFD700; font-weight: 900; }
+.shop-item .info .desc { font-size: 11px; color: #bbb; }
+
+/* Action buttons */
+#actions { position: absolute; bottom: 210px; left: 50%; transform: translateX(-50%); z-index: 35; display: none; gap: 8px; }
+.btn { font-family: 'Bangers', cursive; font-size: 16px; letter-spacing: 2px; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.15s; }
+.btn:hover { transform: scale(1.05); }
+.btn:active { transform: scale(0.95); }
+.btn-gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: #1a0050; }
+.btn-green { background: linear-gradient(135deg, #4ade80, #16a34a); color: #fff; }
+.btn-blue { background: linear-gradient(135deg, #60A5FA, #1D4ED8); color: #fff; }
+.btn-red { background: linear-gradient(135deg, #f87171, #dc2626); color: #fff; }
+.btn-pink { background: linear-gradient(135deg, #ff6fd8, #c026d3); color: #fff; }
+
+/* Info panel (bottom) */
+#info-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; z-index: 40; background: rgba(30,0,80,0.9); border-top: 2px solid #7b2ff7; display: none; align-items: center; justify-content: space-around; padding: 4px 12px; }
+.info-stat { text-align: center; }
+.info-stat .label { font-family: 'Bangers', cursive; font-size: 10px; color: #ff6fd8; letter-spacing: 1px; }
+.info-stat .val { font-family: 'Bangers', cursive; font-size: 18px; color: #fff; }
+
+/* Floating text */
+.float-text { position: absolute; font-family: 'Bangers', cursive; pointer-events: none; z-index: 50; animation: floatUp 1.2s ease-out forwards; }
+@keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-80px) scale(1.3); } }
+
+/* Start screen */
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 60; background: linear-gradient(135deg, #1a0050, #3a0080, #1a0050); pointer-events: all; }
+.screen h1 { font-family: 'Bangers', cursive; font-size: 42px; color: #FFD700; text-shadow: 0 0 20px #ff6000; letter-spacing: 3px; margin-bottom: 4px; }
+.screen h2 { font-family: 'Bangers', cursive; font-size: 22px; color: #ff6fd8; letter-spacing: 2px; margin-bottom: 16px; }
+.screen .subtitle { font-size: 14px; color: #ccc; margin-bottom: 20px; text-align: center; line-height: 1.6; max-width: 400px; }
+.screen .rules { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,179,71,0.3); border-radius: 14px; padding: 16px; max-width: 420px; margin-bottom: 20px; text-align: left; }
+.screen .rules h3 { font-family: 'Bangers', cursive; font-size: 16px; color: #FFD700; margin-bottom: 8px; }
+.screen .rules p { font-size: 16px; color: #ddd; line-height: 2; }
+.screen .rules .highlight { color: #FFD700; font-weight: 900; }
+
+/* Notification */
+#notification { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); z-index: 55; font-family: 'Bangers', cursive; font-size: 26px; color: #fff; text-shadow: 0 0 15px #ff6fd8; background: rgba(30,0,80,0.9); border: 2px solid #ff6fd8; border-radius: 12px; padding: 10px 24px; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+#notification.show { opacity: 1; }
+
+/* Farm info — kid-friendly */
+#farm-info { padding: 0; }
+#farm-info h3 { font-family: 'Bangers', cursive; font-size: 18px; color: #7b2ff7; letter-spacing: 1px; margin-bottom: 6px; }
+.farm-stat { display: flex; justify-content: space-between; font-size: 14px; color: #ddd; margin-bottom: 3px; padding: 2px 0; }
+.farm-stat .fval { color: #FFD700; font-weight: 900; font-size: 15px; }
+
+/* P&L Panel — kid-friendly big fonts */
+#pnl-panel { padding: 0; }
+#pnl-panel h3 { font-family: 'Bangers', cursive; font-size: 18px; letter-spacing: 1px; margin-bottom: 6px; }
+#pnl-panel .pnl-section { margin-bottom: 8px; }
+#pnl-panel .pnl-section-title { font-family: 'Bangers', cursive; font-size: 14px; letter-spacing: 1px; margin-bottom: 3px; padding-bottom: 3px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+.pnl-row { display: flex; justify-content: space-between; font-size: 14px; color: #ddd; margin-bottom: 3px; padding: 2px 0; }
+.pnl-row .pnl-val { font-weight: 900; font-family: 'Nunito', sans-serif; font-size: 15px; }
+.pnl-row .pnl-val.income { color: #4ade80; }
+.pnl-row .pnl-val.cost { color: #ff6666; }
+.pnl-row.total { border-top: 3px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px; font-size: 16px; font-weight: 900; }
+.pnl-row.total .pnl-val { font-size: 18px; }
+.pnl-row.total .pnl-val.profit { color: #4ade80; }
+.pnl-row.total .pnl-val.loss { color: #ff4444; }
+
+/* Game over screen */
+#game-over { position: absolute; inset: 0; z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(10,0,30,0.92); }
+#game-over h2 { font-family: 'Bangers', cursive; font-size: 48px; color: #ff4444; text-shadow: 0 0 30px #f00; letter-spacing: 4px; margin-bottom: 12px; }
+#game-over .stats { font-family: 'Bangers', cursive; font-size: 20px; color: #fff; text-align: center; line-height: 2; }
+#game-over .stats .gold { color: #FFD700; }
+
+/* Night overlay */
+#night-overlay { position: absolute; inset: 0; background: rgba(0,0,20,0); z-index: 2; transition: background 3s; pointer-events: none; }
+#night-overlay.night { background: rgba(0,0,20,0.5); }
+#night-overlay.dawn { background: rgba(255,200,100,0.15); }
+
+/* Sun/Moon */
+#celestial { position: absolute; z-index: 1; font-size: 50px; transition: all 3s ease-in-out; pointer-events: none; }
+
+/* Grass details */
+.grass-tuft { position: absolute; bottom: 200px; z-index: 4; font-size: 20px; pointer-events: none; }
+
+/* Tooltip */
+.tooltip { position: absolute; background: rgba(30,0,80,0.95); border: 2px solid #FFD700; border-radius: 8px; padding: 8px 12px; z-index: 50; font-size: 12px; color: #fff; pointer-events: none; max-width: 200px; }
+.tooltip .tt-title { font-family: 'Bangers', cursive; font-size: 14px; color: #FFD700; }
+
+/* Egg collector worker */
+#egg-worker { position: absolute; bottom: 205px; z-index: 14; font-size: 48px; transition: left 1s ease-in-out; pointer-events: none; display: none; }
+#egg-worker .worker-body { animation: workerWalk 0.4s ease-in-out infinite; }
+@keyframes workerWalk { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+#egg-worker.idle .worker-body { animation: workerIdle 2s ease-in-out infinite; }
+@keyframes workerIdle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px) rotate(2deg); } }
+#egg-worker .worker-carry { position: absolute; top: -10px; right: -5px; font-size: 22px; animation: carryBounce 0.4s ease-in-out infinite; }
+@keyframes carryBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+/* Egg basket */
+#egg-basket { position: absolute; bottom: 205px; right: 240px; z-index: 13; display: none; flex-direction: column; align-items: center; }
+#egg-basket .basket-icon { font-size: 60px; }
+#egg-basket .basket-label { font-family: 'Bangers', cursive; font-size: 20px; color: #FFD700; text-shadow: 0 2px 6px #000; background: rgba(0,0,0,0.5); border-radius: 8px; padding: 2px 10px; }
+#egg-basket .basket-eggs { display: flex; flex-wrap: wrap; width: 70px; justify-content: center; gap: 1px; margin-top: -15px; position: relative; z-index: 14; }
+#egg-basket .basket-eggs .mini-egg { font-size: 16px; animation: miniEggDrop 0.3s ease-out; }
+@keyframes miniEggDrop { 0% { transform: translateY(-20px) scale(0); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
+/* Egg flying to basket animation */
+@keyframes flyToBasket { 0% { transform: scale(1); } 50% { transform: scale(0.6) translateY(-30px); } 100% { transform: scale(0.3); opacity: 0; } }
+.egg.collecting { animation: flyToBasket 0.8s ease-in forwards !important; pointer-events: none; }
+
+/* Money graph */
+#graph-panel { padding: 0; }
+#graph-title { font-family: 'Bangers', cursive; font-size: 12px; color: #FFD700; text-align: center; margin-bottom: 4px; letter-spacing: 1px; cursor: pointer; }
+#money-graph { background: rgba(0,0,0,0.3); border-radius: 6px; width: 100%; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="sky" class="farm0"></div>
+  <div id="night-overlay"></div>
+  <div id="celestial">☀️</div>
+  <div id="ground" class="farm0"></div>
+  <div id="fence-container"></div>
+  <div id="farm-structures"></div>
+  <!-- hidden HUD for compatibility -->
+  <div id="hud"></div>
+
+  <!-- LEFT PANEL — all information/numbers -->
+  <div id="panel-info">
+    <!-- Money + Day hero -->
+    <div id="money-hero">
+      <div class="money-label">BALANCE</div>
+      <div class="money-amount" id="money-display">₹2,000</div>
+      <div class="day-display">Day <span id="day-display">1</span></div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="quick-stats">
+      <div class="quick-stat"><div class="qs-val" id="hen-display">0</div><div class="qs-label">HENS</div></div>
+      <div class="quick-stat"><div class="qs-val" id="egg-display">0</div><div class="qs-label">EGGS</div></div>
+      <div class="quick-stat"><div class="qs-val" id="chick-display">0</div><div class="qs-label">CHICKS</div></div>
+    </div>
+
+    <!-- Daily P&L -->
+    <div class="panel-section" id="pnl-panel">
+      <div class="panel-title" style="color:#FFD700">💰 DAILY P&L</div>
+      <div class="pnl-section">
+        <div class="pnl-section-title" style="color:#4ade80">📈 INCOME</div>
+        <div class="pnl-row"><span>🥚 Total egg income</span><span class="pnl-val income" id="pnl-egg-income">+₹0</span></div>
+        <div class="pnl-row" style="padding-left:12px; font-size:12px; opacity:0.8;"><span>🟢 Healthy × <span id="pnl-healthy-count">0</span></span><span class="pnl-val income" id="pnl-healthy-income">+₹0</span></div>
+        <div class="pnl-row" style="padding-left:12px; font-size:12px; opacity:0.8;"><span>🤒 Sick × <span id="pnl-sick-count">0</span></span><span class="pnl-val" style="color:#888" id="pnl-sick-income">₹0</span></div>
+        <div class="pnl-row" style="padding-left:12px; font-size:12px; opacity:0.8;"><span>💊 Healing × <span id="pnl-healing-count">0</span></span><span class="pnl-val" style="color:#888" id="pnl-healing-income">₹0</span></div>
+        <div class="pnl-row" style="padding-left:12px; font-size:12px; opacity:0.8;"><span id="pnl-dirt-penalty" style="color:#ff8844"></span></div>
+      </div>
+      <div class="pnl-section">
+        <div class="pnl-section-title" style="color:#ff6666">📉 COSTS</div>
+        <div class="pnl-row"><span>🌾 Hen food</span><span class="pnl-val cost" id="pnl-hen-food">-₹0</span></div>
+        <div class="pnl-row"><span>🐤 Chick food</span><span class="pnl-val cost" id="pnl-chick-food">-₹0</span></div>
+        <div class="pnl-row"><span>🔧 Maintenance</span><span class="pnl-val cost" id="pnl-maint">-₹0</span></div>
+        <div class="pnl-row"><span>🔑 Rent</span><span class="pnl-val cost" id="pnl-rent">-₹0</span></div>
+        <div class="pnl-row"><span>💳 EMI/day</span><span class="pnl-val cost" id="pnl-emi">-₹0</span></div>
+        <div class="pnl-row" style="padding-left:16px; font-size:10px; opacity:0.7;"><span>↳ Principal</span><span class="pnl-val cost" id="pnl-emi-principal">-₹0</span></div>
+        <div class="pnl-row" style="padding-left:16px; font-size:10px; opacity:0.7;"><span>↳ Interest</span><span class="pnl-val cost" id="pnl-emi-interest">-₹0</span></div>
+        <div class="pnl-row" style="padding-left:16px; font-size:10px; opacity:0.7;"><span>↳ Principal left</span><span class="pnl-val" id="pnl-principal-left" style="color:#ffaa44">₹0</span></div>
+        <div class="pnl-row"><span>💊 Medicine</span><span class="pnl-val cost" id="pnl-medicine">-₹0</span></div>
+        <div class="pnl-row"><span>🤖 Auto-cleaner</span><span class="pnl-val cost" id="pnl-autocleaner">-₹0</span></div>
+      </div>
+      <div class="pnl-row total"><span><b>INCOME</b></span><span class="pnl-val income" id="pnl-total-income">+₹0</span></div>
+      <div class="pnl-row total" style="border-top:none;margin-top:0;padding-top:0;"><span><b>COST</b></span><span class="pnl-val cost" id="pnl-total-cost-display">-₹0</span></div>
+      <div class="pnl-row total"><span><b>PROFIT</b></span><span class="pnl-val" id="pnl-net">₹0</span></div>
+    </div>
+
+    <!-- Farm Status -->
+    <div class="panel-section" id="farm-info">
+      <div class="panel-title" style="color:#7b2ff7">🏠 FARM</div>
+      <div class="farm-stat"><span>Farm</span><span class="fval" id="fi-farm">🏡 Backyard</span></div>
+      <div class="farm-stat"><span>Status</span><span class="fval" id="fi-owned" style="color:#4ade80">Owned</span></div>
+      <div class="farm-stat"><span>Capacity</span><span class="fval" id="fi-cap">0 / 5</span></div>
+      <div class="farm-stat"><span>Rent/Day</span><span class="fval" id="fi-rent">₹0</span></div>
+      <div class="farm-stat"><span>Food/Day</span><span class="fval" id="fi-food">₹0</span></div>
+      <div class="farm-stat"><span>Maintenance</span><span class="fval" id="fi-cost">₹0</span></div>
+      <div class="farm-stat"><span>Total Cost</span><span class="fval" id="fi-total-cost">₹0</span></div>
+      <div class="farm-stat"><span>Eggs Ready</span><span class="fval" id="fi-eggs">0</span></div>
+      <div class="farm-stat"><span>Hatching</span><span class="fval" id="fi-hatch">0</span></div>
+      <div class="farm-stat"><span>Loan</span><span class="fval" id="fi-loan" style="color:#ff6666">₹0</span></div>
+      <div class="farm-stat"><span>EMI/Day</span><span class="fval" id="fi-interest" style="color:#ff6666">₹0</span></div>
+      <div class="farm-stat" style="padding-left:10px;font-size:10px;opacity:0.7;"><span>↳ Principal</span><span class="fval" id="fi-emi-princ" style="color:#ff6666">₹0</span></div>
+      <div class="farm-stat" style="padding-left:10px;font-size:10px;opacity:0.7;"><span>↳ Interest</span><span class="fval" id="fi-emi-int" style="color:#ff6666">₹0</span></div>
+      <div class="farm-stat" style="padding-left:10px;font-size:10px;opacity:0.7;"><span>↳ Principal left</span><span class="fval" id="fi-princ-left" style="color:#ffaa44">₹0</span></div>
+    </div>
+
+    <!-- Totals -->
+    <div class="panel-section">
+      <div class="panel-title" style="color:#FFD700">📊 TOTALS</div>
+      <div class="pnl-row"><span>Total earned</span><span class="pnl-val income" id="pnl-total-earned">₹0</span></div>
+      <div class="pnl-row"><span>Total spent</span><span class="pnl-val cost" id="pnl-total-spent">₹0</span></div>
+      <div class="pnl-row"><span>Avg profit/day</span><span class="pnl-val" id="pnl-avg-daily">₹0</span></div>
+      <div class="pnl-row"><span>Total debt</span><span class="pnl-val cost" id="pnl-total-debt">₹0</span></div>
+      <div class="pnl-row"><span>Loan balance</span><span class="pnl-val" id="loan-display" style="color:#ff6666">₹0</span></div>
+      <div class="pnl-row total"><span><b>Net worth</b></span><span class="pnl-val" id="pnl-net-worth">₹0</span></div>
+    </div>
+
+    <!-- Graph -->
+    <div class="panel-section" id="graph-panel">
+      <div id="graph-title" onclick="toggleGraphSize()">📈 MONEY (click to resize)</div>
+      <canvas id="money-graph" width="234" height="130"></canvas>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL — all buttons/controls -->
+  <div id="panel-controls">
+    <div class="panel-section" style="text-align:center; padding:8px;">
+      <div class="panel-title" style="color:#FFD700; text-align:center; font-size:16px;">🐔 CONTROLS</div>
+    </div>
+
+    <!-- Farm Care — top priority -->
+    <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
+      <div class="panel-title" style="color:#4ade80">🧹 FARM CARE</div>
+      <div class="shop-item" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">₹30</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
+      <div class="shop-item" onclick="buyAutoCleaner()"><span class="icon">🤖</span><div class="info"><div class="name">AUTO CLEANER</div><div class="cost" id="autocleaner-cost">₹5,000</div><div class="desc" id="autocleaner-desc">Auto-clean daily (₹5/day)</div></div></div>
+      <div class="shop-item" onclick="giveMedicine()"><span class="icon">💊</span><div class="info"><div class="name">HOME MEDICINE</div><div class="cost">₹10/hen</div><div class="desc">Treat unwell hens (70% cure)</div></div></div>
+      <div class="shop-item" onclick="callDoctor()"><span class="icon">👨‍⚕️</span><div class="info"><div class="name">CALL DOCTOR</div><div class="cost">₹150 + ₹5/day</div><div class="desc" id="sick-display">✅ All healthy</div></div></div>
+      <div class="shop-item" onclick="vaccinateHens()"><span class="icon">💉</span><div class="info"><div class="name">VACCINATE</div><div class="cost">₹20/hen</div><div class="desc" id="vaccine-desc">Protect for 180 days</div></div></div>
+    </div>
+
+    <!-- Buy/Sell -->
+    <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
+      <div class="panel-title" style="color:#4ade80">BUY & SELL</div>
+      <div class="shop-item" onclick="buyHen()"><span class="icon">🐔</span><div class="info"><div class="name">BUY HEN</div><div class="cost">₹300</div></div></div>
+      <div class="shop-item" onclick="sellEggs()"><span class="icon">🥚</span><div class="info"><div class="name">SELL EGGS</div><div class="cost">₹6 each</div></div></div>
+      <div class="shop-item" onclick="sellChicken()"><span class="icon">🍗</span><div class="info"><div class="name">SELL HEN</div><div class="cost">₹250</div></div></div>
+    </div>
+
+    <!-- Farm -->
+    <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
+      <div class="panel-title" style="color:#7b2ff7">🏠 FARM</div>
+      <div class="shop-item" onclick="rentFarm()"><span class="icon">🔑</span><div class="info"><div class="name">RENT FARM</div><div class="cost" id="rent-cost">₹5/day</div><div class="desc" id="rent-desc">Small Coop — 10 hens</div></div></div>
+      <div class="shop-item" onclick="buyFarm()"><span class="icon">🏠</span><div class="info"><div class="name">BUY FARM</div><div class="cost" id="buy-cost">₹0</div><div class="desc" id="buy-desc">Own it!</div></div></div>
+    </div>
+
+    <!-- Bank -->
+    <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
+      <div class="panel-title" style="color:#60A5FA">🏦 BANK</div>
+      <div class="shop-item" onclick="takeLoan()"><span class="icon">🏦</span><div class="info"><div class="name">TAKE LOAN</div><div class="cost">9% p.a. | 2yr</div><div class="desc" id="loan-limit-desc">Max ₹10,000</div></div></div>
+      <div class="shop-item" onclick="repayLoan()"><span class="icon">💸</span><div class="info"><div class="name">REPAY LOAN</div><div class="cost" id="loan-outstanding">No loan</div></div></div>
+    </div>
+
+    <!-- Settings -->
+    <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
+      <div class="panel-title" style="color:#ff6fd8">⚙️ SETTINGS</div>
+      <div class="shop-item" id="autosell-btn" onclick="toggleAutoSell()" style="cursor:pointer"><span class="icon">🥚</span><div class="info"><div class="name">AUTO SELL</div><div class="cost" id="autosell-display">OFF</div></div></div>
+      <div class="shop-item" id="speed-btn" onclick="toggleSpeed()" style="cursor:pointer"><span class="icon">⏩</span><div class="info"><div class="name">SPEED</div><div class="cost" id="speed-display">1x</div></div></div>
+    </div>
+  </div>
+
+  <!-- Keep shop div for compatibility -->
+  <div id="shop" style="display:none"></div>
+
+  <div id="farm-area">
+    <div id="dirt-overlay"></div>
+    <div id="sick-bay"><div class="sb-label">🏥 SICK BAY</div><div class="sb-hens" id="sick-bay-hens"></div></div>
+    <div id="hen-grid"></div>
+    <div id="egg-tray">
+      <div class="tray-label">🥚 EGGS</div>
+      <div id="basket-count" style="font-family:'Bangers',cursive; font-size:11px; color:#FFD700; writing-mode:vertical-rl; flex-shrink:0;">0</div>
+    </div>
+  </div>
+
+  <div id="notification"></div>
+
+  <!-- Start Screen -->
+  <div class="screen" id="start-screen">
+    <h1>🐔 ARUSH'S CHICKEN FARM 🐔</h1>
+    <h2>A Business Game</h2>
+    <div class="rules">
+      <h3>📋 HOW TO PLAY</h3>
+      <p>
+        🐔 Buy <span class="highlight">hens (₹300)</span> and they lay eggs every day!<br>
+        🌾 Food: <span class="highlight">₹3/hen/day</span> + <span class="highlight">₹1/chick/day</span> (auto-deducted)<br>
+        ⚠️ No money for food = hens die in <span class="highlight">3 days</span>!<br>
+        🥚 Sell eggs for <span class="highlight">₹6 each</span> or hatch into baby chicks!<br>
+        🐣 Eggs hatch in <span class="highlight">21 days</span>, chicks grow in <span class="highlight">150 days</span>!<br>
+        🍗 Sell grown hens for <span class="highlight">₹250 meat money</span>!<br>
+        🏦 Take <span class="highlight">bank loans at 9% p.a.</span> interest!<br>
+        🏠 Start in backyard (<span class="highlight">5 hens</span>) — rent or buy bigger farms!<br>
+        🔑 Rent = daily cost, Buy = own forever!<br>
+        💰 <span class="highlight">1 game day = 10 seconds</span><br>
+        🔧 Maintenance: <span class="highlight">₹1/hen/day</span> | Profit: <span class="highlight">₹1/hen/day</span><br>
+      </p>
+    </div>
+    <button class="btn btn-gold" onclick="startGame()" style="font-size:24px; padding: 14px 48px;">🚀 START FARMING!</button>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="game-over">
+    <h2>💀 GAME OVER</h2>
+    <div class="stats" id="go-stats"></div>
+    <div id="go-report" style="max-width:500px; text-align:left; margin-top:16px; background:rgba(255,255,255,0.06); border-radius:14px; padding:16px; max-height:40vh; overflow-y:auto;"></div>
+    <button class="btn btn-gold" onclick="location.reload()" style="margin-top:16px; font-size:24px; padding: 14px 44px;">🔄 TRY AGAIN!</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  ARUSH'S CHICKEN FARM — Business Simulation Game
+// ============================================================
+
+// Audio context for sounds
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx;
+function ensureAudio() { try { if (!actx) actx = new AudioCtx(); } catch(e) { console.warn('Audio not available:', e); } }
+
+function playTone(freq, dur, type='square', vol=0.15) {
+  try {
+    ensureAudio();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + dur);
+  } catch(e) { /* audio not available */ }
+}
+
+function sndBuy()    { playTone(523, 0.1); setTimeout(()=>playTone(659, 0.1), 80); setTimeout(()=>playTone(784, 0.15), 160); }
+function sndSell()   { playTone(784, 0.1); setTimeout(()=>playTone(988, 0.15), 100); }
+function sndEgg()    { playTone(880, 0.08, 'sine', 0.2); setTimeout(()=>playTone(1100, 0.12, 'sine', 0.15), 60); }
+function sndDeath()  { playTone(200, 0.3, 'sawtooth', 0.1); setTimeout(()=>playTone(150, 0.4, 'sawtooth', 0.08), 200); }
+function sndNewDay() { playTone(440, 0.08, 'sine', 0.1); setTimeout(()=>playTone(550, 0.08, 'sine', 0.1), 80); setTimeout(()=>playTone(660, 0.1, 'sine', 0.12), 160); }
+function sndError()  { playTone(200, 0.15, 'square', 0.1); setTimeout(()=>playTone(150, 0.2, 'square', 0.1), 100); }
+function sndHatch()  { playTone(600, 0.1, 'sine', 0.15); setTimeout(()=>playTone(800, 0.1, 'sine', 0.15), 100); setTimeout(()=>playTone(1000, 0.15, 'sine', 0.2), 200); }
+function sndUpgrade(){ playTone(523, 0.1); setTimeout(()=>playTone(659, 0.1), 100); setTimeout(()=>playTone(784, 0.1), 200); setTimeout(()=>playTone(1047, 0.2), 300); }
+function sndCluck()  { playTone(400 + Math.random()*200, 0.06, 'sine', 0.08); }
+
+// ============================================================
+//  GAME CONFIG — Change these to tweak the game!
+// ============================================================
+const CONFIG = {
+  STARTING_MONEY:      2000,    // ₹ — enough for 2 hens + food buffer
+  DAY_MS:              10000,   // 1 game day = 10 seconds (real time)
+
+  // Prices (Karnataka/Bangalore realistic, 2025)
+  HEN_COST:            300,     // ₹ point-of-lay pullet (KA: ₹250-350)
+  EGG_PRICE:           6,       // ₹ per egg retail (NECC Bangalore: ₹5-6)
+  CHICKEN_SELL_PRICE:  250,     // ₹ live bird meat (KA: ₹200-300)
+
+  // Daily costs per animal (Karnataka prices)
+  FOOD_COST_PER_HEN:   3,      // ₹/hen/day — 110g × ₹28/kg layer feed
+  FOOD_COST_PER_CHICK: 1,      // ₹/chick/day — 40g starter feed
+  MAINTENANCE_PER_HEN: 1,      // ₹/hen/day — water, electricity, misc
+
+  // Timelines (realistic poultry biology)
+  HATCH_DAYS:          21,      // egg → chick: 21 days incubation
+  CHICK_GROW_DAYS:     150,     // chick → laying hen: ~5 months (18-22 weeks)
+  HUNGRY_DAYS_TO_DIE:  3,       // days without food before death
+  HEN_PEAK_LAYING_AGE: 500,     // peak laying period (~1.4 years)
+  HEN_OLD_AGE:         700,     // stops laying (~2 years)
+  HEN_MAX_AGE:         900,     // natural death (~2.5 years)
+  OLD_HEN_SELL_PRICE:  100,     // ₹ spent hen (KA: ₹80-120)
+
+  // Sickness & Cleaning (Karnataka vet rates)
+  SICK_CHANCE_PER_DAY: 0.02,    // 2% chance per hen per day (clean farm)
+  SICK_CHANCE_DIRTY:   0.08,    // 8% if farm is filthy
+  SICK_CHANCE_WITH_VACCINE: 0.005, // 0.5% if vaccinated
+
+  // Sickness stages: unwell → sick → critical
+  UNWELL_DAYS:         3,       // days hen shows "unwell" warning before getting sick
+  SELF_MEDICINE_COST:  10,      // ₹ home remedy if caught early (unwell stage)
+  SELF_MEDICINE_CURE:  0.7,     // 70% chance home remedy works
+  DOCTOR_FEE:          150,     // ₹ vet visit (only needed if self-medicine fails or hen is sick)
+  MEDICINE_PER_DAY:    5,       // ₹/day antibiotics per hen
+  SICK_DURATION_CLEAN: 3,       // days to recover in clean farm
+  SICK_DURATION_DIRTY: 7,       // days to recover in dirty farm
+  SICK_DEATH_DAYS:     10,      // untreated sick hen dies
+
+  // Cleaning
+  CLEANING_COST:       30,      // ₹ base manual cleaning
+  AUTO_CLEANER_COST:   5000,    // ₹ one-time auto-cleaning machine
+  AUTO_CLEANER_DAILY:  5,       // ₹/day running cost for machine
+  DIRT_RATE:           1,       // dirt per hen per day (0-100 scale)
+  DIRT_CLEAN_THRESHOLD: 30,     // above = dirty
+  DIRT_FILTHY_THRESHOLD: 60,    // above = filthy
+
+  // Vaccination
+  VACCINE_COST_PER_HEN: 20,    // ₹ per hen, lasts 180 days
+  VACCINE_DURATION:    180,     // days vaccine protection lasts
+
+  // Bank loan (Karnataka agricultural credit)
+  LOAN_INTEREST_ANNUAL: 0.09,   // 9% p.a. (KCC/SBI Kisan: 7-9%)
+  LOAN_TENURE_DAYS:    730,     // 2 year tenure
+  LOAN_MIN:            500,     // ₹ minimum
+  LOAN_MAX:            50000,   // ₹ max (scales with farm level)
+  LOAN_MAX_PER_LEVEL:  10000,   // ₹ extra per farm level
+
+  // Farms — Karnataka rural land/shed costs
+  // Per hen profit = ₹2/day. Rent profitable at ~60% capacity.
+  // Buy price = ~2-3 years of rent (worth buying if staying long)
+  FARMS: [
+    { name: 'Backyard',        cap: 5,   rent: 0,    buy: 0,       emoji: '🏡' },
+    { name: 'Small Coop',      cap: 10,  rent: 8,    buy: 3000,    emoji: '🛖' },
+    { name: 'Ranch',           cap: 20,  rent: 20,   buy: 8000,    emoji: '🏠' },
+    { name: 'Big Farm',        cap: 50,  rent: 50,   buy: 25000,   emoji: '🏘️' },
+    { name: 'Mega Farm',       cap: 100, rent: 100,  buy: 60000,   emoji: '🏭' },
+    { name: 'Chicken Empire',  cap: 250, rent: 200,  buy: 150000,  emoji: '🏰' },
+  ],
+};
+
+// Shorthand accessors
+const DAY_MS              = CONFIG.DAY_MS;
+const HATCH_DAYS          = CONFIG.HATCH_DAYS;
+const CHICK_GROW_DAYS     = CONFIG.CHICK_GROW_DAYS;
+const HEN_COST            = CONFIG.HEN_COST;
+const EGG_PRICE           = CONFIG.EGG_PRICE;
+const CHICKEN_SELL_PRICE  = CONFIG.CHICKEN_SELL_PRICE;
+const MAINTENANCE_PER_HEN = CONFIG.MAINTENANCE_PER_HEN;
+const FOOD_COST_PER_HEN   = CONFIG.FOOD_COST_PER_HEN;
+const FOOD_COST_PER_CHICK = CONFIG.FOOD_COST_PER_CHICK;
+const HUNGRY_DAYS_TO_DIE  = CONFIG.HUNGRY_DAYS_TO_DIE;
+const FARMS               = CONFIG.FARMS;
+const DAILY_INTEREST_RATE = CONFIG.LOAN_INTEREST_ANNUAL / 365;
+
+// Game State
+let money = 1000;
+let day = 0;
+let hens = [];
+let eggs = [];
+let chicks = [];
+let foodDaysLeft = 0;
+let farmIndex = 0;         // current farm (index into FARMS)
+let farmOwned = false;     // renting or owned? (index 0 = backyard, always owned)
+let farmCapacity = 5;      // derived from FARMS[farmIndex].cap
+let totalEarned = 0;
+let totalEggsSold = 0;
+let totalHensOwned = 0;
+let gameRunning = false;
+let dayTimer = null;
+let tickTimer = null;
+let nextId = 1;
+let shopOpen = false;
+let speedMultiplier = 1;   // 1x or 10x
+let moneyHistory = [];     // track money each day for graph
+let autoSell = false;      // auto-sell eggs each day
+let basketEggCount = 0;    // eggs visually in basket
+let workerBusy = false;    // worker is collecting
+let dirtLevel = 0;         // 0-100 farm cleanliness
+let hasAutoCleaner = false; // auto-cleaning machine installed
+
+// Tracking for post-mortem report
+let stats = {
+  hensStarved: 0,
+  hensSick: 0,
+  hensDiedUntreated: 0,
+  hensDiedOldAge: 0,
+  hensSold: 0,
+  oldHensSold: 0,
+  eggsHatched: 0,
+  timesCleanedFarm: 0,
+  timesDirtWasFilthy: 0,
+  doctorCalls: 0,
+  totalDoctorSpent: 0,
+  totalMedicineSpent: 0,
+  totalCleaningSpent: 0,
+  totalFoodSpent: 0,
+  totalMaintenanceSpent: 0,
+  totalRentSpent: 0,
+  totalEMISpent: 0,
+  totalLoanTaken: 0,
+  maxHensAtOnce: 0,
+  maxMoney: 0,
+  daysWithDirtyFarm: 0,
+  daysWithSickHens: 0,
+  daysNegativeMoney: 0,
+};
+let loanAmount = 0;        // outstanding loan principal
+let loanInterestAccrued = 0; // interest accumulated
+let dailyEMI = 0;          // daily EMI payment (auto-deducted)
+
+const farmArea = document.getElementById('farm-area');
+
+// ============================================================
+//  VISUAL SETUP
+// ============================================================
+
+// Clouds
+// SVG generators for 2D animals
+function svgHen(color) {
+  const c = color || ['#D84315','#BF360C','#8D6E63','#6D4C41','#E65100'][Math.floor(Math.random()*5)];
+  const comb = '#E53935';
+  const beak = '#FF8F00';
+  const eye = '#212121';
+  const wing = shadeColor(c, -20);
+  return `<svg viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="30" cy="32" rx="20" ry="16" fill="${c}"/>
+    <ellipse cx="28" cy="34" rx="14" ry="10" fill="${wing}" opacity="0.6"/>
+    <circle cx="38" cy="22" r="10" fill="${c}"/>
+    <circle cx="42" cy="20" r="2.5" fill="#fff"/>
+    <circle cx="43" cy="20" r="1.5" fill="${eye}"/>
+    <polygon points="48,22 55,21 48,25" fill="${beak}"/>
+    <path d="M36,12 Q38,4 40,12 Q42,6 44,12" fill="${comb}" stroke="${comb}" stroke-width="1"/>
+    <line x1="22" y1="46" x2="18" y2="50" stroke="#FF8F00" stroke-width="2.5" stroke-linecap="round" class="hen-leg-l"/>
+    <line x1="32" y1="46" x2="36" y2="50" stroke="#FF8F00" stroke-width="2.5" stroke-linecap="round" class="hen-leg-r"/>
+    <path d="M10,30 Q6,28 8,34 Q4,32 8,36" fill="${c}" opacity="0.7"/>
+  </svg>`;
+}
+
+function svgChick() {
+  return `<svg viewBox="0 0 36 32" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="18" cy="22" rx="12" ry="10" fill="#FFD54F"/>
+    <circle cx="18" cy="14" r="8" fill="#FFEB3B"/>
+    <circle cx="21" cy="12" r="2" fill="#fff"/>
+    <circle cx="22" cy="12" r="1.2" fill="#212121"/>
+    <polygon points="26,14 32,13 26,17" fill="#FF8F00"/>
+    <path d="M16,6 Q18,2 20,6" fill="#FF7043" stroke="#FF7043" stroke-width="0.8"/>
+    <line x1="13" y1="30" x2="10" y2="32" stroke="#FF8F00" stroke-width="2" stroke-linecap="round"/>
+    <line x1="22" y1="30" x2="25" y2="32" stroke="#FF8F00" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="16" cy="24" rx="7" ry="5" fill="#FFC107" opacity="0.5"/>
+  </svg>`;
+}
+
+function svgEgg() {
+  return `<svg viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="12" cy="17" rx="10" ry="13" fill="#FFF8E1"/>
+    <ellipse cx="12" cy="17" rx="10" ry="13" fill="none" stroke="#D7CCC8" stroke-width="1"/>
+    <ellipse cx="10" cy="14" rx="4" ry="5" fill="rgba(255,255,255,0.5)"/>
+  </svg>`;
+}
+
+function shadeColor(color, percent) {
+  const num = parseInt(color.replace('#',''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.min(255, Math.max(0, (num >> 16) + amt));
+  const G = Math.min(255, Math.max(0, (num >> 8 & 0x00FF) + amt));
+  const B = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
+  return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+}
+
+// Farm visual update — fence, ground, sky, structures
+function updateFarmVisuals() {
+  const fi = farmIndex;
+  const sky = document.getElementById('sky');
+  const ground = document.getElementById('ground');
+  // Remove old farm classes
+  for (let i = 0; i < 6; i++) { sky.classList.remove('farm' + i); ground.classList.remove('farm' + i); }
+  sky.classList.add('farm' + fi);
+  ground.classList.add('farm' + fi);
+
+  // Update fence
+  const fc = document.getElementById('fence-container');
+  fc.innerHTML = '';
+  const fenceColors = ['#8B6914','#6D4C41','#5D4037','#4E342E','#795548','#A1887F'];
+  const color = fenceColors[fi] || fenceColors[0];
+  const posts = 6 + fi * 2;
+  for (let i = 0; i < posts; i++) {
+    const post = document.createElement('div');
+    post.style.cssText = `position:absolute; bottom:0; width:6px; height:${40+fi*5}px; background:linear-gradient(90deg,${shadeColor(color,-15)},${color},${shadeColor(color,-15)}); border-radius:2px; left:${(i/(posts-1))*100}%;`;
+    fc.appendChild(post);
+  }
+  // Rails
+  for (let r = 0; r < 2; r++) {
+    const rail = document.createElement('div');
+    rail.style.cssText = `position:absolute; left:0; right:0; height:5px; background:${color}; border-radius:2px; bottom:${12+r*16}px;`;
+    fc.appendChild(rail);
+  }
+
+  // Farm structures (barns, silos, etc.)
+  const fs = document.getElementById('farm-structures');
+  fs.innerHTML = '';
+  const structures = [
+    [], // backyard — nothing
+    ['🏠'], // small coop
+    ['🏠','🌾'], // ranch
+    ['🏠','🏠','🌾','⛽'], // big farm
+    ['🏠','🏠','🏭','🌾','🌾','⛽'], // mega farm
+    ['🏰','🏠','🏠','🏭','🌾','🌾','⛽','🗼'], // empire
+  ];
+  const items = structures[fi] || [];
+  items.forEach((emoji, i) => {
+    const s = document.createElement('div');
+    s.className = 'barn-structure';
+    s.style.cssText = `left:${8 + i * (80/Math.max(items.length,1))}%; font-size:${40+fi*8}px; bottom:0; opacity:0.7;`;
+    s.textContent = emoji;
+    fs.appendChild(s);
+  });
+}
+
+function createClouds() {
+  const sky = document.getElementById('sky');
+  for (let i = 0; i < 6; i++) {
+    const c = document.createElement('div');
+    c.className = 'cloud';
+    c.style.width = (80 + Math.random() * 120) + 'px';
+    c.style.height = (30 + Math.random() * 30) + 'px';
+    c.style.top = (5 + Math.random() * 30) + '%';
+    c.style.left = (Math.random() * 100) + '%';
+    c.style.opacity = 0.3 + Math.random() * 0.4;
+    sky.appendChild(c);
+  }
+}
+
+// Grass tufts
+function createGrass() {
+  const game = document.getElementById('game');
+  const tufts = ['🌿', '🌱', '☘️', '🍀'];
+  for (let i = 0; i < 15; i++) {
+    const g = document.createElement('div');
+    g.className = 'grass-tuft';
+    g.textContent = tufts[Math.floor(Math.random() * tufts.length)];
+    g.style.left = (Math.random() * 95) + '%';
+    g.style.opacity = 0.4 + Math.random() * 0.4;
+    game.appendChild(g);
+  }
+}
+
+createClouds();
+createGrass();
+
+// ============================================================
+//  GAME LOGIC
+// ============================================================
+
+function startGame() {
+  try {
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('panel-info').style.display = 'block';
+    document.getElementById('panel-controls').style.display = 'block';
+    gameRunning = true;
+    day = 0;
+    money = CONFIG.STARTING_MONEY;
+    ensureAudio();
+    farmIndex = 0; farmOwned = true; farmCapacity = FARMS[0].cap;
+    updateFarmVisuals();
+    moneyHistory = [CONFIG.STARTING_MONEY];
+    basketEggCount = 0;
+    dirtLevel = 0;
+    Object.keys(stats).forEach(k => stats[k] = 0);
+    hasAutoCleaner = false;
+    document.getElementById('hen-grid').innerHTML = '';
+    notify("🌟 Welcome to the farm, Arush! Buy a hen to start!");
+    updateFarmShopDisplay();
+    updateHUD();
+    startDayCycle();
+  } catch(e) { console.error('startGame error:', e); alert('Error starting game: ' + e.message); }
+}
+
+function startDayCycle() {
+  dayTimer = setInterval(() => {
+    if (!gameRunning) return;
+    advanceDay();
+  }, DAY_MS);
+
+  // Sub-tick for animations and random clucks
+  tickTimer = setInterval(() => {
+    if (!gameRunning) return;
+    updateDayNight();
+    // Random cluck
+    if (hens.filter(h=>h.alive).length > 0 && Math.random() < 0.1) sndCluck();
+    // Hen tile subtle animation
+    hens.forEach(h => {
+      if (!h.alive) return;
+      if (Math.random() < 0.05) {
+        h.el.style.transform = Math.random() > 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
+      }
+    });
+  }, 500);
+}
+
+function advanceDay() {
+  day++;
+  sndNewDay();
+
+  // Day/night cycle visual cue
+  notify("☀️ Day " + day + " begins!");
+
+  // Food + maintenance cost — auto-deducted daily
+  const aliveHens = hens.filter(h => h.alive);
+  const henFoodBill = aliveHens.length * FOOD_COST_PER_HEN;
+  const chickFoodBill = chicks.length * FOOD_COST_PER_CHICK;
+  const totalFoodBill = henFoodBill + chickFoodBill;
+  if (totalFoodBill > 0 && money >= totalFoodBill) {
+    money -= totalFoodBill;
+    stats.totalFoodSpent += totalFoodBill;
+    foodDaysLeft = 1;
+    floatText(document.getElementById('hud'), `🌾 -₹${totalFoodBill} food`, '#ffaa44');
+    aliveHens.forEach(h => { h.hungryDays = 0; h.el.classList.remove('hungry'); });
+  } else if (totalFoodBill > 0) {
+    foodDaysLeft = 0;
+    aliveHens.forEach(h => {
+      h.hungryDays++;
+      h.el.classList.add('hungry');
+      if (h.hungryDays >= HUNGRY_DAYS_TO_DIE) {
+        killHen(h);
+      }
+    });
+    if (aliveHens.length > 0) notify("⚠️ Can't afford food (₹" + totalFoodBill + ")! Hens are starving!");
+  }
+
+  // Hens lay eggs — based on age
+  aliveHens.forEach(h => {
+    if (!h.alive || foodDaysLeft <= 0) return;
+    const age = day - h.bornDay;
+    if (h.health === 'sick' || h.health === 'healing') return; // sick/healing hens don't lay
+    if (h.health === 'unwell' && Math.random() > 0.5) return; // unwell = 50% eggs
+    // Dirt penalty: dirty=80% eggs, filthy=50%
+    const dirtPenalty = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? 0.5 :
+                        dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? 0.8 : 1.0;
+    if (age <= CONFIG.HEN_PEAK_LAYING_AGE) {
+      if (Math.random() < dirtPenalty) layEgg(h);
+    } else if (age <= CONFIG.HEN_OLD_AGE) {
+      if (Math.random() < 0.5 * dirtPenalty) layEgg(h);
+    }
+    // Beyond OLD_AGE: no eggs at all
+  });
+
+  // Age check — flag old hens, kill very old ones
+  aliveHens.forEach(h => {
+    if (!h.alive) return;
+    const age = day - h.bornDay;
+    if (age >= CONFIG.HEN_MAX_AGE) {
+      // Dies of old age
+      h.alive = false;
+      h.el.classList.add('dead');
+      sndDeath();
+      stats.hensDiedOldAge++;
+      floatText(h.el, '👵 Died of old age', '#ff8888');
+      setTimeout(() => { h.el.remove(); hens = hens.filter(x => x.id !== h.id); updateHUD(); }, 2000);
+    } else if (age >= CONFIG.HEN_OLD_AGE) {
+      // Flag as old — visual indicator
+      if (!h.el.classList.contains('old')) {
+        h.el.classList.add('old');
+        notify("⚠️ A hen is old and stopped laying! Sell her for ₹" + CONFIG.OLD_HEN_SELL_PRICE);
+      }
+    } else if (age >= CONFIG.HEN_PEAK_LAYING_AGE) {
+      // Declining
+      if (!h.el.classList.contains('declining')) {
+        h.el.classList.add('declining');
+      }
+    }
+  });
+
+  // Auto-sell eggs (collected ones in basket)
+  if (autoSell) {
+    const unsold = eggs.filter(e => !e.hatching);
+    if (unsold.length > 0) {
+      sellEggs();
+    }
+  }
+
+  // Hatch eggs
+  eggs.forEach(e => {
+    if (e.hatching) {
+      if (day >= e.hatchDay) {
+        hatchEgg(e);
+      }
+    }
+  });
+
+  // Grow chicks
+  chicks.slice().forEach(c => {
+    if (day - c.bornDay >= CHICK_GROW_DAYS) {
+      growChick(c);
+    }
+  });
+
+  // Maintenance cost
+  const maintenanceCost = aliveHens.length * MAINTENANCE_PER_HEN;
+  if (maintenanceCost > 0) {
+    money -= maintenanceCost;
+    stats.totalMaintenanceSpent += maintenanceCost;
+    floatText(document.getElementById('hud'), `🔧 -₹${maintenanceCost}`, '#ff6666');
+  }
+
+  // Farm rent (if renting, not owned)
+  if (!farmOwned && farmIndex > 0) {
+    const rent = FARMS[farmIndex].rent;
+    money -= rent;
+    stats.totalRentSpent += rent;
+    floatText(document.getElementById('hud'), `🔑 -₹${rent} rent`, '#ff8888');
+  }
+
+  // Loan interest accrual (daily compound)
+  if (loanAmount > 0) {
+    const todayInterest = (loanAmount + loanInterestAccrued) * DAILY_INTEREST_RATE;
+    loanInterestAccrued += todayInterest;
+  }
+
+  // EMI auto-deduction (pays off interest first, then principal)
+  if (dailyEMI > 0 && (loanAmount > 0 || loanInterestAccrued > 0)) {
+    const emiPayment = Math.min(dailyEMI, loanAmount + loanInterestAccrued);
+    if (money >= emiPayment) {
+      money -= emiPayment;
+      stats.totalEMISpent += emiPayment;
+      // Pay interest first, then principal
+      if (emiPayment <= loanInterestAccrued) {
+        loanInterestAccrued -= emiPayment;
+      } else {
+        const remainder = emiPayment - loanInterestAccrued;
+        loanInterestAccrued = 0;
+        loanAmount = Math.max(0, loanAmount - remainder);
+      }
+      floatText(document.getElementById('hud'), `💳 -₹${emiPayment.toFixed(2)} EMI`, '#ff8844');
+      // Recalc EMI if loan fully paid
+      if (loanAmount <= 0 && loanInterestAccrued <= 0) {
+        loanAmount = 0; loanInterestAccrued = 0; dailyEMI = 0;
+        notify("🎉 Loan fully repaid via EMI! You're debt-free!");
+      }
+    } else {
+      notify("⚠️ Can't pay EMI (₹" + emiPayment.toFixed(2) + ")! Penalty interest growing!");
+    }
+  }
+
+  // Dirt accumulation — proportional to hens/capacity
+  const aliveCount = hens.filter(h => h.alive).length;
+  const crowdingRatio = farmCapacity > 0 ? aliveCount / farmCapacity : 0;
+  const dirtIncrease = aliveCount * CONFIG.DIRT_RATE * (0.5 + crowdingRatio * 0.5) / Math.max(farmCapacity / 5, 1);
+  dirtLevel = Math.min(100, dirtLevel + dirtIncrease);
+
+  // Auto-cleaner runs daily
+  if (hasAutoCleaner && aliveCount > 0) {
+    money -= CONFIG.AUTO_CLEANER_DAILY;
+    dirtLevel = Math.max(0, dirtLevel - (aliveCount * CONFIG.DIRT_RATE * 0.8)); // cleans 80% of daily dirt
+  }
+  updateDirtVisual();
+
+  // === SICKNESS SYSTEM ===
+  // Stage 1: healthy → unwell (warning, can self-medicate)
+  // Stage 2: unwell → sick (if untreated for UNWELL_DAYS)
+  // Stage 3: sick → healing (if doctor called) or → death (if untreated SICK_DEATH_DAYS)
+
+  const baseSickChance = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? CONFIG.SICK_CHANCE_DIRTY :
+                         dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? CONFIG.SICK_CHANCE_PER_DAY * 2 :
+                         CONFIG.SICK_CHANCE_PER_DAY;
+
+  hens.forEach(h => {
+    if (!h.alive) return;
+
+    // Healthy → may become unwell
+    if (h.health === 'healthy') {
+      const chance = (h.vaccinatedUntil > day) ? CONFIG.SICK_CHANCE_WITH_VACCINE : baseSickChance;
+      if (Math.random() < chance) {
+        h.health = 'unwell';
+        h.sickDay = day;
+        notify("🤧 A hen is feeling unwell! Give home medicine (₹" + CONFIG.SELF_MEDICINE_COST + ") quickly!");
+      }
+    }
+    // Unwell → sick if untreated for UNWELL_DAYS
+    else if (h.health === 'unwell') {
+      if (day - h.sickDay >= CONFIG.UNWELL_DAYS) {
+        h.health = 'sick';
+        h.sickDay = day; // reset for sick timer
+        stats.hensSick++;
+        notify("🤒 An unwell hen got SICK! Call doctor (₹" + CONFIG.DOCTOR_FEE + ") or she dies in " + CONFIG.SICK_DEATH_DAYS + " days!");
+      }
+    }
+    // Sick → healing (treated) or death (untreated)
+    else if (h.health === 'sick') {
+      if (h.treated) {
+        money -= CONFIG.MEDICINE_PER_DAY;
+        stats.totalMedicineSpent += CONFIG.MEDICINE_PER_DAY;
+        const healDuration = dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? CONFIG.SICK_DURATION_DIRTY : CONFIG.SICK_DURATION_CLEAN;
+        if (day - h.sickDay >= healDuration) {
+          h.health = 'healthy';
+          h.treated = false;
+          notify("🎉 A hen recovered!");
+        }
+      } else {
+        if (day - h.sickDay >= CONFIG.SICK_DEATH_DAYS) {
+          h.alive = false;
+          sndDeath();
+          stats.hensDiedUntreated++;
+          floatText(h.el, '💀 Died!', '#ff4444');
+          setTimeout(() => { h.el.remove(); hens = hens.filter(x => x.id !== h.id); updateHUD(); }, 2000);
+        }
+      }
+    }
+    // Healing stage (from self-medicine success)
+    else if (h.health === 'healing') {
+      if (day - h.sickDay >= 2) { // 2 days to recover from unwell with home remedy
+        h.health = 'healthy';
+        notify("🎉 Home remedy worked! Hen is healthy again!");
+      }
+    }
+  });
+
+  // Daily stats tracking
+  if (dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD) stats.daysWithDirtyFarm++;
+  if (dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD) stats.timesDirtWasFilthy++;
+  if (hens.some(h => h.alive && h.health !== 'healthy')) stats.daysWithSickHens++;
+  if (money < 0) stats.daysNegativeMoney++;
+  stats.maxHensAtOnce = Math.max(stats.maxHensAtOnce, hens.filter(h=>h.alive).length);
+  stats.maxMoney = Math.max(stats.maxMoney, money);
+
+  // Track money for graph
+  moneyHistory.push(money);
+
+  // Check bankruptcy
+  if (money < 0 && aliveHens.length === 0 && eggs.length === 0 && chicks.length === 0) {
+    gameOver();
+    return;
+  }
+
+  updateHUD();
+  drawMoneyGraph();
+}
+
+function layEgg(hen) {
+  sndEgg();
+  const eggId = nextId++;
+  const el = document.createElement('div');
+  el.className = 'tray-egg';
+  el.innerHTML = svgEgg();
+  el.onclick = () => eggAction(egg);
+  document.getElementById('egg-tray').appendChild(el);
+
+  const egg = { id: eggId, x: 0, y: 0, henId: hen.id, hatching: false, hatchDay: 0, collected: true, el };
+  eggs.push(egg);
+  basketEggCount++;
+  document.getElementById('basket-count').textContent = basketEggCount + ' egg' + (basketEggCount !== 1 ? 's' : '');
+
+  updateHUD();
+}
+
+
+function eggAction(egg) {
+  if (!gameRunning || egg.hatching) return;
+  // Click egg in tray — hatch it
+  egg.hatching = true;
+  stats.eggsHatched++;
+  egg.hatchDay = day + HATCH_DAYS;
+  egg.el.classList.add('hatching');
+  egg.el.onclick = null;
+  const timer = document.createElement('div');
+  timer.className = 'te-timer';
+  timer.textContent = HATCH_DAYS + 'd';
+  egg.el.appendChild(timer);
+  basketEggCount = Math.max(0, basketEggCount - 1);
+  sndHatch();
+  notify("🥚 Hatching! Ready in " + HATCH_DAYS + " days. Click eggs in tray to hatch more!");
+  updateHUD();
+}
+
+function hatchEgg(egg) {
+  sndHatch();
+  floatText(egg.el, '🐣 HATCHED!', '#FFD700');
+  egg.el.remove();
+  eggs = eggs.filter(e => e.id !== egg.id);
+
+  // Create chick tile in grid
+  const chickId = nextId++;
+  const el = document.createElement('div');
+  el.className = 'hen-tile young';
+  el.style.borderColor = 'rgba(255,235,59,0.4)';
+  el.innerHTML = '<div class="ht-body">' + svgChick() + '</div><div class="ht-age">0d</div><div class="ht-status" style="color:#FFEB3B">🐤 Growing</div>';
+  document.getElementById('hen-grid').appendChild(el);
+
+  const chick = { id: chickId, x: 0, bornDay: day, el };
+  chicks.push(chick);
+  notify("🐣 A chick hatched! It'll grow in " + CHICK_GROW_DAYS + " days");
+  updateHUD();
+}
+
+function growChick(chick) {
+  // Check farm capacity
+  const aliveHens = hens.filter(h => h.alive).length;
+  if (aliveHens >= farmCapacity) {
+    notify("🏠 Farm full! Upgrade or sell a hen first.");
+    return;
+  }
+
+  sndHatch();
+  floatText(chick.el, '🐔 READY!', '#FFD700');
+  chick.el.remove();
+  chicks = chicks.filter(c => c.id !== chick.id);
+
+  // Add as hen
+  addHenToFarm(chick.x);
+  notify("🐔 A chick grew into a hen! More eggs coming!");
+  updateHUD();
+}
+
+function addHenToFarm(x) {
+  const henId = nextId++;
+  const el = document.createElement('div');
+  el.className = 'hen-tile young';
+  el.innerHTML = '<div class="ht-body">' + svgHen() + '</div><div class="ht-age">0d</div><div class="ht-status">🟢 Young</div>';
+  el.onclick = () => henInfo(hen);
+  document.getElementById('hen-grid').appendChild(el);
+
+  const hen = { id: henId, x: 0, hungryDays: 0, alive: true, bornDay: day,
+    health: 'healthy', // healthy, unwell, sick, healing
+    sickDay: 0, treated: false, vaccinatedUntil: 0, el };
+  hens.push(hen);
+  totalHensOwned++;
+  return hen;
+}
+
+function killHen(hen) {
+  hen.alive = false;
+  hen.el.classList.add('dead');
+  hen.el.classList.remove('hungry');
+  sndDeath();
+  floatText(hen.el, '💀 DIED!', '#ff4444');
+  stats.hensStarved++;
+  notify("💀 A hen starved! Buy food to keep them alive!");
+  setTimeout(() => {
+    hen.el.remove();
+    hens = hens.filter(h => h.id !== hen.id);
+    updateHUD();
+  }, 2000);
+}
+
+function henInfo(hen) {
+  if (!hen.alive) return;
+  const age = day - hen.bornDay;
+  let ageStatus, layStatus;
+  if (age <= CONFIG.HEN_PEAK_LAYING_AGE) {
+    ageStatus = '🟢 Young (' + age + 'd)';
+    layStatus = '1 egg/day';
+  } else if (age <= CONFIG.HEN_OLD_AGE) {
+    ageStatus = '🟡 Declining (' + age + 'd)';
+    layStatus = '~50% egg/day';
+  } else {
+    ageStatus = '🔴 OLD (' + age + 'd) — NOT LAYING';
+    layStatus = 'No eggs! Sell for ₹' + CONFIG.OLD_HEN_SELL_PRICE;
+  }
+  const foodStatus = foodDaysLeft > 0 ? '😊 Fed' : '😰 Hungry (' + hen.hungryDays + '/3)';
+  notify(`🐔 ${ageStatus} | ${layStatus} | ${foodStatus}`);
+}
+
+// ============================================================
+//  SHOP ACTIONS
+// ============================================================
+
+function toggleAutoSell() {
+  autoSell = !autoSell;
+  document.getElementById('autosell-display').textContent = autoSell ? 'ON' : 'OFF';
+  document.getElementById('autosell-btn').style.borderColor = autoSell ? '#4ade80' : 'rgba(255,179,71,0.3)';
+  notify(autoSell ? '🥚 Auto-sell ON — eggs sold each day!' : '🥚 Auto-sell OFF');
+}
+
+function toggleSpeed() {
+  if (!gameRunning) return;
+  speedMultiplier = speedMultiplier === 1 ? 10 : 1;
+  document.getElementById('speed-display').textContent = speedMultiplier + 'x';
+  document.getElementById('speed-btn').style.borderColor = speedMultiplier === 10 ? '#ff4444' : 'rgba(255,179,71,0.3)';
+  // Restart day timer with new speed
+  clearInterval(dayTimer);
+  dayTimer = setInterval(() => { if (gameRunning) advanceDay(); }, DAY_MS / speedMultiplier);
+  notify(speedMultiplier === 10 ? '⏩ FAST MODE! 10x speed' : '▶️ Normal speed');
+}
+
+function toggleShop() { /* shop always visible in sidebar */ }
+
+function updateDirtVisual() {
+  const overlay = document.getElementById('dirt-overlay');
+  overlay.className = '';
+  if (dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD) overlay.className = 'filthy';
+  else if (dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD) overlay.className = 'dirty';
+  else if (dirtLevel >= 15) overlay.className = 'very-dirty';
+
+  // Add/remove dirt particles
+  const existing = overlay.querySelectorAll('.dirt-particle').length;
+  const target = Math.floor(dirtLevel / 5);
+  const dirtEmojis = ['💩','🪶','🦟','🐛','🪳'];
+  if (existing < target) {
+    for (let i = existing; i < target; i++) {
+      const p = document.createElement('div');
+      p.className = 'dirt-particle';
+      p.textContent = dirtEmojis[Math.floor(Math.random() * dirtEmojis.length)];
+      p.style.left = Math.random() * 90 + '%';
+      p.style.top = Math.random() * 80 + '%';
+      p.style.fontSize = (10 + Math.random() * 10) + 'px';
+      p.style.opacity = 0.3 + (dirtLevel / 200);
+      overlay.appendChild(p);
+    }
+  } else if (existing > target) {
+    const particles = overlay.querySelectorAll('.dirt-particle');
+    for (let i = target; i < existing; i++) particles[i].remove();
+  }
+}
+
+function getCleaningCost() {
+  // Base ₹20, scales with dirt: ₹20 at 10%, ₹60 at 50%, ₹100 at 100%
+  return Math.round(CONFIG.CLEANING_COST + (dirtLevel / 100) * CONFIG.CLEANING_COST * 4);
+}
+
+function cleanFarm() {
+  if (!gameRunning) return;
+  if (dirtLevel <= 5) { notify("✨ Farm is already clean!"); return; }
+  const cost = getCleaningCost();
+  if (money < cost) { sndError(); notify("❌ Need ₹" + cost + " for cleaning!"); return; }
+  money -= cost;
+  stats.timesCleanedFarm++;
+  stats.totalCleaningSpent += cost;
+  const oldDirt = Math.round(dirtLevel);
+  dirtLevel = 0;
+  sndBuy();
+  updateDirtVisual();
+  notify("✨ Cleaned " + oldDirt + "% dirt for ₹" + cost + "! Clean early = cheaper!");
+  updateHUD();
+}
+
+function giveMedicine() {
+  if (!gameRunning) return;
+  const unwellHens = hens.filter(h => h.alive && h.health === 'unwell');
+  if (unwellHens.length === 0) { notify("✅ No unwell hens to treat!"); return; }
+  const cost = unwellHens.length * CONFIG.SELF_MEDICINE_COST;
+  if (money < cost) { sndError(); notify("❌ Need ₹" + cost + " for home medicine!"); return; }
+  money -= cost;
+  let cured = 0, failed = 0;
+  unwellHens.forEach(h => {
+    if (Math.random() < CONFIG.SELF_MEDICINE_CURE) {
+      h.health = 'healing';
+      h.sickDay = day;
+      cured++;
+    } else {
+      failed++;
+    }
+  });
+  sndBuy();
+  if (failed > 0) notify("💊 Treated " + unwellHens.length + ": " + cured + " cured, " + failed + " still unwell (may need doctor!)");
+  else notify("💊 Home remedy worked on all " + cured + " hens!");
+  updateHUD();
+}
+
+function callDoctor() {
+  if (!gameRunning) return;
+  const sickHens = hens.filter(h => h.alive && h.health === 'sick' && !h.treated);
+  if (sickHens.length === 0) {
+    const healing = hens.filter(h => h.alive && (h.health === 'sick' && h.treated)).length;
+    const unwell = hens.filter(h => h.alive && h.health === 'unwell').length;
+    if (unwell > 0) notify("🤧 " + unwell + " unwell — try Home Medicine first (₹" + CONFIG.SELF_MEDICINE_COST + " each)!");
+    else if (healing > 0) notify("💊 " + healing + " hens already being treated!");
+    else notify("✅ All hens are healthy!");
+    return;
+  }
+  if (money < CONFIG.DOCTOR_FEE) { sndError(); notify("❌ Need ₹" + CONFIG.DOCTOR_FEE + " for doctor!"); return; }
+  money -= CONFIG.DOCTOR_FEE;
+  stats.doctorCalls++;
+  stats.totalDoctorSpent += CONFIG.DOCTOR_FEE;
+  sickHens.forEach(h => { h.treated = true; });
+  sndBuy();
+  const healDur = dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? CONFIG.SICK_DURATION_DIRTY : CONFIG.SICK_DURATION_CLEAN;
+  notify("👨‍⚕️ Doctor treating " + sickHens.length + " hen(s)! ₹" + CONFIG.MEDICINE_PER_DAY + "/day for ~" + healDur + " days" + (healDur > CONFIG.SICK_DURATION_CLEAN ? " (clean farm = faster!)" : ""));
+  updateHUD();
+}
+
+function buyAutoCleaner() {
+  if (!gameRunning) return;
+  if (hasAutoCleaner) { notify("✅ Auto-cleaner already installed!"); return; }
+  if (money < CONFIG.AUTO_CLEANER_COST) { sndError(); notify("❌ Need ₹" + CONFIG.AUTO_CLEANER_COST.toLocaleString() + " for auto-cleaner!"); return; }
+  money -= CONFIG.AUTO_CLEANER_COST;
+  hasAutoCleaner = true;
+  sndUpgrade();
+  notify("🤖 Auto-cleaner installed! Runs daily for ₹" + CONFIG.AUTO_CLEANER_DAILY + "/day. Farm stays clean!");
+  updateHUD();
+}
+
+function vaccinateHens() {
+  if (!gameRunning) return;
+  const unvaccinated = hens.filter(h => h.alive && h.health === 'healthy' && h.vaccinatedUntil <= day);
+  if (unvaccinated.length === 0) { notify("✅ All healthy hens are vaccinated!"); return; }
+  const cost = unvaccinated.length * CONFIG.VACCINE_COST_PER_HEN;
+  if (money < cost) { sndError(); notify("❌ Need ₹" + cost + " to vaccinate " + unvaccinated.length + " hens!"); return; }
+  money -= cost;
+  unvaccinated.forEach(h => { h.vaccinatedUntil = day + CONFIG.VACCINE_DURATION; });
+  sndBuy();
+  notify("💉 Vaccinated " + unvaccinated.length + " hens! Protected for " + CONFIG.VACCINE_DURATION + " days. Sickness chance drops to " + (CONFIG.SICK_CHANCE_WITH_VACCINE * 100) + "%!");
+  updateHUD();
+}
+
+function buyHen() {
+  try {
+    if (!gameRunning) { notify("⚠️ Start the game first!"); return; }
+    if (money < HEN_COST) { sndError(); notify("❌ Need ₹" + HEN_COST + " to buy a hen! You have ₹" + money); return; }
+    const aliveHens = hens.filter(h => h.alive).length;
+    if (aliveHens >= farmCapacity) { sndError(); notify("🏠 Farm is full! (" + aliveHens + "/" + farmCapacity + ") Upgrade first."); return; }
+
+    money -= HEN_COST;
+    sndBuy();
+    const hen = addHenToFarm();
+    floatText(hen.el, '🐔 NEW HEN!', '#FFD700');
+    notify("🐔 Bought a hen for ₹" + HEN_COST + "! Money left: ₹" + money);
+    updateHUD();
+  } catch(e) { console.error('buyHen error:', e); notify("⚠️ Error: " + e.message); }
+}
+
+function sellEggs() {
+  const unsold = eggs.filter(e => !e.hatching);
+  if (unsold.length === 0) { sndError(); notify("❌ No eggs to sell!"); return; }
+
+  const earnings = unsold.length * EGG_PRICE;
+  money += earnings;
+  totalEarned += earnings;
+  totalEggsSold += unsold.length;
+  sndSell();
+
+  unsold.forEach(e => { if (e.el && e.el.parentNode) e.el.remove(); });
+  eggs = eggs.filter(e => e.hatching);
+  basketEggCount = 0;
+
+  notify(`💰 Sold ${unsold.length} eggs for ₹${earnings}!`);
+  updateHUD();
+}
+
+function sellChicken() {
+  const aliveHens = hens.filter(h => h.alive);
+  if (aliveHens.length === 0) { sndError(); notify("❌ No hens to sell!"); return; }
+
+  // Sell oldest hen first (prioritize old non-laying hens)
+  aliveHens.sort((a, b) => a.bornDay - b.bornDay);
+  const hen = aliveHens[0];
+  const age = day - hen.bornDay;
+  const isOld = age >= CONFIG.HEN_OLD_AGE;
+  const price = isOld ? CONFIG.OLD_HEN_SELL_PRICE : CHICKEN_SELL_PRICE;
+
+  money += price;
+  totalEarned += price;
+  sndSell();
+  floatText(hen.el, '+₹' + price + (isOld ? ' 👵' : ' 🍗'), '#00ff00');
+  hen.el.remove();
+  hens = hens.filter(h => h.id !== hen.id);
+
+  stats.hensSold++;
+  if (isOld) stats.oldHensSold++;
+  const label = isOld ? '👵 Sold old hen for ₹' + price + ' (not laying)' : '🍗 Sold hen for ₹' + price + '!';
+  notify(label);
+  updateHUD();
+}
+
+function rentFarm() {
+  try {
+    if (!gameRunning) return;
+    const nextIdx = farmIndex + 1;
+    if (nextIdx >= FARMS.length) { sndError(); notify("🏆 You have the biggest farm!"); return; }
+    const next = FARMS[nextIdx];
+    farmIndex = nextIdx;
+    farmOwned = false;
+    farmCapacity = next.cap;
+    updateFarmVisuals();
+    sndUpgrade();
+    notify(next.emoji + " Rented " + next.name + "! " + next.cap + " hens. Rent: ₹" + next.rent + "/day");
+    floatText(document.getElementById('hud'), next.emoji + ' RENTED!', '#ffaa44');
+    updateFarmShopDisplay();
+    updateHUD();
+  } catch(e) { console.error('rentFarm error:', e); notify("⚠️ Error: " + e.message); }
+}
+
+function buyFarm() {
+  try {
+    if (!gameRunning) return;
+    const farm = FARMS[farmIndex];
+    if (farmIndex === 0) { sndError(); notify("🏡 Backyard is already yours!"); return; }
+    if (farmOwned) { sndError(); notify("✅ You already own " + farm.name + "!"); return; }
+    if (money < farm.buy) { sndError(); notify("❌ Need ₹" + farm.buy.toLocaleString() + " to buy " + farm.name + "!"); return; }
+    money -= farm.buy;
+    farmOwned = true;
+    sndUpgrade();
+    notify(farm.emoji + " You now OWN " + farm.name + "! No more rent! Saved ₹" + farm.rent + "/day");
+    floatText(document.getElementById('hud'), farm.emoji + ' BOUGHT!', '#4ade80');
+    updateFarmShopDisplay();
+    updateHUD();
+  } catch(e) { console.error('buyFarm error:', e); notify("⚠️ Error: " + e.message); }
+}
+
+function updateFarmShopDisplay() {
+  const nextIdx = farmIndex + 1;
+  if (nextIdx < FARMS.length) {
+    const next = FARMS[nextIdx];
+    document.getElementById('rent-cost').textContent = '₹' + next.rent.toLocaleString() + '/day';
+    document.getElementById('rent-desc').textContent = next.emoji + ' ' + next.name + ' — ' + next.cap + ' hens';
+  } else {
+    document.getElementById('rent-cost').textContent = 'MAX';
+    document.getElementById('rent-desc').textContent = 'Biggest farm reached!';
+  }
+  const farm = FARMS[farmIndex];
+  if (farmIndex === 0 || farmOwned) {
+    document.getElementById('buy-cost').textContent = farmOwned ? 'OWNED ✅' : 'FREE';
+    document.getElementById('buy-desc').textContent = farmOwned ? 'No rent to pay!' : 'Your backyard';
+  } else {
+    document.getElementById('buy-cost').textContent = '₹' + farm.buy.toLocaleString();
+    document.getElementById('buy-desc').textContent = 'Own ' + farm.name + ' — save ₹' + farm.rent + '/day rent';
+  }
+}
+
+// ============================================================
+//  BANK LOAN
+// ============================================================
+
+// EMI = P * r * (1+r)^n / ((1+r)^n - 1)
+function calcDailyEMI(principal, dailyRate, tenureDays) {
+  if (principal <= 0 || dailyRate <= 0) return 0;
+  const r = dailyRate;
+  const n = tenureDays;
+  const factor = Math.pow(1 + r, n);
+  return principal * r * factor / (factor - 1);
+}
+
+function getMaxLoan() {
+  return CONFIG.LOAN_MAX_PER_LEVEL * (farmIndex + 1);
+}
+
+function takeLoan() {
+  try {
+    if (!gameRunning) return;
+    const maxLoan = getMaxLoan();
+    const available = maxLoan - loanAmount;
+    if (available <= 0) { sndError(); notify("🏦 Max loan reached! (₹" + maxLoan.toLocaleString() + ")"); return; }
+
+    const amounts = [500, 1000, 2000, 5000, 10000].filter(a => a <= available);
+    if (amounts.length === 0) { sndError(); notify("🏦 Loan limit reached!"); return; }
+
+    // Simple prompt for amount
+    const input = prompt(
+      "🏦 BANK LOAN\n\n" +
+      "Interest: 12% per annum (₹" + (DAILY_INTEREST_RATE * 100).toFixed(3) + "% daily)\n" +
+      "Current debt: ₹" + Math.round(loanAmount + loanInterestAccrued).toLocaleString() + "\n" +
+      "Max available: ₹" + available.toLocaleString() + "\n\n" +
+      "Enter loan amount (₹" + CONFIG.LOAN_MIN + " - ₹" + available.toLocaleString() + "):"
+    );
+    if (!input) return;
+
+    const amount = parseInt(input);
+    if (isNaN(amount) || amount < CONFIG.LOAN_MIN || amount > available) {
+      sndError();
+      notify("❌ Invalid amount! Min ₹" + CONFIG.LOAN_MIN + ", Max ₹" + available.toLocaleString());
+      return;
+    }
+
+    loanAmount += amount;
+    stats.totalLoanTaken += amount;
+    money += amount;
+    // Recalculate EMI for total outstanding loan
+    dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
+    sndBuy();
+    notify("🏦 Loan ₹" + amount.toLocaleString() + "! EMI: ₹" + dailyEMI.toFixed(2) + "/day for " + CONFIG.LOAN_TENURE_DAYS + " days");
+    floatText(document.getElementById('hud'), '+₹' + amount.toLocaleString() + ' 🏦', '#60A5FA');
+    updateHUD();
+  } catch(e) { console.error('takeLoan error:', e); }
+}
+
+function repayLoan() {
+  try {
+    if (!gameRunning) return;
+    const totalDebt = Math.round(loanAmount + loanInterestAccrued);
+    if (totalDebt <= 0) { sndError(); notify("✅ No loan to repay!"); return; }
+
+    const input = prompt(
+      "💸 REPAY LOAN\n\n" +
+      "Total debt: ₹" + totalDebt.toLocaleString() + "\n" +
+      "  Principal: ₹" + Math.round(loanAmount).toLocaleString() + "\n" +
+      "  Interest: ₹" + Math.round(loanInterestAccrued).toLocaleString() + "\n" +
+      "Your money: ₹" + money.toLocaleString() + "\n\n" +
+      "Enter repayment amount (or 'all'):"
+    );
+    if (!input) return;
+
+    let repay;
+    if (input.toLowerCase() === 'all') {
+      repay = Math.min(totalDebt, money);
+    } else {
+      repay = parseInt(input);
+    }
+
+    if (isNaN(repay) || repay <= 0) { sndError(); notify("❌ Invalid amount!"); return; }
+    if (repay > money) { sndError(); notify("❌ You only have ₹" + money.toLocaleString() + "!"); return; }
+    repay = Math.min(repay, totalDebt);
+
+    money -= repay;
+    // Pay interest first, then principal
+    if (repay <= loanInterestAccrued) {
+      loanInterestAccrued -= repay;
+    } else {
+      repay -= loanInterestAccrued;
+      loanInterestAccrued = 0;
+      loanAmount -= repay;
+      if (loanAmount < 0) loanAmount = 0;
+    }
+
+    // Recalculate EMI on remaining principal
+    dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
+    sndSell();
+    const remaining = Math.round(loanAmount + loanInterestAccrued);
+    if (remaining <= 0) {
+      dailyEMI = 0;
+      notify("🎉 Loan fully repaid! You're debt-free!");
+    } else {
+      notify("💸 Repaid! Remaining: ₹" + remaining.toLocaleString() + " | New EMI: ₹" + dailyEMI.toFixed(2) + "/day");
+    }
+    updateHUD();
+  } catch(e) { console.error('repayLoan error:', e); }
+}
+
+// ============================================================
+//  UI UPDATES
+// ============================================================
+
+function updateHUD() {
+  document.getElementById('money-display').textContent = '₹' + money.toLocaleString();
+  document.getElementById('day-display').textContent = day;
+  document.getElementById('hen-display').textContent = hens.filter(h=>h.alive).length;
+  document.getElementById('egg-display').textContent = eggs.filter(e=>!e.hatching).length;
+  document.getElementById('chick-display').textContent = chicks.length;
+
+  // Money color
+  const md = document.getElementById('money-display');
+  md.style.color = money < 50 ? '#ff4444' : money < 200 ? '#ffaa44' : '#FFD700';
+
+  // Farm info
+  document.getElementById('fi-cap').textContent = hens.filter(h=>h.alive).length + ' / ' + farmCapacity;
+  const henCount = hens.filter(h=>h.alive).length;
+  const dailyHenFood = henCount * FOOD_COST_PER_HEN;
+  const dailyChickFood = chicks.length * FOOD_COST_PER_CHICK;
+  const dailyFood = dailyHenFood + dailyChickFood;
+  const dailyMaint = henCount * MAINTENANCE_PER_HEN;
+  const dailyRent = (!farmOwned && farmIndex > 0) ? FARMS[farmIndex].rent : 0;
+  const dailyTotal = dailyFood + dailyMaint + dailyRent;
+  document.getElementById('fi-food').textContent = '₹' + dailyFood + (chicks.length ? ' (🐔' + dailyHenFood + ' + 🐤' + dailyChickFood + ')' : '');
+  document.getElementById('fi-food').style.color = money < dailyFood ? '#ff4444' : '#FFD700';
+  document.getElementById('fi-cost').textContent = '₹' + dailyMaint;
+  document.getElementById('fi-total-cost').textContent = '₹' + dailyTotal + (dailyRent ? ' (incl ₹' + dailyRent + ' rent)' : '');
+  document.getElementById('fi-total-cost').style.color = money < dailyTotal ? '#ff4444' : '#FFD700';
+  document.getElementById('fi-eggs').textContent = eggs.filter(e=>!e.hatching).length;
+  document.getElementById('fi-hatch').textContent = eggs.filter(e=>e.hatching).length;
+  const farm = FARMS[farmIndex];
+  document.getElementById('fi-farm').textContent = farm.emoji + ' ' + farm.name;
+  document.getElementById('fi-owned').textContent = (farmIndex === 0 || farmOwned) ? 'Owned' : 'Renting';
+  document.getElementById('fi-owned').style.color = (farmIndex === 0 || farmOwned) ? '#4ade80' : '#ffaa44';
+  document.getElementById('fi-rent').textContent = (!farmOwned && farmIndex > 0) ? '₹' + farm.rent + '/day' : '₹0';
+  document.getElementById('fi-rent').style.color = (!farmOwned && farmIndex > 0) ? '#ff6666' : '#4ade80';
+
+  // Loan display
+  const totalDebt = Math.round(loanAmount + loanInterestAccrued);
+  document.getElementById('loan-display').textContent = totalDebt > 0 ? '₹' + totalDebt.toLocaleString() : '₹0';
+  document.getElementById('loan-display').style.color = totalDebt > 0 ? '#ff6666' : '#4ade80';
+  document.getElementById('fi-loan').textContent = totalDebt > 0 ? '₹' + totalDebt.toLocaleString() : '₹0';
+  document.getElementById('fi-interest').textContent = dailyEMI > 0 ? '₹' + dailyEMI.toFixed(2) : '₹0';
+  if (dailyEMI > 0 && loanAmount > 0) {
+    const diRate = (loanAmount + loanInterestAccrued) * DAILY_INTEREST_RATE;
+    document.getElementById('fi-emi-princ').textContent = '₹' + Math.max(0, dailyEMI - diRate).toFixed(2);
+    document.getElementById('fi-emi-int').textContent = '₹' + diRate.toFixed(2);
+    document.getElementById('fi-princ-left').textContent = '₹' + Math.round(loanAmount).toLocaleString();
+  } else {
+    document.getElementById('fi-emi-princ').textContent = '₹0';
+    document.getElementById('fi-emi-int').textContent = '₹0';
+    document.getElementById('fi-princ-left').textContent = '₹0';
+  }
+  document.getElementById('loan-outstanding').textContent = totalDebt > 0 ? 'Debt: ₹' + totalDebt.toLocaleString() + ' | EMI: ₹' + dailyEMI.toFixed(2) + '/day' : 'No loan';
+  document.getElementById('loan-limit-desc').textContent = 'Max ₹' + getMaxLoan().toLocaleString() + ' | ' + CONFIG.LOAN_TENURE_DAYS + ' day tenure';
+
+  updatePnL();
+
+  // Hen grid auto-sizing — smooth shrink as farm grows
+  const totalBirds = hens.filter(h=>h.alive).length + chicks.length;
+  const grid = document.getElementById('hen-grid');
+  grid.classList.remove('hen-grid-xs','hen-grid-sm','hen-grid-md','hen-grid-lg','hen-grid-xl');
+  if (totalBirds <= 5) grid.classList.add('hen-grid-xs');
+  else if (totalBirds <= 15) grid.classList.add('hen-grid-sm');
+  else if (totalBirds <= 35) grid.classList.add('hen-grid-md');
+  else if (totalBirds <= 70) grid.classList.add('hen-grid-lg');
+  else grid.classList.add('hen-grid-xl');
+
+  // Dirt display
+  const dirtDesc = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? '💩 FILTHY!' :
+                   dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? '🟡 Dirty' :
+                   dirtLevel >= 15 ? '🟠 Messy' : '✨ Clean';
+  document.getElementById('dirt-display').textContent = dirtDesc + ' (' + Math.round(dirtLevel) + '%)';
+  document.getElementById('clean-cost').textContent = dirtLevel <= 5 ? 'Clean!' : '₹' + getCleaningCost();
+  document.getElementById('autocleaner-cost').textContent = hasAutoCleaner ? 'INSTALLED ✅' : '₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString();
+  document.getElementById('autocleaner-desc').textContent = hasAutoCleaner ? 'Running! ₹' + CONFIG.AUTO_CLEANER_DAILY + '/day' : 'Auto-clean daily (₹' + CONFIG.AUTO_CLEANER_DAILY + '/day)';
+  const vaccinated = hens.filter(h => h.alive && h.vaccinatedUntil > day).length;
+  document.getElementById('vaccine-desc').textContent = vaccinated > 0 ? '💉 ' + vaccinated + ' vaccinated' : 'Protect for ' + CONFIG.VACCINE_DURATION + ' days';
+
+  // Sick display
+  const unwellCount = hens.filter(h => h.alive && h.health === 'unwell').length;
+  const sickUntreatedCount = hens.filter(h => h.alive && h.health === 'sick' && !h.treated).length;
+  const healingCount = hens.filter(h => h.alive && (h.health === 'healing' || (h.health === 'sick' && h.treated))).length;
+  let sickText = '';
+  if (unwellCount > 0) sickText += '🤧 ' + unwellCount + ' unwell ';
+  if (sickUntreatedCount > 0) sickText += '🤒 ' + sickUntreatedCount + ' SICK! ';
+  if (healingCount > 0) sickText += '💊 ' + healingCount + ' healing';
+  if (!sickText) sickText = '✅ All healthy';
+  document.getElementById('sick-display').textContent = sickText;
+
+  // Sick bay — only truly sick/healing hens go to sick bay, unwell stay in grid
+  const sickBay = document.getElementById('sick-bay');
+  const sickBayArea = document.getElementById('sick-bay-hens');
+  const inSickBay = hens.filter(h => h.alive && h.health === 'sick');
+  sickBay.style.display = inSickBay.length > 0 ? 'block' : 'none';
+  inSickBay.forEach(h => {
+    if (h.el.parentNode !== sickBayArea) sickBayArea.appendChild(h.el);
+  });
+  // Move recovered/unwell hens back to grid
+  hens.forEach(h => {
+    if (h.alive && h.health !== 'sick' && h.el.parentNode === sickBayArea) {
+      grid.appendChild(h.el);
+    }
+  });
+
+  // Update hen tiles
+  hens.forEach(h => {
+    if (!h.alive) return;
+    const age = day - h.bornDay;
+    const ageEl = h.el.querySelector('.ht-age');
+    const statusEl = h.el.querySelector('.ht-status');
+    if (ageEl) ageEl.textContent = age + 'd';
+
+    // Remove old classes
+    h.el.classList.remove('young', 'declining', 'old', 'sick', 'hungry', 'unwell', 'in-sick-bay', 'healing', 'vaccinated');
+
+    // Vaccination badge
+    if (h.vaccinatedUntil > day) h.el.classList.add('vaccinated');
+
+    // Health state takes priority over age
+    if (h.health === 'unwell') {
+      h.el.classList.add('unwell');
+      if (statusEl) statusEl.textContent = '🤧 Unwell!';
+    } else if (h.health === 'sick' && !h.treated) {
+      h.el.classList.add('in-sick-bay');
+      if (statusEl) statusEl.textContent = '🤒 SICK!';
+    } else if (h.health === 'sick' && h.treated) {
+      h.el.classList.add('healing');
+      const healDur = dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? CONFIG.SICK_DURATION_DIRTY : CONFIG.SICK_DURATION_CLEAN;
+      const daysLeft = Math.max(0, healDur - (day - h.sickDay));
+      if (statusEl) statusEl.textContent = '💊 ' + daysLeft + 'd left';
+    } else if (h.health === 'healing') {
+      h.el.classList.add('healing');
+      if (statusEl) statusEl.textContent = '🩹 Resting';
+    } else if (h.hungryDays > 0) {
+      h.el.classList.add('hungry');
+      if (statusEl) statusEl.textContent = '😰 Hungry!';
+    } else if (age >= CONFIG.HEN_OLD_AGE) {
+      h.el.classList.add('old');
+      if (statusEl) statusEl.textContent = '🔴 No eggs!';
+    } else if (age >= CONFIG.HEN_PEAK_LAYING_AGE) {
+      h.el.classList.add('declining');
+      if (statusEl) statusEl.textContent = '🟡 50% eggs';
+    } else {
+      h.el.classList.add('young');
+      if (statusEl) statusEl.textContent = '🟢 1 egg/day';
+    }
+  });
+
+  // Update egg & chick labels
+  eggs.forEach(e => {
+    const label = e.el.querySelector('.egg-label');
+    if (!label) return;
+    if (e.hatching) {
+      const left = Math.max(0, e.hatchDay - day);
+      label.className = 'egg-label ' + (left <= 1 ? 'ready' : 'hatch');
+      label.textContent = left <= 0 ? '🐣 READY!' : '🐣 ' + left + ' days';
+    }
+  });
+  // Update chick tiles
+  chicks.forEach(c => {
+    const left = Math.max(0, CHICK_GROW_DAYS - (day - c.bornDay));
+    const ageEl = c.el.querySelector('.ht-age');
+    const statusEl = c.el.querySelector('.ht-status');
+    if (ageEl) ageEl.textContent = (day - c.bornDay) + 'd';
+    if (statusEl) statusEl.textContent = left <= 0 ? '🐔 Ready!' : '🐤 ' + left + 'd to grow';
+  });
+
+  // Update hatching egg timers
+  eggs.forEach(e => {
+    if (!e.hatching) return;
+    const timer = e.el.querySelector('.te-timer');
+    if (timer) timer.textContent = Math.max(0, e.hatchDay - day) + 'd';
+  });
+}
+
+function notify(msg) {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function floatText(anchor, text, color) {
+  const el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color;
+  el.style.fontSize = '20px';
+
+  const rect = anchor.getBoundingClientRect();
+  el.style.left = rect.left + rect.width/2 + 'px';
+  el.style.top = rect.top + 'px';
+
+  document.getElementById('game').appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+function updateDayNight() {
+  // Simple day/night based on sub-position within day cycle
+  const now = Date.now();
+  const phase = ((now / DAY_MS) * 2 * Math.PI) % (2 * Math.PI);
+  const nightOverlay = document.getElementById('night-overlay');
+  const celestial = document.getElementById('celestial');
+
+  const brightness = Math.sin(phase);
+  if (brightness < -0.3) {
+    nightOverlay.className = 'night';
+    celestial.textContent = '🌙';
+  } else if (brightness < 0.3) {
+    nightOverlay.className = 'dawn';
+    celestial.textContent = '🌅';
+  } else {
+    nightOverlay.className = '';
+    celestial.textContent = '☀️';
+  }
+
+  // Move celestial body
+  const xPct = ((phase / (2 * Math.PI)) * 100);
+  const yPct = 10 + 20 * (1 - Math.abs(brightness));
+  celestial.style.left = xPct + '%';
+  celestial.style.top = yPct + '%';
+}
+
+function gameOver() {
+  gameRunning = false;
+  clearInterval(dayTimer);
+  clearInterval(tickTimer);
+  sndDeath();
+
+  document.getElementById('game-over').style.display = 'flex';
+
+  // Basic stats
+  const totalDebt = Math.round(loanAmount + loanInterestAccrued);
+  document.getElementById('go-stats').innerHTML = `
+    <div>You survived <span class="gold">${day}</span> days</div>
+    <div>Final money: <span class="gold">₹${money.toLocaleString()}</span></div>
+    <div>Total earned: <span class="gold">₹${totalEarned.toLocaleString()}</span></div>
+    <div>Eggs sold: <span class="gold">${totalEggsSold}</span></div>
+    <div>Most hens: <span class="gold">${stats.maxHensAtOnce}</span></div>
+    <div>Best money: <span class="gold">₹${stats.maxMoney.toLocaleString()}</span></div>
+  `;
+
+  // Build smart report card
+  const reasons = [];
+  const tips = [];
+  const good = [];
+
+  // Analyze what went wrong
+  if (stats.hensStarved > 0) {
+    reasons.push({icon:'😰', text: stats.hensStarved + ' hens starved to death because you ran out of money for food!'});
+    tips.push({icon:'💡', text: 'Always keep enough money for food. Each hen costs ₹3/day to feed.'});
+  }
+  if (stats.hensDiedUntreated > 0) {
+    reasons.push({icon:'🤒', text: stats.hensDiedUntreated + ' sick hens died because you didn\'t call the doctor!'});
+    tips.push({icon:'💡', text: 'When a hen gets sick, call the doctor (₹150). It\'s cheaper than losing the hen (₹300 to replace)!'});
+  }
+  if (stats.daysWithDirtyFarm > day * 0.5 && day > 10) {
+    reasons.push({icon:'💩', text: 'Your farm was dirty for ' + stats.daysWithDirtyFarm + ' days! Dirty farms = sick hens + less eggs.'});
+    tips.push({icon:'💡', text: 'Clean the farm regularly! It costs only ₹30 when clean but ₹100 when filthy.'});
+  }
+  if (stats.timesDirtWasFilthy > 5) {
+    reasons.push({icon:'🤮', text: 'Farm was FILTHY ' + stats.timesDirtWasFilthy + ' times! Hens only lay 50% eggs in a filthy farm.'});
+  }
+  if (stats.totalLoanTaken > 0 && totalDebt > 0) {
+    const emiPct = stats.totalEMISpent > 0 ? Math.round(stats.totalEMISpent / (totalEarned || 1) * 100) : 0;
+    reasons.push({icon:'🏦', text: 'You borrowed ₹' + stats.totalLoanTaken.toLocaleString() + ' and still owe ₹' + totalDebt.toLocaleString() + '. EMI ate ' + emiPct + '% of your earnings!'});
+    tips.push({icon:'💡', text: 'Don\'t borrow too much! EMI payments eat your daily profit. Only borrow what your hens can pay back.'});
+  }
+  if (stats.hensDiedOldAge > 0) {
+    reasons.push({icon:'👵', text: stats.hensDiedOldAge + ' hens died of old age. You should have sold them earlier!'});
+    tips.push({icon:'💡', text: 'Sell old hens (700+ days) for ₹100 before they die. Replace with young hens that lay eggs!'});
+  }
+  if (stats.hensSick > 3 && stats.timesCleanedFarm < 3) {
+    reasons.push({icon:'🧹', text: stats.hensSick + ' hens got sick but you only cleaned ' + stats.timesCleanedFarm + ' times!'});
+    tips.push({icon:'💡', text: 'Cleaning prevents sickness. Clean farm = healthy hens = more eggs = more money!'});
+  }
+  if (totalEggsSold < day * 0.5 && day > 20) {
+    reasons.push({icon:'🥚', text: 'You only sold ' + totalEggsSold + ' eggs in ' + day + ' days. Not enough income!'});
+    tips.push({icon:'💡', text: 'Turn on AUTO SELL to sell eggs every day. Each egg = ₹6!'});
+  }
+  if (stats.eggsHatched > totalEggsSold && totalEggsSold > 0) {
+    reasons.push({icon:'🐣', text: 'You hatched ' + stats.eggsHatched + ' eggs but only sold ' + totalEggsSold + '. Hatching costs ₹150 in chick food and takes 150 days!'});
+    tips.push({icon:'💡', text: 'Balance selling and hatching. Sell most eggs for quick money, hatch a few to grow your farm slowly.'});
+  }
+  if (stats.maxHensAtOnce > farmCapacity * 0.8 && stats.totalRentSpent > totalEarned * 0.3) {
+    reasons.push({icon:'🔑', text: 'Rent cost ₹' + Math.round(stats.totalRentSpent).toLocaleString() + ' — that\'s ' + Math.round(stats.totalRentSpent/(totalEarned||1)*100) + '% of all your earnings!'});
+    tips.push({icon:'💡', text: 'If you\'re renting, try to BUY the farm. It saves rent money every day!'});
+  }
+
+  // What went right
+  if (stats.timesCleanedFarm > 5) good.push({icon:'🧹', text: 'Good job cleaning the farm ' + stats.timesCleanedFarm + ' times!'});
+  if (stats.oldHensSold > 0) good.push({icon:'👵', text: 'Smart! You sold ' + stats.oldHensSold + ' old hens before they died.'});
+  if (stats.eggsHatched > 0) good.push({icon:'🐣', text: 'You hatched ' + stats.eggsHatched + ' eggs — free hens!'});
+  if (stats.maxMoney > CONFIG.STARTING_MONEY * 3) good.push({icon:'💰', text: 'You grew your money to ₹' + stats.maxMoney.toLocaleString() + '!'});
+  if (day > 100) good.push({icon:'⏰', text: 'You survived ' + day + ' days — good effort!'});
+  if (stats.doctorCalls > 0) good.push({icon:'👨‍⚕️', text: 'You called the doctor ' + stats.doctorCalls + ' times — caring farmer!'});
+
+  // If nothing specific went wrong
+  if (reasons.length === 0) {
+    reasons.push({icon:'💸', text: 'You ran out of money! Your costs were more than your income.'});
+    tips.push({icon:'💡', text: 'Start with fewer hens, keep costs low, and grow slowly!'});
+  }
+
+  // Build HTML
+  let html = '<div style="font-family:Bangers,cursive; font-size:20px; color:#ff4444; margin-bottom:10px; text-align:center;">❌ WHY DID I FAIL?</div>';
+  reasons.forEach(r => {
+    html += '<div style="font-size:16px; color:#ffaa44; margin-bottom:8px; line-height:1.4;">' + r.icon + ' ' + r.text + '</div>';
+  });
+
+  if (good.length > 0) {
+    html += '<div style="font-family:Bangers,cursive; font-size:18px; color:#4ade80; margin:12px 0 8px; text-align:center;">✅ WHAT I DID RIGHT</div>';
+    good.forEach(g => {
+      html += '<div style="font-size:14px; color:#4ade80; margin-bottom:6px; line-height:1.3;">' + g.icon + ' ' + g.text + '</div>';
+    });
+  }
+
+  html += '<div style="font-family:Bangers,cursive; font-size:18px; color:#60A5FA; margin:12px 0 8px; text-align:center;">💡 TIPS FOR NEXT TIME</div>';
+  tips.forEach(t => {
+    html += '<div style="font-size:15px; color:#60A5FA; margin-bottom:8px; line-height:1.4;">' + t.icon + ' ' + t.text + '</div>';
+  });
+
+  // Spending breakdown
+  const totalSpent = stats.totalFoodSpent + stats.totalMaintenanceSpent + stats.totalRentSpent + stats.totalEMISpent + stats.totalCleaningSpent + stats.totalDoctorSpent + stats.totalMedicineSpent;
+  html += '<div style="font-family:Bangers,cursive; font-size:18px; color:#FFD700; margin:12px 0 8px; text-align:center;">💸 WHERE DID MY MONEY GO?</div>';
+  html += '<div style="font-size:14px; color:#ddd; line-height:1.8;">';
+  html += '🌾 Food: ₹' + Math.round(stats.totalFoodSpent).toLocaleString() + '<br>';
+  html += '🔧 Maintenance: ₹' + Math.round(stats.totalMaintenanceSpent).toLocaleString() + '<br>';
+  html += '🔑 Rent: ₹' + Math.round(stats.totalRentSpent).toLocaleString() + '<br>';
+  html += '💳 EMI: ₹' + Math.round(stats.totalEMISpent).toLocaleString() + '<br>';
+  html += '🧹 Cleaning: ₹' + Math.round(stats.totalCleaningSpent).toLocaleString() + '<br>';
+  html += '👨‍⚕️ Doctor: ₹' + Math.round(stats.totalDoctorSpent).toLocaleString() + '<br>';
+  html += '💊 Medicine: ₹' + Math.round(stats.totalMedicineSpent).toLocaleString() + '<br>';
+  html += '<b>Total spent: ₹' + Math.round(totalSpent).toLocaleString() + '</b><br>';
+  html += '<b>Total earned: ₹' + totalEarned.toLocaleString() + '</b><br>';
+  html += '</div>';
+
+  document.getElementById('go-report').innerHTML = html;
+}
+
+// ============================================================
+//  MONEY GRAPH
+// ============================================================
+function updatePnL() {
+  const hc = hens.filter(h => h.alive).length;
+  const cc = chicks.length;
+
+  // Income — broken down by hen health
+  const healthyHens = hens.filter(h => h.alive && h.health === 'healthy').length;
+  const sickUntreated = hens.filter(h => h.alive && h.health === 'sick' && !h.treated).length;
+  const sickHealing = hens.filter(h => h.alive && ((h.health === 'sick' && h.treated) || h.health === 'healing')).length;
+  const unwellHens = hens.filter(h => h.alive && h.health === 'unwell').length;
+  const dirtMult = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? 0.5 :
+                   dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? 0.8 : 1.0;
+  // Healthy hens lay (with dirt penalty), sick don't, healing don't
+  const healthyIncome = Math.round(healthyHens * EGG_PRICE * dirtMult);
+  const effectiveEggIncome = healthyIncome;
+
+  document.getElementById('pnl-healthy-count').textContent = healthyHens;
+  document.getElementById('pnl-healthy-income').textContent = '+₹' + healthyIncome;
+  document.getElementById('pnl-sick-count').textContent = sickUntreated;
+  document.getElementById('pnl-sick-income').textContent = '₹0 (no eggs)';
+  document.getElementById('pnl-healing-count').textContent = sickHealing;
+  document.getElementById('pnl-healing-income').textContent = '₹0 (resting)';
+  document.getElementById('pnl-dirt-penalty').textContent = dirtMult < 1 ? '⚠️ Dirt penalty: ' + Math.round(dirtMult*100) + '% production' : '';
+  document.getElementById('pnl-egg-income').textContent = '+₹' + effectiveEggIncome;
+  const eggIncome = effectiveEggIncome;
+
+  // Costs
+  const henFood = hc * FOOD_COST_PER_HEN;
+  const chickFood = cc * FOOD_COST_PER_CHICK;
+  const maint = hc * MAINTENANCE_PER_HEN;
+  const rent = (!farmOwned && farmIndex > 0) ? FARMS[farmIndex].rent : 0;
+  const emi = dailyEMI;
+
+  document.getElementById('pnl-hen-food').textContent = henFood > 0 ? '-₹' + henFood : '-₹0';
+  document.getElementById('pnl-chick-food').textContent = chickFood > 0 ? '-₹' + chickFood : '-₹0';
+  document.getElementById('pnl-maint').textContent = maint > 0 ? '-₹' + maint : '-₹0';
+  document.getElementById('pnl-rent').textContent = rent > 0 ? '-₹' + rent : '-₹0';
+  document.getElementById('pnl-emi').textContent = emi > 0 ? '-₹' + emi.toFixed(2) : '-₹0';
+  // EMI breakdown: interest portion = daily interest on outstanding, principal = EMI - interest
+  if (emi > 0 && loanAmount > 0) {
+    const dailyInt = (loanAmount + loanInterestAccrued) * DAILY_INTEREST_RATE;
+    const principalPortion = Math.max(0, emi - dailyInt);
+    document.getElementById('pnl-emi-principal').textContent = '-₹' + principalPortion.toFixed(2);
+    document.getElementById('pnl-emi-interest').textContent = '-₹' + dailyInt.toFixed(2);
+    document.getElementById('pnl-principal-left').textContent = '₹' + Math.round(loanAmount).toLocaleString();
+  } else {
+    document.getElementById('pnl-emi-principal').textContent = '-₹0';
+    document.getElementById('pnl-emi-interest').textContent = '-₹0';
+    document.getElementById('pnl-principal-left').textContent = '₹0';
+  }
+
+  // Medicine
+  const treatedCount = hens.filter(h => h.alive && h.sick && h.treated).length;
+  const medicineCost = treatedCount * CONFIG.MEDICINE_PER_DAY;
+  document.getElementById('pnl-medicine').textContent = medicineCost > 0 ? '-₹' + medicineCost : '-₹0';
+  const autoCleanCost = hasAutoCleaner && hens.filter(h=>h.alive).length > 0 ? CONFIG.AUTO_CLEANER_DAILY : 0;
+  document.getElementById('pnl-autocleaner').textContent = autoCleanCost > 0 ? '-₹' + autoCleanCost : '-₹0';
+
+  // Summaries
+  const totalCost = henFood + chickFood + maint + rent + emi + medicineCost + autoCleanCost;
+  const net = eggIncome - totalCost;
+  document.getElementById('pnl-total-income').textContent = '+₹' + eggIncome;
+  document.getElementById('pnl-total-cost-display').textContent = '-₹' + totalCost.toFixed(2);
+  const netEl = document.getElementById('pnl-net');
+  netEl.textContent = (net >= 0 ? '+₹' : '-₹') + Math.abs(net).toFixed(2);
+  netEl.className = 'pnl-val ' + (net >= 0 ? 'profit' : 'loss');
+
+  // Totals
+  document.getElementById('pnl-total-earned').textContent = '₹' + totalEarned.toLocaleString();
+  const totalAllSpent = Math.round(stats.totalFoodSpent + stats.totalMaintenanceSpent + stats.totalRentSpent + stats.totalEMISpent + stats.totalCleaningSpent + stats.totalDoctorSpent + stats.totalMedicineSpent);
+  document.getElementById('pnl-total-spent').textContent = '₹' + totalAllSpent.toLocaleString();
+  const avgDaily = day > 0 ? Math.round((totalEarned - totalAllSpent) / day) : 0;
+  const avgEl = document.getElementById('pnl-avg-daily');
+  avgEl.textContent = (avgDaily >= 0 ? '+₹' : '-₹') + Math.abs(avgDaily);
+  avgEl.className = 'pnl-val ' + (avgDaily >= 0 ? 'profit' : 'loss');
+  const totalDebt = Math.round(loanAmount + loanInterestAccrued);
+  document.getElementById('pnl-total-debt').textContent = totalDebt > 0 ? '₹' + totalDebt.toLocaleString() : '₹0';
+  const netWorth = money - totalDebt;
+  const nwEl = document.getElementById('pnl-net-worth');
+  nwEl.textContent = '₹' + netWorth.toLocaleString();
+  nwEl.className = 'pnl-val ' + (netWorth >= 0 ? 'profit' : 'loss');
+}
+
+let graphSize = 0; // 0=small, 1=medium, 2=large
+const GRAPH_SIZES = [
+  { w: 234, h: 130 },
+  { w: 234, h: 220 },
+  { w: 234, h: 320 },
+];
+
+function toggleGraphSize() {
+  graphSize = (graphSize + 1) % GRAPH_SIZES.length;
+  const s = GRAPH_SIZES[graphSize];
+  const canvas = document.getElementById('money-graph');
+  canvas.width = s.w;
+  canvas.height = s.h;
+  drawMoneyGraph();
+}
+
+function drawMoneyGraph() {
+  const canvas = document.getElementById('money-graph');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const data = moneyHistory;
+  if (data.length < 2) return;
+
+  // Show ALL data — shrink to fit
+  const maxVal = Math.max(...data, 100);
+  const minVal = Math.min(...data, 0);
+  const range = maxVal - minVal || 1;
+  const pad = { top: 25, bottom: 25, left: 55, right: 15 };
+  const gW = W - pad.left - pad.right;
+  const gH = H - pad.top - pad.bottom;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Y-axis grid lines + value labels
+  ctx.font = "12px 'Bangers', cursive";
+  ctx.textAlign = 'right';
+  const gridLines = 5;
+  for (let i = 0; i <= gridLines; i++) {
+    const val = maxVal - (range / gridLines) * i;
+    const y = pad.top + (gH / gridLines) * i;
+    // Grid line
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    // Label
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText('₹' + Math.round(val).toLocaleString(), pad.left - 5, y + 4);
+  }
+
+  // Zero line
+  if (minVal < 0 && maxVal > 0) {
+    const zeroY = pad.top + (maxVal / range) * gH;
+    ctx.strokeStyle = 'rgba(255,100,100,0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath(); ctx.moveTo(pad.left, zeroY); ctx.lineTo(W - pad.right, zeroY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#ff6666';
+    ctx.textAlign = 'right';
+    ctx.fillText('₹0', pad.left - 5, zeroY + 4);
+  }
+
+  // X-axis day labels
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = "11px 'Bangers', cursive";
+  const xLabelCount = Math.min(data.length, 10);
+  for (let i = 0; i < xLabelCount; i++) {
+    const idx = Math.round((data.length - 1) / (xLabelCount - 1) * i);
+    const x = pad.left + (idx / (data.length - 1)) * gW;
+    ctx.fillText('D' + idx, x, H - 5);
+  }
+
+  // Plot line
+  const stepX = gW / (data.length - 1);
+  ctx.beginPath();
+  ctx.lineWidth = 2.5;
+  data.forEach((v, i) => {
+    const x = pad.left + i * stepX;
+    const y = pad.top + ((maxVal - v) / range) * gH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  // Color: green if trending up, red if down
+  const lastVal = data[data.length - 1];
+  const lineColor = lastVal >= 0 ? '#4ade80' : '#ff4444';
+  ctx.strokeStyle = lineColor;
+  ctx.shadowColor = lineColor;
+  ctx.shadowBlur = 4;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Fill under
+  const lastX = pad.left + (data.length - 1) * stepX;
+  const lastY = pad.top + ((maxVal - lastVal) / range) * gH;
+  ctx.lineTo(lastX, pad.top + gH);
+  ctx.lineTo(pad.left, pad.top + gH);
+  ctx.closePath();
+  ctx.fillStyle = lastVal >= 0 ? 'rgba(74,222,128,0.08)' : 'rgba(255,68,68,0.08)';
+  ctx.fill();
+
+  // Key data point markers — min, max, current
+  const maxIdx = data.indexOf(Math.max(...data));
+  const minIdx = data.indexOf(Math.min(...data));
+  // Max point
+  drawMarker(ctx, pad.left + maxIdx * stepX, pad.top + ((maxVal - data[maxIdx]) / range) * gH,
+    '₹' + Math.round(data[maxIdx]).toLocaleString(), '#FFD700', 'above');
+  // Min point (if different from max)
+  if (minIdx !== maxIdx) {
+    drawMarker(ctx, pad.left + minIdx * stepX, pad.top + ((maxVal - data[minIdx]) / range) * gH,
+      '₹' + Math.round(data[minIdx]).toLocaleString(), '#ff6666', 'below');
+  }
+  // Current point
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+  ctx.fillStyle = lineColor;
+  ctx.fill();
+  ctx.font = "bold 14px 'Bangers', cursive";
+  ctx.fillStyle = lineColor;
+  ctx.textAlign = 'right';
+  ctx.fillText('₹' + Math.round(lastVal).toLocaleString(), lastX - 8, lastY - 8);
+
+  // Title with stats
+  document.getElementById('graph-title').textContent =
+    '📈 Day ' + day + ' | ₹' + Math.round(lastVal).toLocaleString() + ' (click to resize)';
+}
+
+function drawMarker(ctx, x, y, label, color, pos) {
+  ctx.beginPath();
+  ctx.arc(x, y, 4, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.font = "11px 'Bangers', cursive";
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.fillText(label, x, pos === 'above' ? y - 8 : y + 16);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (!gameRunning) {
+    if (e.code === 'Space' || e.code === 'Enter') startGame();
+    return;
+  }
+  switch(e.key.toLowerCase()) {
+    case 'h': buyHen(); break;
+    // f was buyFood — now automatic
+    case 'e': sellEggs(); break;
+    case 's': toggleShop(); break;
+    case 'c': sellChicken(); break;
+    case 'a': toggleAutoSell(); break;
+    case 'u': rentFarm(); break;
+    case 'b': buyFarm(); break;
+    case 'l': takeLoan(); break;
+    case 'r': repayLoan(); break;
+  }
+});
+</script>
+</body>
+</html>
