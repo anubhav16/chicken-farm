@@ -220,6 +220,15 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .shop-item { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,179,71,0.3); border-radius: 10px; padding: 8px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
 .shop-item:hover { border-color: #FFD700; background: rgba(255,255,255,0.15); transform: scale(1.02); }
 .shop-item.disabled { opacity: 0.4; cursor: not-allowed; }
+/* [2026-03-18 16:00] Kid-friendly attention system — wobble/bounce/shimmer on shop items needing action */
+.shop-item.attn-urgent { border-color: #ff4444; background: rgba(255,68,68,0.2); animation: shopWobble 0.4s ease-in-out infinite; box-shadow: 0 0 12px rgba(255,68,68,0.5); }
+.shop-item.attn-warning { border-color: #ff9900; background: rgba(255,153,0,0.15); animation: shopBounce 0.8s ease-in-out infinite; box-shadow: 0 0 10px rgba(255,153,0,0.4); }
+.shop-item.attn-info { border-color: #FFD700; background: rgba(255,215,0,0.12); box-shadow: 0 0 8px rgba(255,215,0,0.3); animation: shopShimmer 1.5s ease-in-out infinite; }
+.shop-item.attn-resolved { animation: shopResolved 0.5s ease-out forwards; }
+@keyframes shopWobble { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-2deg) scale(1.03); } 75% { transform: rotate(2deg) scale(1.03); } }
+@keyframes shopBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes shopShimmer { 0%,100% { box-shadow: 0 0 6px rgba(255,215,0,0.2); } 50% { box-shadow: 0 0 14px rgba(255,215,0,0.5); } }
+@keyframes shopResolved { 0% { border-color: #4ade80; box-shadow: 0 0 16px rgba(74,222,128,0.6); transform: scale(1.06); } 100% { border-color: rgba(255,179,71,0.3); box-shadow: none; transform: scale(1); } }
 .shop-item .icon { font-size: 32px; }
 .shop-item .info { flex: 1; }
 .shop-item .info .name { font-family: 'Bangers', cursive; font-size: 16px; color: #fff; letter-spacing: 1px; }
@@ -449,10 +458,10 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <!-- Farm Care — top priority -->
     <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
       <div class="panel-title" style="color:#4ade80">🧹 FARM CARE</div>
-      <div class="shop-item" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">₹30</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
+      <div class="shop-item" data-action="clean" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">₹30</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
       <div class="shop-item" onclick="buyAutoCleaner()"><span class="icon">🤖</span><div class="info"><div class="name">AUTO CLEANER</div><div class="cost" id="autocleaner-cost">₹5,000</div><div class="desc" id="autocleaner-desc">Auto-clean daily (₹5/day)</div></div></div>
-      <div class="shop-item" onclick="giveMedicine()"><span class="icon">💊</span><div class="info"><div class="name">HOME MEDICINE</div><div class="cost">₹10/hen</div><div class="desc">Treat unwell hens (70% cure)</div></div></div>
-      <div class="shop-item" onclick="callDoctor()"><span class="icon">👨‍⚕️</span><div class="info"><div class="name">CALL DOCTOR</div><div class="cost">₹150 + ₹5/day</div><div class="desc" id="sick-display">✅ All healthy</div></div></div>
+      <div class="shop-item" data-action="medicine" onclick="giveMedicine()"><span class="icon">💊</span><div class="info"><div class="name">HOME MEDICINE</div><div class="cost">₹10/hen</div><div class="desc">Treat unwell hens (70% cure)</div></div></div>
+      <div class="shop-item" data-action="doctor" onclick="callDoctor()"><span class="icon">👨‍⚕️</span><div class="info"><div class="name">CALL DOCTOR</div><div class="cost">₹150 + ₹5/day</div><div class="desc" id="sick-display">✅ All healthy</div></div></div>
       <div class="shop-item" onclick="vaccinateHens()"><span class="icon">💉</span><div class="info"><div class="name">VACCINATE</div><div class="cost">₹20/hen</div><div class="desc" id="vaccine-desc">Protect for 180 days</div></div></div>
     </div>
 
@@ -460,7 +469,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
       <div class="panel-title" style="color:#4ade80">BUY & SELL</div>
       <div class="shop-item" onclick="buyHen()"><span class="icon">🐔</span><div class="info"><div class="name">BUY HEN</div><div class="cost">₹300</div></div></div>
-      <div class="shop-item" onclick="sellEggs()"><span class="icon">🥚</span><div class="info"><div class="name">SELL EGGS</div><div class="cost">₹6 each</div></div></div>
+      <div class="shop-item" data-action="sell-eggs" onclick="sellEggs()"><span class="icon">🥚</span><div class="info"><div class="name">SELL EGGS</div><div class="cost">₹6 each</div></div></div>
       <div class="shop-item" onclick="sellChicken()"><span class="icon">🍗</span><div class="info"><div class="name">SELL HEN</div><div class="cost">₹250</div></div></div>
     </div>
 
@@ -591,7 +600,7 @@ function sndCluck()  { playTone(400 + Math.random()*200, 0.06, 'sine', 0.08); }
 //  MIXPANEL ANALYTICS — pixel-based, no SDK needed
 //  [2026-03-18 12:00] Added Mixpanel tracking for game analytics
 // ============================================================
-const MP_TOKEN = 'f312eb9fc449831d9161f0682e3c6f64';
+const MP_TOKEN = '9b80be99d5592e53cb3b693faf1cb07e'; // [2026-03-18 13:00] Chicken Farm project token
 const MP_API = 'https://api-eu.mixpanel.com';
 
 const DEVICE_ID = (()=>{
@@ -766,6 +775,8 @@ let autoSell = false;      // auto-sell eggs each day
 let basketEggCount = 0;    // eggs visually in basket
 let workerBusy = false;    // worker is collecting
 let dirtLevel = 0;         // 0-100 farm cleanliness
+// [2026-03-18 16:00] Track previous attention state for resolution flash
+let prevAttn = { clean: '', medicine: '', doctor: '', 'sell-eggs': '' };
 let hasAutoCleaner = false; // auto-cleaning machine installed
 
 // Tracking for post-mortem report
@@ -960,6 +971,7 @@ function startGame() {
     dirtLevel = 0;
     Object.keys(stats).forEach(k => stats[k] = 0);
     hasAutoCleaner = false;
+    prevAttn = { clean: '', medicine: '', doctor: '', 'sell-eggs': '' }; // [2026-03-18 16:00] Reset attention state
     document.getElementById('hen-grid').innerHTML = '';
     document.getElementById('shortcut-bar').style.display = 'flex'; // [2026-03-18 14:10] Show shortcuts bar
     notify("🌟 Welcome to the farm, Arush! Buy a hen to start!");
@@ -1070,6 +1082,8 @@ function advanceDay() {
       h.el.classList.add('dead');
       sndDeath();
       stats.hensDiedOldAge++;
+      // [2026-03-18 13:30] Track hen death
+      mpTrack('hen_died', { cause: 'old_age', day: day, hens_remaining: hens.filter(x=>x.alive&&x.id!==h.id).length });
       floatText(h.el, '👵 Died of old age', '#ff8888');
       setTimeout(() => { h.el.remove(); hens = hens.filter(x => x.id !== h.id); updateHUD(); }, 2000);
     } else if (age >= CONFIG.HEN_OLD_AGE) {
@@ -1220,6 +1234,8 @@ function advanceDay() {
           h.alive = false;
           sndDeath();
           stats.hensDiedUntreated++;
+          // [2026-03-18 13:30] Track hen death
+          mpTrack('hen_died', { cause: 'sickness', day: day, hens_remaining: hens.filter(x=>x.alive&&x.id!==h.id).length });
           floatText(h.el, '💀 Died!', '#ff4444');
           setTimeout(() => { h.el.remove(); hens = hens.filter(x => x.id !== h.id); updateHUD(); }, 2000);
         }
@@ -1287,6 +1303,8 @@ function eggAction(egg) {
   egg.el.appendChild(timer);
   basketEggCount = Math.max(0, basketEggCount - 1);
   sndHatch();
+  // [2026-03-18 13:30] Track egg hatching
+  mpTrack('egg_hatching_started', { eggs_hatching: eggs.filter(e=>e.hatching).length, day: day });
   notify("🥚 Hatching! Ready in " + HATCH_DAYS + " days. Click eggs in tray to hatch more!");
   updateHUD();
 }
@@ -1360,6 +1378,8 @@ function killHen(hen) {
   sndDeath();
   floatText(hen.el, '💀 DIED!', '#ff4444');
   stats.hensStarved++;
+  // [2026-03-18 13:30] Track hen death
+  mpTrack('hen_died', { cause: 'starvation', day: day, hens_remaining: hens.filter(h=>h.alive&&h.id!==hen.id).length });
   notify("💀 A hen starved! Buy food to keep them alive!");
   setTimeout(() => {
     hen.el.remove();
@@ -1499,6 +1519,8 @@ function callDoctor() {
   stats.totalDoctorSpent += CONFIG.DOCTOR_FEE;
   sickHens.forEach(h => { h.treated = true; });
   sndBuy();
+  // [2026-03-18 13:30] Track healthcare action
+  mpTrack('doctor_called', { type: 'doctor', cost: CONFIG.DOCTOR_FEE, hens_treated: sickHens.length, day: day });
   const healDur = dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? CONFIG.SICK_DURATION_DIRTY : CONFIG.SICK_DURATION_CLEAN;
   notify("👨‍⚕️ Doctor treating " + sickHens.length + " hen(s)! ₹" + CONFIG.MEDICINE_PER_DAY + "/day for ~" + healDur + " days" + (healDur > CONFIG.SICK_DURATION_CLEAN ? " (clean farm = faster!)" : ""));
   updateHUD();
@@ -1603,6 +1625,8 @@ function rentFarm() {
     updateFarmVisuals();
     sndUpgrade();
     notify(next.emoji + " Rented " + next.name + "! " + next.cap + " hens. Rent: ₹" + next.rent + "/day");
+    // [2026-03-18 13:30] Track farm upgrade
+    mpTrack('farm_upgraded', { action: 'rent', farm_name: next.name, farm_index: nextIdx, capacity: next.cap, day: day });
     floatText(document.getElementById('hud'), next.emoji + ' RENTED!', '#ffaa44');
     updateFarmShopDisplay();
     updateHUD();
@@ -1620,6 +1644,8 @@ function buyFarm() {
     farmOwned = true;
     sndUpgrade();
     notify(farm.emoji + " You now OWN " + farm.name + "! No more rent! Saved ₹" + farm.rent + "/day");
+    // [2026-03-18 13:30] Track farm purchase
+    mpTrack('farm_upgraded', { action: 'buy', farm_name: farm.name, farm_index: farmIndex, capacity: farm.cap, cost: farm.buy, day: day });
     floatText(document.getElementById('hud'), farm.emoji + ' BOUGHT!', '#4ade80');
     updateFarmShopDisplay();
     updateHUD();
@@ -1696,6 +1722,8 @@ function takeLoan() {
     // Recalculate EMI for total outstanding loan
     dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
     sndBuy();
+    // [2026-03-18 13:30] Track loan taken
+    mpTrack('loan_taken', { amount: amount, total_debt: Math.round(loanAmount + loanInterestAccrued), daily_emi: parseFloat(dailyEMI.toFixed(2)), day: day });
     notify("🏦 Loan ₹" + amount.toLocaleString() + "! EMI: ₹" + dailyEMI.toFixed(2) + "/day for " + CONFIG.LOAN_TENURE_DAYS + " days");
     floatText(document.getElementById('hud'), '+₹' + amount.toLocaleString() + ' 🏦', '#60A5FA');
     updateHUD();
@@ -1848,6 +1876,31 @@ function updateHUD() {
   if (healingCount > 0) sickText += '💊 ' + healingCount + ' healing';
   if (!sickText) sickText = '✅ All healthy';
   document.getElementById('sick-display').textContent = sickText;
+
+  // [2026-03-18 16:00] Shop item attention system — highlight buttons needing kid's action
+  const attnMap = {
+    'clean': dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? 'attn-urgent' :
+             dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? 'attn-warning' : '',
+    'medicine': unwellCount > 0 ? 'attn-warning' : '',
+    'doctor': sickUntreatedCount > 0 ? 'attn-urgent' : '',
+    'sell-eggs': eggs.filter(e => !e.hatching).length > 0 ? 'attn-info' : ''
+  };
+  Object.keys(attnMap).forEach(action => {
+    const el = document.querySelector('[data-action="' + action + '"]');
+    if (!el) return;
+    const cls = attnMap[action];
+    const prev = prevAttn[action];
+    // Remove all attention classes
+    el.classList.remove('attn-urgent', 'attn-warning', 'attn-info', 'attn-resolved');
+    if (cls) {
+      el.classList.add(cls);
+    } else if (prev) {
+      // Condition just resolved — green flash reward
+      el.classList.add('attn-resolved');
+      el.addEventListener('animationend', function handler() { el.classList.remove('attn-resolved'); el.removeEventListener('animationend', handler); }, { once: true });
+    }
+    prevAttn[action] = cls;
+  });
 
   // Sick bay — only truly sick/healing hens go to sick bay, unwell stay in grid
   const sickBay = document.getElementById('sick-bay');
@@ -2139,6 +2192,34 @@ function gameOver() {
   html += '</div>';
 
   document.getElementById('go-report').innerHTML = html;
+
+  // [2026-03-18 13:30] Send full game summary to Mixpanel
+  mpTrack('game_summary', {
+    days_survived: day, final_money: money, total_earned: totalEarned,
+    eggs_sold: totalEggsSold, max_hens: stats.maxHensAtOnce, max_money: stats.maxMoney,
+    game_number: mpGameCount,
+    // Death stats
+    hens_starved: stats.hensStarved, hens_died_sick: stats.hensDiedUntreated,
+    hens_died_old_age: stats.hensDiedOldAge, hens_sick_total: stats.hensSick,
+    // Spending breakdown
+    spent_food: Math.round(stats.totalFoodSpent),
+    spent_maintenance: Math.round(stats.totalMaintenanceSpent),
+    spent_rent: Math.round(stats.totalRentSpent),
+    spent_emi: Math.round(stats.totalEMISpent),
+    spent_cleaning: Math.round(stats.totalCleaningSpent),
+    spent_doctor: Math.round(stats.totalDoctorSpent),
+    spent_medicine: Math.round(stats.totalMedicineSpent),
+    spent_total: Math.round(totalSpent),
+    // Behavior stats
+    doctor_calls: stats.doctorCalls, times_cleaned: stats.timesCleanedFarm,
+    eggs_hatched: stats.eggsHatched, old_hens_sold: stats.oldHensSold,
+    loan_taken_total: stats.totalLoanTaken, total_debt_at_end: totalDebt,
+    farm_level: farmIndex, farm_owned: farmOwned,
+    // Report card text
+    failure_reasons: reasons.map(r => r.text).join(' | '),
+    good_things: good.map(g => g.text).join(' | '),
+    tips_given: tips.map(t => t.text).join(' | ')
+  });
 }
 
 // ============================================================

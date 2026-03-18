@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.2.1 | 2026-03-18 | Patch | Shop item attention system — wobble/bounce/shimmer alerts for kid engagement |
 | v3.2.0 | 2026-03-18 | Minor | Kid-friendly overhaul — pause, big sick indicators, simplified tiles, shortcut bar |
 | v3.1.0 | 2026-03-17 | Minor | Sickness stages, vaccination, auto-cleaner |
 | v3.0.0 | 2026-03-17 | Major | Hen aging, sickness, cleaning, smart game-over report, 2-panel layout |
@@ -13,6 +14,18 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.2.1 — Shop Item Attention System (Mar 18)
+
+### Playful Alert Animations on Shop Buttons
+- **URGENT** (red wobble): Sick untreated hens → Doctor button, Filthy farm (≥70%) → Clean button
+- **WARNING** (orange bounce): Unwell hens → Medicine button, Dirty farm (≥30%) → Clean button
+- **INFO** (gold shimmer): Eggs ready to sell → Sell Eggs button
+- **Resolution reward**: Green flash when condition clears — satisfying "I fixed it!" feedback
+- Uses `data-action` attributes for clean DOM querying
+- State tracked per-action to detect alert→clear transitions
 
 ---
 
