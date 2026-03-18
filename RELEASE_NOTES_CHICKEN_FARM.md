@@ -4,6 +4,8 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.2.0 | 2026-03-18 | Minor | Kid-friendly overhaul — pause, big sick indicators, simplified tiles, shortcut bar |
+| v3.1.0 | 2026-03-17 | Minor | Sickness stages, vaccination, auto-cleaner |
 | v3.0.0 | 2026-03-17 | Major | Hen aging, sickness, cleaning, smart game-over report, 2-panel layout |
 | v2.0.0 | 2026-03-17 | Major | Hen grid tiles, egg tray, sick bay, dirt particles, auto-sizing |
 | v1.3.0 | 2026-03-17 | Minor | Karnataka/Bangalore realistic pricing, kid-friendly big fonts |
@@ -11,6 +13,56 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.2.0 — Kid-Friendly Overhaul (Mar 18)
+
+### Spacebar Pause/Resume
+- Press Space to pause/resume game — neon overlay with "⏸️ PAUSED" (Ronaldo Chicken style)
+- Day counter stops while paused, all timers frozen
+- Reset on game over and new game
+
+### Keyboard Shortcuts Bar
+- Always-visible bottom bar during gameplay showing all shortcuts
+- Styled key icons: [H] Buy Hen, [E] Sell Eggs, [C] Sell Hen, [A] Auto-sell, [U] Upgrade, [L] Loan, [␣] Pause
+- Hides on game over
+
+### Simplified Hen Tiles
+- All hens now same warm brown color (removed confusing 5-color variants)
+- Each hen gets a fun name (Goldie, Pepper, Sunny, Nugget, etc.) — no duplicate names among living hens
+- Age shown as emoji stages: 🐔 (young) → 🐓 (declining) → 👴 (old) instead of "127d"
+- Tile sizes bumped ~15% at 6-35 hen range for readability
+
+### BIG & LOUD Sick Indicators
+- Full-tile color floods: yellow (unwell), red (sick), blue (healing)
+- Giant 40px emoji overlays centered on sick tiles (🤧🤒💊🩹)
+- Action buttons directly on tiles: "💊 Fix" for unwell, "🚑 Help!" for sick
+- Aggressive shake animation for sick tiles (bigger amplitude)
+- Sound alerts on health transitions (sine tone for unwell, square two-tone for sick)
+- Notifications now include hen name
+
+### Game Starts Immediately
+- "BUY YOUR FIRST HEN! 🐔" CTA shows in farm area when 0 hens
+- Pulsing gold text with [H] hint, disappears on first hen purchase
+- Day counter and rent deduct from game start, creating urgency
+
+---
+
+## v3.1.0 — Sickness Stages, Vaccination & Auto-Cleaner (Mar 17)
+
+### Sickness Stages
+- Three-stage system: Unwell (3-day warning) → Sick (needs doctor) → Death (10 days untreated)
+- Home medicine: ₹10 with 70% cure rate (unwell stage only)
+- Healing speed: 3 days (clean farm) vs 7 days (dirty farm)
+
+### Vaccination
+- ₹20/hen, 180 days protection, drops sick chance to 0.5%
+- 💉 badge on vaccinated hens
+
+### Auto-Cleaner
+- ₹5,000 one-time purchase + ₹5/day running cost
+- Cleans 80% of daily dirt automatically
 
 ---
 

@@ -81,18 +81,18 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 /* 1-5 hens: extra large */
 .hen-grid-xs .hen-tile { width: 110px; height: 120px; padding: 6px; }
 .hen-grid-xs .ht-body { width: 60px; height: 54px; }
-.hen-grid-xs .ht-age { font-size: 15px; }
+.hen-grid-xs .ht-age { font-size: 20px; } /* [2026-03-18 14:20] Bigger for emoji age stages */
 .hen-grid-xs .ht-status { font-size: 13px; }
-/* 6-15 hens */
-.hen-grid-sm .hen-tile { width: 82px; height: 90px; padding: 4px; }
-.hen-grid-sm .ht-body { width: 44px; height: 40px; }
-.hen-grid-sm .ht-age { font-size: 12px; }
-.hen-grid-sm .ht-status { font-size: 10px; }
-/* 16-35 hens */
-.hen-grid-md .hen-tile { width: 64px; height: 72px; padding: 3px; }
-.hen-grid-md .ht-body { width: 34px; height: 30px; }
-.hen-grid-md .ht-age { font-size: 10px; }
-.hen-grid-md .ht-status { font-size: 8px; }
+/* [2026-03-18 14:20] 6-15 hens — bumped ~15% for kid readability */
+.hen-grid-sm .hen-tile { width: 95px; height: 105px; padding: 5px; }
+.hen-grid-sm .ht-body { width: 50px; height: 46px; }
+.hen-grid-sm .ht-age { font-size: 16px; }
+.hen-grid-sm .ht-status { font-size: 11px; }
+/* [2026-03-18 14:20] 16-35 hens — bumped ~15% for kid readability */
+.hen-grid-md .hen-tile { width: 75px; height: 85px; padding: 4px; }
+.hen-grid-md .ht-body { width: 40px; height: 35px; }
+.hen-grid-md .ht-age { font-size: 14px; }
+.hen-grid-md .ht-status { font-size: 9px; }
 /* 36-70 hens */
 .hen-grid-lg .hen-tile { width: 48px; height: 56px; padding: 2px; border-width: 2px; }
 .hen-grid-lg .ht-body { width: 26px; height: 24px; }
@@ -151,12 +151,20 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 #sick-bay .ht-body { width: 24px !important; height: 22px !important; }
 #sick-bay .ht-age { font-size: 8px !important; }
 #sick-bay .ht-status { font-size: 7px !important; }
-.hen-tile.unwell { border-color: rgba(251,191,36,0.6) !important; background: rgba(251,191,36,0.08) !important; }
-.hen-tile.unwell .ht-body { animation: unwellPulse 1s ease-in-out infinite; }
-@keyframes unwellPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
-.hen-tile.in-sick-bay { border-color: rgba(255,80,80,0.6) !important; background: rgba(255,80,80,0.1) !important; }
-.hen-tile.in-sick-bay .ht-body { animation: sickShake 0.5s ease-in-out infinite; }
-.hen-tile.healing { border-color: rgba(96,165,250,0.5) !important; background: rgba(96,165,250,0.08) !important; }
+/* [2026-03-18 14:30] BIG & LOUD sick indicators — full-tile color floods for kids */
+.hen-tile.unwell { border-color: rgba(251,191,36,0.8) !important; background: rgba(255,235,0,0.35) !important; border-width: 3px !important; }
+.hen-tile.unwell .ht-body { animation: unwellPulse 0.8s ease-in-out infinite; }
+@keyframes unwellPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.95); } }
+.hen-tile.in-sick-bay { border-color: rgba(255,50,50,0.8) !important; background: rgba(255,50,50,0.4) !important; border-width: 3px !important; }
+.hen-tile.in-sick-bay .ht-body { animation: sickShakeBig 0.4s ease-in-out infinite; }
+@keyframes sickShakeBig { 0%,100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-6px) rotate(-8deg); } 75% { transform: translateX(6px) rotate(8deg); } }
+.hen-tile.healing { border-color: rgba(96,165,250,0.7) !important; background: rgba(50,150,255,0.3) !important; border-width: 3px !important; }
+/* Sick emoji overlay — giant centered emoji on tile */
+.sick-emoji-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; z-index: 2; pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+/* Action button on sick tile */
+.tile-action-btn { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 3; font-family: 'Bangers', cursive; font-size: 10px; padding: 2px 8px; border-radius: 8px; cursor: pointer; border: 2px solid rgba(255,255,255,0.6); color: #fff; white-space: nowrap; }
+.tile-action-btn.medicine-btn { background: rgba(255,180,0,0.85); }
+.tile-action-btn.doctor-btn { background: rgba(255,50,50,0.85); animation: pausePulse 0.6s ease-in-out infinite alternate; }
 .hen-tile.healing .ht-body { animation: healPulse 1.5s ease-in-out infinite; }
 @keyframes healPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 .hen-tile.vaccinated { position: relative; }
@@ -319,6 +327,24 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 #graph-panel { padding: 0; }
 #graph-title { font-family: 'Bangers', cursive; font-size: 12px; color: #FFD700; text-align: center; margin-bottom: 4px; letter-spacing: 1px; cursor: pointer; }
 #money-graph { background: rgba(0,0,0,0.3); border-radius: 6px; width: 100%; }
+/* [2026-03-18 14:00] Pause overlay — copied from Ronaldo Chicken, adapted for farm theme */
+#pause-overlay { position: absolute; inset: 0; z-index: 55; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.75); pointer-events: none; }
+#pause-overlay .pause-title { font-family: 'Bangers', cursive; font-size: 80px; color: #fff; text-shadow: 0 0 40px #ff6fd8, 0 0 80px #7b2ff7; letter-spacing: 8px; animation: pausePulse 0.8s ease-in-out infinite alternate; }
+#pause-overlay .pause-hint { font-family: 'Bangers', cursive; font-size: 24px; color: #ffb347; letter-spacing: 2px; margin-top: 16px; display: flex; align-items: center; gap: 12px; }
+#pause-overlay .space-key { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(180deg, #555, #333); border: 2px solid #888; border-radius: 8px; padding: 6px 24px; font-size: 18px; color: #fff; box-shadow: 0 4px 0 #222, 0 0 16px rgba(255,179,71,0.4); min-width: 120px; }
+@keyframes pausePulse { 0% { transform: scale(1); } 100% { transform: scale(1.06); } }
+
+/* [2026-03-18 14:10] Keyboard shortcuts bar — always visible during gameplay */
+#shortcut-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; display: none; justify-content: center; align-items: center; gap: 12px; padding: 6px 16px; background: linear-gradient(180deg, rgba(20,0,50,0.92), rgba(10,0,30,0.98)); border-top: 2px solid rgba(123,47,247,0.4); flex-wrap: wrap; }
+.shortcut-item { display: flex; align-items: center; gap: 4px; }
+.shortcut-key { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(180deg, #3a3a5c, #2a2a4c); border: 2px solid #666; border-radius: 6px; padding: 2px 10px; font-family: 'Bangers', cursive; font-size: 14px; color: #fff; box-shadow: 0 3px 0 #222, 0 0 8px rgba(123,47,247,0.3); min-width: 28px; }
+.shortcut-label { font-family: 'Nunito', sans-serif; font-size: 11px; color: #ccc; font-weight: 700; }
+
+/* [2026-03-18 14:40] First hen CTA — pulsing prompt when no hens */
+#first-hen-cta { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 15; text-align: center; pointer-events: none; }
+#first-hen-cta .cta-text { font-family: 'Bangers', cursive; font-size: 36px; color: #FFD700; text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,111,216,0.3); animation: pausePulse 0.8s ease-in-out infinite alternate; letter-spacing: 3px; }
+#first-hen-cta .cta-hint { font-family: 'Nunito', sans-serif; font-size: 16px; color: #ccc; margin-top: 8px; }
+
 </style>
 </head>
 <body>
@@ -467,6 +493,11 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <div id="dirt-overlay"></div>
     <div id="sick-bay"><div class="sb-label">🏥 SICK BAY</div><div class="sb-hens" id="sick-bay-hens"></div></div>
     <div id="hen-grid"></div>
+    <!-- [2026-03-18 14:40] First hen CTA — shown when 0 hens to create urgency -->
+    <div id="first-hen-cta">
+      <div class="cta-text">BUY YOUR FIRST HEN! 🐔</div>
+      <div class="cta-hint">Press <span style="font-family:'Bangers',cursive; color:#FFD700;">[H]</span> or click "Buy Hen"</div>
+    </div>
     <div id="egg-tray">
       <div class="tray-label">🥚 EGGS</div>
       <div id="basket-count" style="font-family:'Bangers',cursive; font-size:11px; color:#FFD700; writing-mode:vertical-rl; flex-shrink:0;">0</div>
@@ -474,6 +505,12 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
   </div>
 
   <div id="notification"></div>
+
+  <!-- [2026-03-18 14:00] Pause overlay — spacebar toggle -->
+  <div id="pause-overlay">
+    <div class="pause-title">⏸️ PAUSED</div>
+    <div class="pause-hint">Press <span class="space-key">␣ SPACE</span> to resume</div>
+  </div>
 
   <!-- Start Screen -->
   <div class="screen" id="start-screen">
@@ -504,6 +541,17 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <div class="stats" id="go-stats"></div>
     <div id="go-report" style="max-width:500px; text-align:left; margin-top:16px; background:rgba(255,255,255,0.06); border-radius:14px; padding:16px; max-height:40vh; overflow-y:auto;"></div>
     <button class="btn btn-gold" onclick="location.reload()" style="margin-top:16px; font-size:24px; padding: 14px 44px;">🔄 TRY AGAIN!</button>
+  </div>
+
+  <!-- [2026-03-18 14:10] Keyboard shortcuts bar — always visible during gameplay -->
+  <div id="shortcut-bar">
+    <div class="shortcut-item"><span class="shortcut-key">H</span><span class="shortcut-label">Buy Hen</span></div>
+    <div class="shortcut-item"><span class="shortcut-key">E</span><span class="shortcut-label">Sell Eggs</span></div>
+    <div class="shortcut-item"><span class="shortcut-key">C</span><span class="shortcut-label">Sell Hen</span></div>
+    <div class="shortcut-item"><span class="shortcut-key">A</span><span class="shortcut-label">Auto-sell</span></div>
+    <div class="shortcut-item"><span class="shortcut-key">U</span><span class="shortcut-label">Upgrade</span></div>
+    <div class="shortcut-item"><span class="shortcut-key">L</span><span class="shortcut-label">Loan</span></div>
+    <div class="shortcut-item"><span class="shortcut-key">␣</span><span class="shortcut-label">Pause</span></div>
   </div>
 </div>
 
@@ -538,6 +586,68 @@ function sndError()  { playTone(200, 0.15, 'square', 0.1); setTimeout(()=>playTo
 function sndHatch()  { playTone(600, 0.1, 'sine', 0.15); setTimeout(()=>playTone(800, 0.1, 'sine', 0.15), 100); setTimeout(()=>playTone(1000, 0.15, 'sine', 0.2), 200); }
 function sndUpgrade(){ playTone(523, 0.1); setTimeout(()=>playTone(659, 0.1), 100); setTimeout(()=>playTone(784, 0.1), 200); setTimeout(()=>playTone(1047, 0.2), 300); }
 function sndCluck()  { playTone(400 + Math.random()*200, 0.06, 'sine', 0.08); }
+
+// ============================================================
+//  MIXPANEL ANALYTICS — pixel-based, no SDK needed
+//  [2026-03-18 12:00] Added Mixpanel tracking for game analytics
+// ============================================================
+const MP_TOKEN = 'f312eb9fc449831d9161f0682e3c6f64';
+const MP_API = 'https://api-eu.mixpanel.com';
+
+const DEVICE_ID = (()=>{
+  let id = localStorage.getItem('cf_device_id');
+  if (!id) {
+    id = 'device_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    localStorage.setItem('cf_device_id', id);
+  }
+  return id;
+})();
+
+const SESSION_ID = (()=>{
+  let id = sessionStorage.getItem('cf_session');
+  if (!id) {
+    id = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    sessionStorage.setItem('cf_session', id);
+  }
+  return id;
+})();
+
+let mpGameCount = parseInt(sessionStorage.getItem('cf_game_count') || '0');
+
+function mpTrack(event, props={}) {
+  try {
+    const data = btoa(JSON.stringify({
+      event: event,
+      properties: {
+        token: MP_TOKEN, distinct_id: DEVICE_ID, session_id: SESSION_ID,
+        game_count: mpGameCount, game_title: 'Chicken Farm', game_version: 'v3.1.0',
+        ...props
+      }
+    }));
+    new Image().src = MP_API + '/track/?data=' + encodeURIComponent(data) + '&ip=1&_=' + Date.now();
+  } catch(e) {}
+}
+
+function mpEngage(ops) {
+  try {
+    const payload = { '$token': MP_TOKEN, '$distinct_id': DEVICE_ID, ...ops };
+    const data = btoa(JSON.stringify(payload));
+    new Image().src = MP_API + '/engage/?data=' + encodeURIComponent(data) + '&_=' + Date.now();
+  } catch(e) {}
+}
+
+const MP_SESSION_START = Date.now();
+mpTrack('game_loaded');
+mpEngage({
+  '$set_once': { '$created': new Date().toISOString(), 'first_device': DEVICE_ID },
+  '$set': { '$name': 'Farmer ' + DEVICE_ID.slice(-6) }
+});
+
+window.addEventListener('beforeunload', () => {
+  const dur = Math.round((Date.now() - MP_SESSION_START) / 1000);
+  mpTrack('session_end', { session_duration_seconds: dur, games_played: mpGameCount });
+  mpEngage({ '$add': { total_sessions: 1, total_session_seconds: dur } });
+});
 
 // ============================================================
 //  GAME CONFIG — Change these to tweak the game!
@@ -610,6 +720,11 @@ const CONFIG = {
     { name: 'Mega Farm',       cap: 100, rent: 100,  buy: 60000,   emoji: '🏭' },
     { name: 'Chicken Empire',  cap: 250, rent: 200,  buy: 150000,  emoji: '🏰' },
   ],
+
+  // [2026-03-18 14:20] Hen names — fun names for kids to bond with their hens
+  HEN_NAMES: ['Goldie','Pepper','Sunny','Nugget','Coco','Rosie','Daisy','Ginger','Honey','Ruby',
+              'Biscuit','Mango','Tikka','Brownie','Chiku','Ladoo','Meera','Chintu','Guddi','Pari',
+              'Pinky','Lucky','Tuffy','Bubbly','Mithu','Champa','Rani','Munni','Kaju','Roti'],
 };
 
 // Shorthand accessors
@@ -640,6 +755,7 @@ let totalEarned = 0;
 let totalEggsSold = 0;
 let totalHensOwned = 0;
 let gameRunning = false;
+let paused = false; // [2026-03-18 14:00] Pause state for spacebar toggle
 let dayTimer = null;
 let tickTimer = null;
 let nextId = 1;
@@ -691,7 +807,8 @@ const farmArea = document.getElementById('farm-area');
 // Clouds
 // SVG generators for 2D animals
 function svgHen(color) {
-  const c = color || ['#D84315','#BF360C','#8D6E63','#6D4C41','#E65100'][Math.floor(Math.random()*5)];
+  // [2026-03-18 14:20] Single warm brown — removed confusing color variants for kids
+  const c = '#8D6E63';
   const comb = '#E53935';
   const beak = '#FF8F00';
   const eye = '#212121';
@@ -831,6 +948,8 @@ function startGame() {
     document.getElementById('panel-info').style.display = 'block';
     document.getElementById('panel-controls').style.display = 'block';
     gameRunning = true;
+    paused = false; // [2026-03-18 14:00] Reset pause state on new game
+    document.getElementById('pause-overlay').style.display = 'none';
     day = 0;
     money = CONFIG.STARTING_MONEY;
     ensureAudio();
@@ -842,9 +961,14 @@ function startGame() {
     Object.keys(stats).forEach(k => stats[k] = 0);
     hasAutoCleaner = false;
     document.getElementById('hen-grid').innerHTML = '';
+    document.getElementById('shortcut-bar').style.display = 'flex'; // [2026-03-18 14:10] Show shortcuts bar
     notify("🌟 Welcome to the farm, Arush! Buy a hen to start!");
     updateFarmShopDisplay();
     updateHUD();
+    // [2026-03-18 12:00] Track game start
+    mpGameCount++;
+    sessionStorage.setItem('cf_game_count', mpGameCount);
+    mpTrack('game_started', { game_number: mpGameCount });
     startDayCycle();
   } catch(e) { console.error('startGame error:', e); alert('Error starting game: ' + e.message); }
 }
@@ -869,6 +993,24 @@ function startDayCycle() {
       }
     });
   }, 500);
+}
+
+// [2026-03-18 14:00] Pause/resume toggle — spacebar, copies Ronaldo Chicken pattern
+function togglePause() {
+  if (!gameRunning && !paused) return;
+  paused = !paused;
+  const po = document.getElementById('pause-overlay');
+  if (paused) {
+    gameRunning = false;
+    clearInterval(dayTimer);
+    clearInterval(tickTimer);
+    po.style.display = 'flex';
+  } else {
+    gameRunning = true;
+    po.style.display = 'none';
+    startDayCycle();
+    notify('▶️ RESUMED!');
+  }
 }
 
 function advanceDay() {
@@ -1046,7 +1188,9 @@ function advanceDay() {
       if (Math.random() < chance) {
         h.health = 'unwell';
         h.sickDay = day;
-        notify("🤧 A hen is feeling unwell! Give home medicine (₹" + CONFIG.SELF_MEDICINE_COST + ") quickly!");
+        // [2026-03-18 14:30] Alert sound for unwell — kids need audio cue
+        playTone(300, 0.3, 'sine', 0.2); setTimeout(()=>playTone(250, 0.3, 'sine', 0.15), 200);
+        notify("🤧 " + (h.name||'A hen') + " is feeling unwell! Give home medicine (₹" + CONFIG.SELF_MEDICINE_COST + ") quickly!");
       }
     }
     // Unwell → sick if untreated for UNWELL_DAYS
@@ -1055,7 +1199,9 @@ function advanceDay() {
         h.health = 'sick';
         h.sickDay = day; // reset for sick timer
         stats.hensSick++;
-        notify("🤒 An unwell hen got SICK! Call doctor (₹" + CONFIG.DOCTOR_FEE + ") or she dies in " + CONFIG.SICK_DEATH_DAYS + " days!");
+        // [2026-03-18 14:30] Urgent two-tone alert for sick — louder than unwell
+        playTone(200, 0.2, 'square', 0.2); setTimeout(()=>playTone(400, 0.3, 'square', 0.25), 150);
+        notify("🤒 " + (h.name||'A hen') + " got SICK! Call doctor (₹" + CONFIG.DOCTOR_FEE + ") or she dies in " + CONFIG.SICK_DEATH_DAYS + " days!");
       }
     }
     // Sick → healing (treated) or death (untreated)
@@ -1186,13 +1332,20 @@ function growChick(chick) {
 
 function addHenToFarm(x) {
   const henId = nextId++;
+  // [2026-03-18 14:20] Pick a fun name, avoid repeats with living hens
+  const usedNames = hens.filter(h=>h.alive).map(h=>h.name);
+  const available = CONFIG.HEN_NAMES.filter(n => !usedNames.includes(n));
+  const name = available.length > 0 ? available[Math.floor(Math.random()*available.length)] : CONFIG.HEN_NAMES[Math.floor(Math.random()*CONFIG.HEN_NAMES.length)];
+
   const el = document.createElement('div');
   el.className = 'hen-tile young';
-  el.innerHTML = '<div class="ht-body">' + svgHen() + '</div><div class="ht-age">0d</div><div class="ht-status">🟢 Young</div>';
+  // [2026-03-18 14:20] Emoji age stages instead of "0d", show hen name
+  el.innerHTML = '<div class="ht-body">' + svgHen() + '</div><div class="ht-age">🐔</div><div class="ht-status">' + name + '</div>';
   el.onclick = () => henInfo(hen);
   document.getElementById('hen-grid').appendChild(el);
 
   const hen = { id: henId, x: 0, hungryDays: 0, alive: true, bornDay: day,
+    name: name, // [2026-03-18 14:20] Hen name for kid-friendly display
     health: 'healthy', // healthy, unwell, sick, healing
     sickDay: 0, treated: false, vaccinatedUntil: 0, el };
   hens.push(hen);
@@ -1388,6 +1541,8 @@ function buyHen() {
     floatText(hen.el, '🐔 NEW HEN!', '#FFD700');
     notify("🐔 Bought a hen for ₹" + HEN_COST + "! Money left: ₹" + money);
     updateHUD();
+    // [2026-03-18 12:00] Track hen purchase
+    mpTrack('hen_bought', { money_left: money, total_hens: hens.filter(h=>h.alive).length, day: day });
   } catch(e) { console.error('buyHen error:', e); notify("⚠️ Error: " + e.message); }
 }
 
@@ -1407,6 +1562,8 @@ function sellEggs() {
 
   notify(`💰 Sold ${unsold.length} eggs for ₹${earnings}!`);
   updateHUD();
+  // [2026-03-18 12:00] Track egg sale
+  mpTrack('eggs_sold', { eggs_count: unsold.length, earnings: earnings, money: money, day: day });
 }
 
 function sellChicken() {
@@ -1656,6 +1813,10 @@ function updateHUD() {
 
   updatePnL();
 
+  // [2026-03-18 14:40] Show/hide first hen CTA
+  const cta = document.getElementById('first-hen-cta');
+  if (cta) cta.style.display = (hens.filter(h=>h.alive).length === 0 && chicks.length === 0) ? 'block' : 'none';
+
   // Hen grid auto-sizing — smooth shrink as farm grows
   const totalBirds = hens.filter(h=>h.alive).length + chicks.length;
   const grid = document.getElementById('hen-grid');
@@ -1703,13 +1864,19 @@ function updateHUD() {
     }
   });
 
-  // Update hen tiles
+  // [2026-03-18 14:20] Update hen tiles — emoji age stages, names, simplified for kids
   hens.forEach(h => {
     if (!h.alive) return;
     const age = day - h.bornDay;
     const ageEl = h.el.querySelector('.ht-age');
     const statusEl = h.el.querySelector('.ht-status');
-    if (ageEl) ageEl.textContent = age + 'd';
+
+    // Emoji age stage instead of numeric days
+    if (ageEl) {
+      if (age >= CONFIG.HEN_OLD_AGE) ageEl.textContent = '👴';
+      else if (age >= CONFIG.HEN_PEAK_LAYING_AGE) ageEl.textContent = '🐓';
+      else ageEl.textContent = '🐔';
+    }
 
     // Remove old classes
     h.el.classList.remove('young', 'declining', 'old', 'sick', 'hungry', 'unwell', 'in-sick-bay', 'healing', 'vaccinated');
@@ -1717,33 +1884,54 @@ function updateHUD() {
     // Vaccination badge
     if (h.vaccinatedUntil > day) h.el.classList.add('vaccinated');
 
-    // Health state takes priority over age
+    // [2026-03-18 14:30] Remove old overlays/buttons before re-rendering
+    const oldOverlay = h.el.querySelector('.sick-emoji-overlay');
+    if (oldOverlay) oldOverlay.remove();
+    const oldBtn = h.el.querySelector('.tile-action-btn');
+    if (oldBtn) oldBtn.remove();
+
+    // Health state takes priority over age — show name when healthy, BIG indicators when sick
     if (h.health === 'unwell') {
       h.el.classList.add('unwell');
-      if (statusEl) statusEl.textContent = '🤧 Unwell!';
+      if (statusEl) statusEl.textContent = '🤧 ' + (h.name || 'Unwell');
+      // Giant emoji overlay + action button
+      h.el.insertAdjacentHTML('beforeend', '<div class="sick-emoji-overlay">🤧</div>');
+      const btn = document.createElement('button');
+      btn.className = 'tile-action-btn medicine-btn';
+      btn.textContent = '💊 Fix';
+      btn.onclick = (e) => { e.stopPropagation(); giveMedicine(); };
+      h.el.appendChild(btn);
     } else if (h.health === 'sick' && !h.treated) {
       h.el.classList.add('in-sick-bay');
-      if (statusEl) statusEl.textContent = '🤒 SICK!';
+      if (statusEl) statusEl.textContent = '🤒 ' + (h.name || 'SICK');
+      h.el.insertAdjacentHTML('beforeend', '<div class="sick-emoji-overlay">🤒</div>');
+      const btn = document.createElement('button');
+      btn.className = 'tile-action-btn doctor-btn';
+      btn.textContent = '🚑 Help!';
+      btn.onclick = (e) => { e.stopPropagation(); callDoctor(); };
+      h.el.appendChild(btn);
     } else if (h.health === 'sick' && h.treated) {
       h.el.classList.add('healing');
       const healDur = dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? CONFIG.SICK_DURATION_DIRTY : CONFIG.SICK_DURATION_CLEAN;
       const daysLeft = Math.max(0, healDur - (day - h.sickDay));
-      if (statusEl) statusEl.textContent = '💊 ' + daysLeft + 'd left';
+      if (statusEl) statusEl.textContent = '💊 ' + daysLeft + 'd';
+      h.el.insertAdjacentHTML('beforeend', '<div class="sick-emoji-overlay">💊</div>');
     } else if (h.health === 'healing') {
       h.el.classList.add('healing');
-      if (statusEl) statusEl.textContent = '🩹 Resting';
+      if (statusEl) statusEl.textContent = '🩹 ' + (h.name || 'Resting');
+      h.el.insertAdjacentHTML('beforeend', '<div class="sick-emoji-overlay">🩹</div>');
     } else if (h.hungryDays > 0) {
       h.el.classList.add('hungry');
       if (statusEl) statusEl.textContent = '😰 Hungry!';
     } else if (age >= CONFIG.HEN_OLD_AGE) {
       h.el.classList.add('old');
-      if (statusEl) statusEl.textContent = '🔴 No eggs!';
+      if (statusEl) statusEl.textContent = h.name || '🔴 Old';
     } else if (age >= CONFIG.HEN_PEAK_LAYING_AGE) {
       h.el.classList.add('declining');
-      if (statusEl) statusEl.textContent = '🟡 50% eggs';
+      if (statusEl) statusEl.textContent = h.name || '🟡 Slowing';
     } else {
       h.el.classList.add('young');
-      if (statusEl) statusEl.textContent = '🟢 1 egg/day';
+      if (statusEl) statusEl.textContent = h.name || '🟢 Young';
     }
   });
 
@@ -1825,9 +2013,23 @@ function updateDayNight() {
 
 function gameOver() {
   gameRunning = false;
+  paused = false; // [2026-03-18 14:00] Reset pause on game over
+  document.getElementById('pause-overlay').style.display = 'none';
+  document.getElementById('shortcut-bar').style.display = 'none'; // [2026-03-18 14:10] Hide shortcuts on game over
   clearInterval(dayTimer);
   clearInterval(tickTimer);
   sndDeath();
+  // [2026-03-18 12:00] Track game over
+  mpTrack('game_ended', {
+    days_survived: day, final_money: money, total_earned: totalEarned,
+    eggs_sold: totalEggsSold, max_hens: stats.maxHensAtOnce, max_money: stats.maxMoney,
+    hens_starved: stats.hensStarved, hens_died_sick: stats.hensDiedUntreated,
+    game_number: mpGameCount
+  });
+  mpEngage({
+    '$set': { last_game: new Date().toISOString(), last_days_survived: day },
+    '$add': { total_games: 1, total_days_played: day, total_earned_lifetime: totalEarned }
+  });
 
   document.getElementById('game-over').style.display = 'flex';
 
@@ -2164,8 +2366,15 @@ function drawMarker(ctx, x, y, label, color, pos) {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+  // [2026-03-18 14:00] Spacebar pause/resume support
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (paused) { togglePause(); return; }
+    if (!gameRunning) { startGame(); return; }
+    togglePause(); return;
+  }
   if (!gameRunning) {
-    if (e.code === 'Space' || e.code === 'Enter') startGame();
+    if (e.code === 'Enter') startGame();
     return;
   }
   switch(e.key.toLowerCase()) {
