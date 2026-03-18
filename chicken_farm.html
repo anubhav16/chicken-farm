@@ -97,14 +97,14 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .hen-grid-lg .hen-tile { width: 48px; height: 56px; padding: 2px; border-width: 2px; }
 .hen-grid-lg .ht-body { width: 26px; height: 24px; }
 .hen-grid-lg .ht-age { font-size: 8px; }
-.hen-grid-lg .ht-status { font-size: 6px; }
+.hen-grid-lg .ht-status { font-size: 8px; } /* [2026-03-19 10:00] Min 8px for readability */
 /* 71+ hens */
 .hen-grid-xl .hen-tile { width: 36px; height: 42px; padding: 1px; border-width: 1px; border-radius: 5px; }
 .hen-grid-xl .ht-body { width: 20px; height: 18px; }
 .hen-grid-xl .ht-age { font-size: 7px; }
-.hen-grid-xl .ht-status { font-size: 5px; }
+.hen-grid-xl .ht-status { font-size: 8px; } /* [2026-03-19 10:00] Min 8px for readability */
 .ht-age { font-family: 'Bangers', cursive; color: #ddd; }
-.ht-status { font-family: 'Bangers', cursive; padding: 1px 4px; border-radius: 4px; font-weight: 900; }
+.ht-status { font-family: 'Bangers', cursive; padding: 1px 4px; border-radius: 4px; font-weight: 900; text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.8); } /* [2026-03-19 10:00] Dark shadow for contrast on all backgrounds */
 .hen-tile.young .ht-status { color: #86efac; text-shadow: 0 0 4px rgba(74,222,128,0.5); }
 .hen-tile.young { border-color: rgba(74,222,128,0.4); }
 .hen-tile.declining .ht-status { color: #ffaa44; }
@@ -135,12 +135,11 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 #sick-bay .sb-label { font-family: 'Bangers', cursive; font-size: 10px; color: #c084fc; text-align: center; letter-spacing: 1px; }
 #sick-bay .sb-hens { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
 
-/* Ground dirt/mess — visual particles */
-#dirt-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: background 2s; }
-#dirt-overlay.dirty { background: rgba(101,67,33,0.06); }
-#dirt-overlay.very-dirty { background: rgba(101,67,33,0.14); }
-#dirt-overlay.filthy { background: rgba(101,67,33,0.25); }
-.dirt-particle { position: absolute; pointer-events: none; z-index: 2; font-size: 14px; opacity: 0.6; }
+/* [2026-03-19 10:00] Dirt visual — poop emojis + flies instead of dark overlay (kids find poop hilarious + clearly not night) */
+#dirt-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.dirt-particle { position: absolute; pointer-events: none; z-index: 2; font-size: 20px; opacity: 0.9; transition: opacity 0.3s; }
+.dirt-particle.fly { animation: flyBuzz 1.5s ease-in-out infinite alternate; font-size: 16px; }
+@keyframes flyBuzz { 0% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(8px,-6px) rotate(15deg); } 50% { transform: translate(-4px,4px) rotate(-10deg); } 75% { transform: translate(6px,2px) rotate(8deg); } 100% { transform: translate(-3px,-5px) rotate(-5deg); } }
 
 /* Sick bay — compact fixed-size tiles */
 #sick-bay { background: rgba(192,132,252,0.06); border: 2px dashed rgba(192,132,252,0.4); border-radius: 10px; padding: 4px 6px; margin: 4px 8px; display: none; flex-shrink: 0; }
@@ -336,6 +335,21 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 #graph-panel { padding: 0; }
 #graph-title { font-family: 'Bangers', cursive; font-size: 12px; color: #FFD700; text-align: center; margin-bottom: 4px; letter-spacing: 1px; cursor: pointer; }
 #money-graph { background: rgba(0,0,0,0.3); border-radius: 6px; width: 100%; }
+/* [2026-03-19 10:00] Loan modal — big buttons for kids, no prompt() */
+.loan-modal { position: absolute; inset: 0; z-index: 58; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); gap: 12px; }
+.loan-modal.active { display: flex; }
+.loan-modal h3 { font-family: 'Bangers', cursive; font-size: 36px; color: #FFD700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(255,215,0,0.5); margin: 0; }
+.loan-modal .loan-info { font-family: 'Nunito', sans-serif; font-size: 14px; color: #ccc; text-align: center; line-height: 1.6; }
+.loan-modal .loan-info .gold { color: #FFD700; font-weight: 900; }
+.loan-modal .loan-info .red { color: #ff6666; font-weight: 900; }
+.loan-btn-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 8px 0; }
+.loan-btn { font-family: 'Bangers', cursive; font-size: 22px; letter-spacing: 2px; border: 3px solid #FFD700; border-radius: 16px; padding: 14px 28px; cursor: pointer; background: linear-gradient(180deg, rgba(255,179,71,0.3), rgba(255,179,71,0.1)); color: #FFD700; transition: all 0.15s; min-width: 100px; }
+.loan-btn:hover:not(:disabled) { transform: scale(1.08); background: linear-gradient(180deg, rgba(255,179,71,0.5), rgba(255,179,71,0.2)); box-shadow: 0 0 16px rgba(255,215,0,0.4); }
+.loan-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #666; color: #666; }
+.loan-btn.repay-btn { border-color: #4ade80; color: #4ade80; background: linear-gradient(180deg, rgba(74,222,128,0.3), rgba(74,222,128,0.1)); }
+.loan-btn.repay-btn:hover:not(:disabled) { box-shadow: 0 0 16px rgba(74,222,128,0.4); background: linear-gradient(180deg, rgba(74,222,128,0.5), rgba(74,222,128,0.2)); }
+.loan-btn.close-btn { border-color: #888; color: #aaa; font-size: 16px; padding: 8px 20px; background: rgba(255,255,255,0.05); }
+
 /* [2026-03-18 14:00] Pause overlay — copied from Ronaldo Chicken, adapted for farm theme */
 #pause-overlay { position: absolute; inset: 0; z-index: 55; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.75); pointer-events: none; }
 #pause-overlay .pause-title { font-family: 'Bangers', cursive; font-size: 80px; color: #fff; text-shadow: 0 0 40px #ff6fd8, 0 0 80px #7b2ff7; letter-spacing: 8px; animation: pausePulse 0.8s ease-in-out infinite alternate; }
@@ -550,6 +564,22 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <div class="stats" id="go-stats"></div>
     <div id="go-report" style="max-width:500px; text-align:left; margin-top:16px; background:rgba(255,255,255,0.06); border-radius:14px; padding:16px; max-height:40vh; overflow-y:auto;"></div>
     <button class="btn btn-gold" onclick="location.reload()" style="margin-top:16px; font-size:24px; padding: 14px 44px;">🔄 TRY AGAIN!</button>
+  </div>
+
+  <!-- [2026-03-19 10:00] Loan modal — big buttons for kids -->
+  <div id="loan-modal" class="loan-modal">
+    <h3>🏦 BANK LOAN</h3>
+    <div class="loan-info" id="loan-modal-info"></div>
+    <div class="loan-btn-grid" id="loan-modal-buttons"></div>
+    <button class="loan-btn close-btn" onclick="closeLoanModal()">✖ Close</button>
+  </div>
+
+  <!-- [2026-03-19 10:00] Repay modal — single pay-all button -->
+  <div id="repay-modal" class="loan-modal">
+    <h3>💸 PAY BACK LOAN</h3>
+    <div class="loan-info" id="repay-modal-info"></div>
+    <div class="loan-btn-grid" id="repay-modal-buttons"></div>
+    <button class="loan-btn close-btn" onclick="closeRepayModal()">✖ Close</button>
   </div>
 
   <!-- [2026-03-18 14:10] Keyboard shortcuts bar — always visible during gameplay -->
@@ -1160,14 +1190,14 @@ function advanceDay() {
         loanInterestAccrued = 0;
         loanAmount = Math.max(0, loanAmount - remainder);
       }
-      floatText(document.getElementById('hud'), `💳 -₹${emiPayment.toFixed(2)} EMI`, '#ff8844');
+      floatText(document.getElementById('hud'), `💳 -₹${Math.round(emiPayment)} EMI`, '#ff8844'); // [2026-03-19 10:00] No decimals
       // Recalc EMI if loan fully paid
       if (loanAmount <= 0 && loanInterestAccrued <= 0) {
         loanAmount = 0; loanInterestAccrued = 0; dailyEMI = 0;
         notify("🎉 Loan fully repaid via EMI! You're debt-free!");
       }
     } else {
-      notify("⚠️ Can't pay EMI (₹" + emiPayment.toFixed(2) + ")! Penalty interest growing!");
+      notify("⚠️ Can't pay EMI (₹" + Math.round(emiPayment) + ")! Penalty interest growing!");
     }
   }
 
@@ -1430,31 +1460,49 @@ function toggleSpeed() {
 
 function toggleShop() { /* shop always visible in sidebar */ }
 
+// [2026-03-19 10:00] Dirt visual — poop + flies, no dark overlay. Kids laugh at poop, instantly understand "dirty"
 function updateDirtVisual() {
   const overlay = document.getElementById('dirt-overlay');
-  overlay.className = '';
-  if (dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD) overlay.className = 'filthy';
-  else if (dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD) overlay.className = 'dirty';
-  else if (dirtLevel >= 15) overlay.className = 'very-dirty';
+  // Target counts: poop scales with dirt, flies only at filthy
+  const poopTarget = dirtLevel < 15 ? 0 :
+                     dirtLevel < CONFIG.DIRT_CLEAN_THRESHOLD ? Math.floor(dirtLevel / 10) :
+                     dirtLevel < CONFIG.DIRT_FILTHY_THRESHOLD ? Math.floor(dirtLevel / 6) :
+                     Math.floor(dirtLevel / 4);
+  const flyTarget = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? Math.floor((dirtLevel - CONFIG.DIRT_FILTHY_THRESHOLD) / 8) + 2 : 0;
 
-  // Add/remove dirt particles
-  const existing = overlay.querySelectorAll('.dirt-particle').length;
-  const target = Math.floor(dirtLevel / 5);
-  const dirtEmojis = ['💩','🪶','🦟','🐛','🪳'];
-  if (existing < target) {
-    for (let i = existing; i < target; i++) {
+  const existingPoop = overlay.querySelectorAll('.dirt-particle:not(.fly)').length;
+  const existingFlies = overlay.querySelectorAll('.dirt-particle.fly').length;
+
+  // Add/remove poop
+  if (existingPoop < poopTarget) {
+    for (let i = existingPoop; i < poopTarget; i++) {
       const p = document.createElement('div');
       p.className = 'dirt-particle';
-      p.textContent = dirtEmojis[Math.floor(Math.random() * dirtEmojis.length)];
-      p.style.left = Math.random() * 90 + '%';
-      p.style.top = Math.random() * 80 + '%';
-      p.style.fontSize = (10 + Math.random() * 10) + 'px';
-      p.style.opacity = 0.3 + (dirtLevel / 200);
+      p.textContent = '💩';
+      p.style.left = (5 + Math.random() * 85) + '%';
+      p.style.top = (5 + Math.random() * 75) + '%';
+      p.style.fontSize = (16 + Math.random() * 12) + 'px';
       overlay.appendChild(p);
     }
-  } else if (existing > target) {
-    const particles = overlay.querySelectorAll('.dirt-particle');
-    for (let i = target; i < existing; i++) particles[i].remove();
+  } else if (existingPoop > poopTarget) {
+    const poops = overlay.querySelectorAll('.dirt-particle:not(.fly)');
+    for (let i = poopTarget; i < existingPoop; i++) poops[i].remove();
+  }
+
+  // Add/remove flies
+  if (existingFlies < flyTarget) {
+    for (let i = existingFlies; i < flyTarget; i++) {
+      const f = document.createElement('div');
+      f.className = 'dirt-particle fly';
+      f.textContent = '🪰';
+      f.style.left = (10 + Math.random() * 80) + '%';
+      f.style.top = (10 + Math.random() * 70) + '%';
+      f.style.animationDelay = (Math.random() * 1.5) + 's';
+      overlay.appendChild(f);
+    }
+  } else if (existingFlies > flyTarget) {
+    const flies = overlay.querySelectorAll('.dirt-particle.fly');
+    for (let i = flyTarget; i < existingFlies; i++) flies[i].remove();
   }
 }
 
@@ -1689,105 +1737,105 @@ function getMaxLoan() {
   return CONFIG.LOAN_MAX_PER_LEVEL * (farmIndex + 1);
 }
 
+// [2026-03-19 10:00] Loan modal UI — big buttons for kids, no prompt()
 function takeLoan() {
-  try {
-    if (!gameRunning) return;
-    const maxLoan = getMaxLoan();
-    const available = maxLoan - loanAmount;
-    if (available <= 0) { sndError(); notify("🏦 Max loan reached! (₹" + maxLoan.toLocaleString() + ")"); return; }
+  if (!gameRunning) return;
+  const maxLoan = getMaxLoan();
+  const available = Math.round(maxLoan - loanAmount);
+  if (available <= 0) { sndError(); notify("🏦 Max loan reached! (₹" + maxLoan.toLocaleString() + ")"); return; }
 
-    const amounts = [500, 1000, 2000, 5000, 10000].filter(a => a <= available);
-    if (amounts.length === 0) { sndError(); notify("🏦 Loan limit reached!"); return; }
+  const totalDebt = Math.round(loanAmount + loanInterestAccrued);
+  const modal = document.getElementById('loan-modal');
+  document.getElementById('loan-modal-info').innerHTML =
+    'Interest: <span class="gold">9% per year</span><br>' +
+    (totalDebt > 0 ? 'Current debt: <span class="red">₹' + totalDebt.toLocaleString() + '</span><br>' : '') +
+    'Max you can borrow: <span class="gold">₹' + available.toLocaleString() + '</span>';
 
-    // Simple prompt for amount
-    const input = prompt(
-      "🏦 BANK LOAN\n\n" +
-      "Interest: 12% per annum (₹" + (DAILY_INTEREST_RATE * 100).toFixed(3) + "% daily)\n" +
-      "Current debt: ₹" + Math.round(loanAmount + loanInterestAccrued).toLocaleString() + "\n" +
-      "Max available: ₹" + available.toLocaleString() + "\n\n" +
-      "Enter loan amount (₹" + CONFIG.LOAN_MIN + " - ₹" + available.toLocaleString() + "):"
-    );
-    if (!input) return;
-
-    const amount = parseInt(input);
-    if (isNaN(amount) || amount < CONFIG.LOAN_MIN || amount > available) {
-      sndError();
-      notify("❌ Invalid amount! Min ₹" + CONFIG.LOAN_MIN + ", Max ₹" + available.toLocaleString());
-      return;
-    }
-
-    loanAmount += amount;
-    stats.totalLoanTaken += amount;
-    money += amount;
-    // Recalculate EMI for total outstanding loan
-    dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
-    sndBuy();
-    // [2026-03-18 13:30] Track loan taken
-    mpTrack('loan_taken', { amount: amount, total_debt: Math.round(loanAmount + loanInterestAccrued), daily_emi: parseFloat(dailyEMI.toFixed(2)), day: day });
-    notify("🏦 Loan ₹" + amount.toLocaleString() + "! EMI: ₹" + dailyEMI.toFixed(2) + "/day for " + CONFIG.LOAN_TENURE_DAYS + " days");
-    floatText(document.getElementById('hud'), '+₹' + amount.toLocaleString() + ' 🏦', '#60A5FA');
-    updateHUD();
-  } catch(e) { console.error('takeLoan error:', e); }
+  const btnGrid = document.getElementById('loan-modal-buttons');
+  btnGrid.innerHTML = '';
+  [1000, 5000, 10000].forEach(amt => {
+    const btn = document.createElement('button');
+    btn.className = 'loan-btn';
+    btn.textContent = '₹' + amt.toLocaleString();
+    btn.disabled = amt > available;
+    btn.onclick = () => { executeLoan(amt); closeLoanModal(); };
+    btnGrid.appendChild(btn);
+  });
+  modal.classList.add('active');
 }
+
+function executeLoan(amount) {
+  loanAmount += amount;
+  stats.totalLoanTaken += amount;
+  money += amount;
+  dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
+  sndBuy();
+  mpTrack('loan_taken', { amount: amount, total_debt: Math.round(loanAmount + loanInterestAccrued), daily_emi: Math.round(dailyEMI), day: day });
+  notify("🏦 Loan ₹" + amount.toLocaleString() + "! EMI: ₹" + Math.round(dailyEMI) + "/day for " + CONFIG.LOAN_TENURE_DAYS + " days");
+  floatText(document.getElementById('hud'), '+₹' + amount.toLocaleString() + ' 🏦', '#60A5FA');
+  updateHUD();
+}
+
+function closeLoanModal() { document.getElementById('loan-modal').classList.remove('active'); }
 
 function repayLoan() {
-  try {
-    if (!gameRunning) return;
-    const totalDebt = Math.round(loanAmount + loanInterestAccrued);
-    if (totalDebt <= 0) { sndError(); notify("✅ No loan to repay!"); return; }
+  if (!gameRunning) return;
+  const totalDebt = Math.round(loanAmount + loanInterestAccrued);
+  if (totalDebt <= 0) { sndError(); notify("✅ No loan to repay!"); return; }
 
-    const input = prompt(
-      "💸 REPAY LOAN\n\n" +
-      "Total debt: ₹" + totalDebt.toLocaleString() + "\n" +
-      "  Principal: ₹" + Math.round(loanAmount).toLocaleString() + "\n" +
-      "  Interest: ₹" + Math.round(loanInterestAccrued).toLocaleString() + "\n" +
-      "Your money: ₹" + money.toLocaleString() + "\n\n" +
-      "Enter repayment amount (or 'all'):"
-    );
-    if (!input) return;
+  const modal = document.getElementById('repay-modal');
+  const canPay = Math.round(Math.min(totalDebt, money));
+  document.getElementById('repay-modal-info').innerHTML =
+    'Total debt: <span class="red">₹' + totalDebt.toLocaleString() + '</span><br>' +
+    'Your money: <span class="gold">₹' + Math.round(money).toLocaleString() + '</span>';
 
-    let repay;
-    if (input.toLowerCase() === 'all') {
-      repay = Math.min(totalDebt, money);
-    } else {
-      repay = parseInt(input);
-    }
-
-    if (isNaN(repay) || repay <= 0) { sndError(); notify("❌ Invalid amount!"); return; }
-    if (repay > money) { sndError(); notify("❌ You only have ₹" + money.toLocaleString() + "!"); return; }
-    repay = Math.min(repay, totalDebt);
-
-    money -= repay;
-    // Pay interest first, then principal
-    if (repay <= loanInterestAccrued) {
-      loanInterestAccrued -= repay;
-    } else {
-      repay -= loanInterestAccrued;
-      loanInterestAccrued = 0;
-      loanAmount -= repay;
-      if (loanAmount < 0) loanAmount = 0;
-    }
-
-    // Recalculate EMI on remaining principal
-    dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
-    sndSell();
-    const remaining = Math.round(loanAmount + loanInterestAccrued);
-    if (remaining <= 0) {
-      dailyEMI = 0;
-      notify("🎉 Loan fully repaid! You're debt-free!");
-    } else {
-      notify("💸 Repaid! Remaining: ₹" + remaining.toLocaleString() + " | New EMI: ₹" + dailyEMI.toFixed(2) + "/day");
-    }
-    updateHUD();
-  } catch(e) { console.error('repayLoan error:', e); }
+  const btnGrid = document.getElementById('repay-modal-buttons');
+  btnGrid.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'loan-btn repay-btn';
+  if (canPay >= totalDebt) {
+    btn.textContent = '💸 Pay All ₹' + totalDebt.toLocaleString();
+  } else if (canPay > 0) {
+    btn.textContent = '💸 Pay ₹' + canPay.toLocaleString() + ' (all you have)';
+  } else {
+    btn.textContent = '😢 No money!';
+    btn.disabled = true;
+  }
+  btn.onclick = () => { executeRepay(canPay); closeRepayModal(); };
+  btnGrid.appendChild(btn);
+  modal.classList.add('active');
 }
+
+function executeRepay(repay) {
+  if (repay <= 0) return;
+  money -= repay;
+  if (repay <= loanInterestAccrued) {
+    loanInterestAccrued -= repay;
+  } else {
+    const remainder = repay - loanInterestAccrued;
+    loanInterestAccrued = 0;
+    loanAmount = Math.max(0, loanAmount - remainder);
+  }
+  dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
+  sndSell();
+  const remaining = Math.round(loanAmount + loanInterestAccrued);
+  if (remaining <= 0) {
+    dailyEMI = 0;
+    notify("🎉 Loan fully repaid! You're debt-free!");
+  } else {
+    notify("💸 Repaid ₹" + repay + "! Remaining: ₹" + remaining.toLocaleString());
+  }
+  updateHUD();
+}
+
+function closeRepayModal() { document.getElementById('repay-modal').classList.remove('active'); }
 
 // ============================================================
 //  UI UPDATES
 // ============================================================
 
 function updateHUD() {
-  document.getElementById('money-display').textContent = '₹' + money.toLocaleString();
+  document.getElementById('money-display').textContent = '₹' + Math.round(money).toLocaleString(); // [2026-03-19 10:00] No decimals
   document.getElementById('day-display').textContent = day;
   document.getElementById('hen-display').textContent = hens.filter(h=>h.alive).length;
   document.getElementById('egg-display').textContent = eggs.filter(e=>!e.hatching).length;
@@ -1825,18 +1873,18 @@ function updateHUD() {
   document.getElementById('loan-display').textContent = totalDebt > 0 ? '₹' + totalDebt.toLocaleString() : '₹0';
   document.getElementById('loan-display').style.color = totalDebt > 0 ? '#ff6666' : '#4ade80';
   document.getElementById('fi-loan').textContent = totalDebt > 0 ? '₹' + totalDebt.toLocaleString() : '₹0';
-  document.getElementById('fi-interest').textContent = dailyEMI > 0 ? '₹' + dailyEMI.toFixed(2) : '₹0';
+  document.getElementById('fi-interest').textContent = dailyEMI > 0 ? '₹' + Math.round(dailyEMI) : '₹0'; // [2026-03-19 10:00] No decimals
   if (dailyEMI > 0 && loanAmount > 0) {
     const diRate = (loanAmount + loanInterestAccrued) * DAILY_INTEREST_RATE;
-    document.getElementById('fi-emi-princ').textContent = '₹' + Math.max(0, dailyEMI - diRate).toFixed(2);
-    document.getElementById('fi-emi-int').textContent = '₹' + diRate.toFixed(2);
+    document.getElementById('fi-emi-princ').textContent = '₹' + Math.round(Math.max(0, dailyEMI - diRate));
+    document.getElementById('fi-emi-int').textContent = '₹' + Math.round(diRate);
     document.getElementById('fi-princ-left').textContent = '₹' + Math.round(loanAmount).toLocaleString();
   } else {
     document.getElementById('fi-emi-princ').textContent = '₹0';
     document.getElementById('fi-emi-int').textContent = '₹0';
     document.getElementById('fi-princ-left').textContent = '₹0';
   }
-  document.getElementById('loan-outstanding').textContent = totalDebt > 0 ? 'Debt: ₹' + totalDebt.toLocaleString() + ' | EMI: ₹' + dailyEMI.toFixed(2) + '/day' : 'No loan';
+  document.getElementById('loan-outstanding').textContent = totalDebt > 0 ? 'Debt: ₹' + totalDebt.toLocaleString() + ' | EMI: ₹' + Math.round(dailyEMI) + '/day' : 'No loan'; // [2026-03-19 10:00] No decimals
   document.getElementById('loan-limit-desc').textContent = 'Max ₹' + getMaxLoan().toLocaleString() + ' | ' + CONFIG.LOAN_TENURE_DAYS + ' day tenure';
 
   updatePnL();
@@ -2090,7 +2138,7 @@ function gameOver() {
   const totalDebt = Math.round(loanAmount + loanInterestAccrued);
   document.getElementById('go-stats').innerHTML = `
     <div>You survived <span class="gold">${day}</span> days</div>
-    <div>Final money: <span class="gold">₹${money.toLocaleString()}</span></div>
+    <div>Final money: <span class="gold">₹${Math.round(money).toLocaleString()}</span></div>
     <div>Total earned: <span class="gold">₹${totalEarned.toLocaleString()}</span></div>
     <div>Eggs sold: <span class="gold">${totalEggsSold}</span></div>
     <div>Most hens: <span class="gold">${stats.maxHensAtOnce}</span></div>
@@ -2261,13 +2309,13 @@ function updatePnL() {
   document.getElementById('pnl-chick-food').textContent = chickFood > 0 ? '-₹' + chickFood : '-₹0';
   document.getElementById('pnl-maint').textContent = maint > 0 ? '-₹' + maint : '-₹0';
   document.getElementById('pnl-rent').textContent = rent > 0 ? '-₹' + rent : '-₹0';
-  document.getElementById('pnl-emi').textContent = emi > 0 ? '-₹' + emi.toFixed(2) : '-₹0';
+  document.getElementById('pnl-emi').textContent = emi > 0 ? '-₹' + Math.round(emi) : '-₹0'; // [2026-03-19 10:00] No decimals
   // EMI breakdown: interest portion = daily interest on outstanding, principal = EMI - interest
   if (emi > 0 && loanAmount > 0) {
     const dailyInt = (loanAmount + loanInterestAccrued) * DAILY_INTEREST_RATE;
     const principalPortion = Math.max(0, emi - dailyInt);
-    document.getElementById('pnl-emi-principal').textContent = '-₹' + principalPortion.toFixed(2);
-    document.getElementById('pnl-emi-interest').textContent = '-₹' + dailyInt.toFixed(2);
+    document.getElementById('pnl-emi-principal').textContent = '-₹' + Math.round(principalPortion);
+    document.getElementById('pnl-emi-interest').textContent = '-₹' + Math.round(dailyInt);
     document.getElementById('pnl-principal-left').textContent = '₹' + Math.round(loanAmount).toLocaleString();
   } else {
     document.getElementById('pnl-emi-principal').textContent = '-₹0';
@@ -2286,9 +2334,9 @@ function updatePnL() {
   const totalCost = henFood + chickFood + maint + rent + emi + medicineCost + autoCleanCost;
   const net = eggIncome - totalCost;
   document.getElementById('pnl-total-income').textContent = '+₹' + eggIncome;
-  document.getElementById('pnl-total-cost-display').textContent = '-₹' + totalCost.toFixed(2);
+  document.getElementById('pnl-total-cost-display').textContent = '-₹' + Math.round(totalCost); // [2026-03-19 10:00] No decimals
   const netEl = document.getElementById('pnl-net');
-  netEl.textContent = (net >= 0 ? '+₹' : '-₹') + Math.abs(net).toFixed(2);
+  netEl.textContent = (net >= 0 ? '+₹' : '-₹') + Math.round(Math.abs(net));
   netEl.className = 'pnl-val ' + (net >= 0 ? 'profit' : 'loss');
 
   // Totals
@@ -2448,6 +2496,8 @@ function drawMarker(ctx, x, y, label, color, pos) {
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   // [2026-03-18 14:00] Spacebar pause/resume support
+  // [2026-03-19 10:00] Escape closes loan/repay modals
+  if (e.key === 'Escape') { closeLoanModal(); closeRepayModal(); return; }
   if (e.code === 'Space') {
     e.preventDefault();
     if (paused) { togglePause(); return; }

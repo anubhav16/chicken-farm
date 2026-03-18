@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.3.0 | 2026-03-19 | Minor | Kid UX: readable names, poop dirt, button loan UI, no decimals |
 | v3.2.1 | 2026-03-18 | Patch | Shop item attention system — wobble/bounce/shimmer alerts for kid engagement |
 | v3.2.0 | 2026-03-18 | Minor | Kid-friendly overhaul — pause, big sick indicators, simplified tiles, shortcut bar |
 | v3.1.0 | 2026-03-17 | Minor | Sickness stages, vaccination, auto-cleaner |
@@ -14,6 +15,29 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.3.0 — Kid UX Overhaul (Mar 19)
+
+### Hen Name Contrast
+- Added dark text-shadow to `.ht-status` for readability on all backgrounds
+- Minimum font size 8px (was 5-6px on large/xl grids)
+
+### Fun Dirty Farm
+- Replaced dark brown overlay with scattered 💩 poop emojis that multiply with dirt level
+- At filthy level (60%+), 🪰 buzzing flies appear with animated movement
+- Clearly distinguishable from night cycle — no more confusion
+
+### Loan Button UI
+- Replaced `prompt()` dialogs with in-game modals (Bangers font, neon borders)
+- Take loan: 3 big buttons (₹1K, ₹5K, ₹10K) — unaffordable ones greyed out
+- Repay: single "Pay Back All" button — shows partial if can't afford full
+- Escape key closes modals
+
+### No Decimal Money
+- All money displays rounded to whole rupees (₹)
+- Internal float preserved for EMI/interest accuracy
 
 ---
 
