@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.4.2 | 2026-03-19 | Patch | Fix: Mixpanel SDK crash kills game when CDN blocked |
 | v3.4.1 | 2026-03-19 | Patch | Mixpanel JS SDK + session recording + 11 missing events |
 | v3.4.0 | 2026-03-19 | Minor | Random events: Festival Bonus, Lucky Day, Mongoose Attack + Guard Dog |
 | v3.3.0 | 2026-03-19 | Minor | Kid UX: readable names, poop dirt, button loan UI, no decimals |
@@ -17,6 +18,17 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.4.2 — Fix: Mixpanel SDK Crash (Mar 19)
+
+### Critical Fix
+- Mixpanel SDK CDN script could fail to load (ad blocker, offline, slow network)
+- When it failed, `mixpanel.init()` threw uncaught error, killing entire game script
+- All game variables (including `gameRunning`) never initialized → "Cannot access before initialization"
+- **Fix**: Guard all Mixpanel calls with `typeof mixpanel !== 'undefined'` check
+- Game now works perfectly with or without Mixpanel SDK loaded
 
 ---
 

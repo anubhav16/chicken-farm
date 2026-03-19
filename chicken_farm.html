@@ -659,21 +659,26 @@ function sndCluck()  { playTone(400 + Math.random()*200, 0.06, 'sine', 0.08); }
 const MP_TOKEN = '9b80be99d5592e53cb3b693faf1cb07e';
 const MP_API = 'https://api-eu.mixpanel.com';
 
-// [2026-03-19 14:00] Initialize Mixpanel SDK with session recording
-mixpanel.init(MP_TOKEN, {
-  api_host: MP_API,
-  record_sessions_percent: 100,
-  persistence: 'localStorage',
-  track_pageview: true,
-});
+// [2026-03-19 15:00] Safe Mixpanel init — game works even if SDK fails to load (ad blocker, offline, slow CDN)
+const mpAvailable = typeof mixpanel !== 'undefined';
+if (mpAvailable) {
+  try {
+    mixpanel.init(MP_TOKEN, {
+      api_host: MP_API,
+      record_sessions_percent: 100,
+      persistence: 'localStorage',
+      track_pageview: true,
+    });
+  } catch(e) { console.warn('Mixpanel init failed:', e); }
+}
 
 let mpGameCount = parseInt(sessionStorage.getItem('cf_game_count') || '0');
 
-// [2026-03-19 14:00] Wrapper functions — same signature as before, SDK internals
+// [2026-03-19 15:00] Wrapper functions — no-op if SDK unavailable
 function mpTrack(event, props={}) {
   try {
-    mixpanel.track(event, {
-      game_count: mpGameCount, game_title: 'Chicken Farm', game_version: 'v3.4.1',
+    if (mpAvailable) mixpanel.track(event, {
+      game_count: mpGameCount, game_title: 'Chicken Farm', game_version: 'v3.4.2',
       ...props
     });
   } catch(e) {}
@@ -681,6 +686,7 @@ function mpTrack(event, props={}) {
 
 function mpEngage(ops) {
   try {
+    if (!mpAvailable) return;
     if (ops['$set']) mixpanel.people.set(ops['$set']);
     if (ops['$set_once']) mixpanel.people.set_once(ops['$set_once']);
     if (ops['$add']) {
@@ -691,10 +697,14 @@ function mpEngage(ops) {
 
 const MP_SESSION_START = Date.now();
 mpTrack('game_loaded');
-mpEngage({
-  '$set_once': { '$created': new Date().toISOString() },
-  '$set': { '$name': 'Farmer ' + (mixpanel.get_distinct_id() || '').slice(-6) }
-});
+if (mpAvailable) {
+  try {
+    mpEngage({
+      '$set_once': { '$created': new Date().toISOString() },
+      '$set': { '$name': 'Farmer ' + (mixpanel.get_distinct_id() || '').slice(-6) }
+    });
+  } catch(e) {}
+}
 
 window.addEventListener('beforeunload', () => {
   const dur = Math.round((Date.now() - MP_SESSION_START) / 1000);
