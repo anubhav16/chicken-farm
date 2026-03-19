@@ -1258,7 +1258,7 @@ function startGame() {
     lastEventDay = 0; festivalDaysLeft = 0; hasGuardDog = false; // [2026-03-19 12:00] Reset event state
     currentFestival = null; currentFestivalPrice = 0; subsidyDaysLeft = 0; hasColdStorage = false; // [2026-03-19 18:30] Reset festival + subsidy + cold storage
     autoSellInterval = 0; // [2026-03-19 18:00] Reset auto-sell stepper
-    poopMiniGameActive = false; // [2026-03-19 22:00] Reset poop mini-game state
+    cancelPoopMiniGame(); // [2026-03-19 23:30] Fix: clean up DOM + reset flag (was just flag reset, left orphan elements)
     profitStreak = 0; cleanStreak = 0; prevDayMoney = CONFIG.STARTING_MONEY; hadLossDay = false; // [2026-03-19 22:00] Reset badge tracking
     updateBadgeShelf(); // [2026-03-19 22:00] Render badge shelf (badges persist across games via localStorage)
     document.getElementById('hen-grid').innerHTML = '';
@@ -1877,10 +1877,20 @@ function getCleaningCost() {
 
 // [2026-03-19 22:00] Poop mini-game — tap poop emojis to clean Backyard for free. Effort = time not money.
 let poopMiniGameActive = false;
+
+// [2026-03-19 23:30] Fix: cancel any stuck/abandoned poop mini-game — clears DOM + resets flag
+function cancelPoopMiniGame() {
+  const grid = document.getElementById('hen-grid');
+  if (grid) grid.querySelectorAll('.poop-target').forEach(el => el.remove());
+  poopMiniGameActive = false;
+}
+
 function startPoopMiniGame() {
-  if (poopMiniGameActive) return;
+  // [2026-03-19 23:30] Fix: if previous mini-game stuck, cancel it and restart instead of silently blocking
+  if (poopMiniGameActive) cancelPoopMiniGame();
   poopMiniGameActive = true;
-  const farmArea = document.getElementById('farm-area');
+  // [2026-03-19 23:30] Fix: append poops to #hen-grid (not #farm-area) so they aren't hidden behind flex children
+  const grid = document.getElementById('hen-grid');
   const poopCount = Math.max(3, Math.floor(dirtLevel / 10));
   let remaining = poopCount;
   const oldDirt = Math.round(dirtLevel);
@@ -1889,8 +1899,8 @@ function startPoopMiniGame() {
     const p = document.createElement('div');
     p.className = 'poop-target';
     p.textContent = '💩';
-    p.style.left = (8 + Math.random() * 75) + '%';
-    p.style.top = (10 + Math.random() * 60) + '%';
+    p.style.left = (8 + Math.random() * 80) + '%';
+    p.style.top = (5 + Math.random() * 80) + '%';
     p.onclick = function() {
       if (p.classList.contains('popped')) return;
       p.classList.add('popped');
@@ -1909,11 +1919,13 @@ function startPoopMiniGame() {
         notify("✨ You cleaned all the poop! Farm is spotless!");
         addTodayEvent('🧹', 'Cleaned farm (free!)');
         // Remove all targets after brief delay
-        setTimeout(() => farmArea.querySelectorAll('.poop-target').forEach(el => el.remove()), 400);
+        setTimeout(() => grid.querySelectorAll('.poop-target').forEach(el => el.remove()), 400);
       }
     };
-    farmArea.appendChild(p);
+    grid.appendChild(p);
   }
+  // [2026-03-19 23:30] Fix: auto-cancel after 30 seconds if player doesn't finish — prevents permanent stuck state
+  setTimeout(() => { if (poopMiniGameActive && remaining > 0) { cancelPoopMiniGame(); notify("⏰ Poop cleanup timed out! Try again."); } }, 30000);
   notify("💩 Tap all the poop to clean your farm!");
 }
 

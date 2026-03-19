@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v4.2.1 | 2026-03-19 | Patch | Fix: Clean Farm button permanently broken after poop mini-game not completed |
 | v4.2.0 | 2026-03-19 | Minor | Visual polish: readability, dirt tint, loan steppers, P&L cleanup, animations |
 | v4.1.0 | 2026-03-19 | Minor | Economics rebalance (₹15 cleaning) + poop mini-game + 20 badges |
 | v4.0.0 | 2026-03-19 | Major | Festival calendar (7 multi-faith festivals) + cold storage + govt subsidy event |
@@ -24,6 +25,15 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v4.2.1 — Fix: Clean Farm Button Stuck (Mar 19)
+
+### Bug Fix
+- **CRITICAL**: Clean Farm button became permanently unresponsive after poop mini-game was abandoned or not completed. `poopMiniGameActive` flag had no timeout or cancel mechanism — once stuck, only a full game restart could fix it.
+- **Fix**: Re-clicking Clean Farm now cancels any stuck mini-game and starts fresh. Added 30-second auto-cancel timeout. Moved poop targets from `#farm-area` to `#hen-grid` to prevent poops hiding behind flex children (egg tray, sick bay).
+- **Root cause**: v4.1.0 introduced poop mini-game with a boolean lock (`poopMiniGameActive`) but only two reset paths — both required successful completion. If poops were invisible (behind flex children) or player didn't understand the mechanic, the lock was permanent.
 
 ---
 
