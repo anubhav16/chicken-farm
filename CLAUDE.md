@@ -8,11 +8,26 @@ A business simulation game for 7-year-olds, teaching farming economics, money ma
 | File | Purpose |
 |------|---------|
 | `chicken_farm.html` | The game (single HTML file, self-contained) |
+| `test_runtime.js` | Node.js VM smoke test — run after every change (Rule E) |
 | `RELEASE_NOTES_CHICKEN_FARM.md` | Version history and changelog |
 | `ideas.md` | Game ideas and feature backlog |
 
 ## Current Version
-**Chicken Farm:** v3.5.0 (2026-03-19)
+**Chicken Farm:** v3.6.0 (2026-03-19)
+
+## ⛔ Hard Rules
+
+### Rule E: RUN IT, DON'T READ IT
+After implementing any change, execute the game script in a Node.js VM sandbox before declaring it works. Static analysis (grep, read, pattern-matching) catches syntax — only execution catches runtime failures. Specifically:
+1. Extract the `<script>` block from `chicken_farm.html`
+2. Run it in `vm.runInContext()` with DOM stubs and **external dependencies deliberately missing**
+3. Verify: script loads without crash, key functions exist (`startGame`, `mpTrack`, `getEggPrice`), `mpTrack()` is a safe no-op
+4. If it crashes, the ship is **BLOCKED**
+
+**Why**: v3.4.1 shipped with unguarded `mixpanel.init()` that killed the entire game when CDN was blocked. Static review passed. Runtime test would have caught it in 5 seconds.
+
+### Rule F: EXTERNAL DEPS MUST BE GUARDED
+Any external `<script>`, `<link>`, or API dependency must be wrapped in `typeof !== 'undefined'` or try/catch. The game must work fully without them. Analytics, CDN libraries, and fonts are best-effort — the game is not.
 
 ## Release Notes Protocol
 

@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.6.0 | 2026-03-19 | Minor | Auto-cleaner fix + robot animation + P&L costs + Today's Events |
 | v3.5.0 | 2026-03-19 | Minor | Visual fixes (name contrast, remove age emoji) + egg spoilage system |
 | v3.4.2 | 2026-03-19 | Patch | Fix: Mixpanel SDK crash kills game when CDN blocked |
 | v3.4.1 | 2026-03-19 | Patch | Mixpanel JS SDK + session recording + 11 missing events |
@@ -19,6 +20,31 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.6.0 — Auto-cleaner Fix + P&L Costs + Today's Events (Mar 19)
+
+### Auto-cleaner Fix
+- **100% daily cleaning**: Auto-cleaner now sets dirt to 0% (was 80%, confusing for kids — Piaget: kids think in absolutes)
+- **Clean Farm button grayed out**: When auto-cleaner installed, manual clean is disabled (opacity 0.4, pointer-events none, "🤖 Auto-cleaner handles it!" message)
+- **Shop attention suppressed**: No wobble/shimmer on Clean Farm when auto-cleaner active
+
+### Robot Visual Animation (NEW)
+- 🤖 icon appears in farm corner after buying auto-cleaner
+- **Daily sweep animation**: Robot slides across farm left→right each day with ✨ sparkle trail
+- Gives kids visual feedback that "my ₹5,000 machine is working!"
+
+### Today's Events Section (NEW)
+- New panel below Daily P&L showing one-time purchases made today
+- Entries: hen purchases, farm upgrades, cleaning, doctor, vaccination, medicine, auto-cleaner, guard dog
+- Clears automatically each new day
+- Separates one-time CAPEX from recurring daily OPEX (financially accurate P&L)
+
+### Vaccination Tracking (Fix)
+- `stats.totalVaccinationSpent` now tracked (was missing)
+- Included in game-over spending breakdown and total spent calculation
+- Added to Mixpanel game-over event
 
 ---
 

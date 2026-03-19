@@ -141,6 +141,12 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .dirt-particle { position: absolute; pointer-events: none; z-index: 2; font-size: 20px; opacity: 0.9; transition: opacity 0.3s; }
 .dirt-particle.fly { animation: flyBuzz 1.5s ease-in-out infinite alternate; font-size: 16px; }
 @keyframes flyBuzz { 0% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(8px,-6px) rotate(15deg); } 50% { transform: translate(-4px,4px) rotate(-10deg); } 75% { transform: translate(6px,2px) rotate(8deg); } 100% { transform: translate(-3px,-5px) rotate(-5deg); } }
+/* [2026-03-19 17:00] Auto-cleaner robot — sits in corner, sweeps across farm each day */
+#robot-cleaner { position: absolute; bottom: 85px; right: 8px; font-size: 28px; z-index: 15; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); transition: opacity 0.3s; }
+#robot-cleaner.sweeping { animation: robotSweep 1.5s ease-in-out forwards; }
+@keyframes robotSweep { 0% { right: 8px; } 50% { right: calc(100% - 40px); } 100% { right: 8px; } }
+.robot-sparkle { position: absolute; font-size: 14px; z-index: 14; pointer-events: none; animation: sparkleFade 0.8s ease-out forwards; }
+@keyframes sparkleFade { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }
 
 /* Sick bay — compact fixed-size tiles */
 #sick-bay { background: rgba(192,132,252,0.06); border: 2px dashed rgba(192,132,252,0.4); border-radius: 10px; padding: 4px 6px; margin: 4px 8px; display: none; flex-shrink: 0; }
@@ -440,6 +446,12 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <div class="pnl-row total"><span><b>PROFIT</b></span><span class="pnl-val" id="pnl-net">₹0</span></div>
     </div>
 
+    <!-- [2026-03-19 17:00] Today's Events — one-time purchases, clears each new day -->
+    <div class="panel-section" id="today-events" style="display:none;">
+      <div class="panel-title" style="color:#ffb347; font-size:12px;">📋 TODAY</div>
+      <div id="today-events-list"></div>
+    </div>
+
     <!-- Farm Status -->
     <div class="panel-section" id="farm-info">
       <div class="panel-title" style="color:#7b2ff7">🏠 FARM</div>
@@ -529,6 +541,8 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 
   <div id="farm-area">
     <div id="dirt-overlay"></div>
+    <!-- [2026-03-19 17:00] Auto-cleaner robot — persistent icon + sweep animation -->
+    <div id="robot-cleaner" style="display:none;">🤖</div>
     <div id="sick-bay"><div class="sb-label">🏥 SICK BAY</div><div class="sb-hens" id="sick-bay-hens"></div></div>
     <div id="hen-grid"></div>
     <!-- [2026-03-18 14:40] First hen CTA — shown when 0 hens to create urgency -->
@@ -865,6 +879,7 @@ let stats = {
   doctorCalls: 0,
   totalDoctorSpent: 0,
   totalMedicineSpent: 0,
+  totalVaccinationSpent: 0, // [2026-03-19 17:00] Track vaccination spending
   totalCleaningSpent: 0,
   totalFoodSpent: 0,
   totalMaintenanceSpent: 0,
@@ -1108,6 +1123,7 @@ function togglePause() {
 function advanceDay() {
   day++;
   sndNewDay();
+  clearTodayEvents(); // [2026-03-19 17:00] Reset today's events for new day
 
   // Day/night cycle visual cue
   notify("☀️ Day " + day + " begins!");
@@ -1267,10 +1283,30 @@ function advanceDay() {
   const dirtIncrease = aliveCount * CONFIG.DIRT_RATE * (0.5 + crowdingRatio * 0.5) / Math.max(farmCapacity / 5, 1);
   dirtLevel = Math.min(100, dirtLevel + dirtIncrease);
 
-  // Auto-cleaner runs daily
+  // [2026-03-19 17:00] Auto-cleaner runs daily — 100% clean (kids think in absolutes, Piaget preoperational stage)
   if (hasAutoCleaner && aliveCount > 0) {
     money -= CONFIG.AUTO_CLEANER_DAILY;
-    dirtLevel = Math.max(0, dirtLevel - (aliveCount * CONFIG.DIRT_RATE * 0.8)); // cleans 80% of daily dirt
+    dirtLevel = 0;
+    // Trigger robot sweep animation + sparkles
+    const robot = document.getElementById('robot-cleaner');
+    if (robot) {
+      robot.classList.remove('sweeping');
+      void robot.offsetWidth; // force reflow to restart animation
+      robot.classList.add('sweeping');
+      // Sparkle trail
+      const farmArea = document.getElementById('farm-area');
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const s = document.createElement('div');
+          s.className = 'robot-sparkle';
+          s.textContent = '✨';
+          s.style.bottom = '90px';
+          s.style.left = (20 + i * 30) + '%';
+          farmArea.appendChild(s);
+          setTimeout(() => s.remove(), 800);
+        }, 300 + i * 300);
+      }
+    }
   }
   updateDirtVisual();
 
@@ -1584,6 +1620,8 @@ function getCleaningCost() {
 
 function cleanFarm() {
   if (!gameRunning) return;
+  // [2026-03-19 17:00] Block manual cleaning when auto-cleaner handles it
+  if (hasAutoCleaner) { notify("🤖 Auto-cleaner handles it!"); return; }
   if (dirtLevel <= 5) { notify("✨ Farm is already clean!"); return; }
   const cost = getCleaningCost();
   if (money < cost) { sndError(); notify("❌ Need ₹" + cost + " for cleaning!"); return; }
@@ -1596,6 +1634,7 @@ function cleanFarm() {
   updateDirtVisual();
   mpTrack('farm_cleaned', { cost: cost, dirt_before: oldDirt, dirt_after: 0, day: day }); // [2026-03-19 14:00]
   notify("✨ Cleaned " + oldDirt + "% dirt for ₹" + cost + "! Clean early = cheaper!");
+  addTodayEvent('🧹', 'Cleaned farm -₹' + cost);
   updateHUD();
 }
 
@@ -1620,6 +1659,7 @@ function giveMedicine() {
   mpTrack('medicine_given', { hens_treated: unwellHens.length, cured: cured, failed: failed, cost: cost, day: day }); // [2026-03-19 14:00]
   if (failed > 0) notify("💊 Treated " + unwellHens.length + ": " + cured + " cured, " + failed + " still unwell (may need doctor!)");
   else notify("💊 Home remedy worked on all " + cured + " hens!");
+  addTodayEvent('💊', 'Medicine for ' + unwellHens.length + ' hens -₹' + cost);
   updateHUD();
 }
 
@@ -1644,6 +1684,7 @@ function callDoctor() {
   mpTrack('doctor_called', { type: 'doctor', cost: CONFIG.DOCTOR_FEE, hens_treated: sickHens.length, day: day });
   const healDur = dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? CONFIG.SICK_DURATION_DIRTY : CONFIG.SICK_DURATION_CLEAN;
   notify("👨‍⚕️ Doctor treating " + sickHens.length + " hen(s)! ₹" + CONFIG.MEDICINE_PER_DAY + "/day for ~" + healDur + " days" + (healDur > CONFIG.SICK_DURATION_CLEAN ? " (clean farm = faster!)" : ""));
+  addTodayEvent('👨‍⚕️', 'Doctor visit -₹' + CONFIG.DOCTOR_FEE);
   updateHUD();
 }
 
@@ -1656,6 +1697,7 @@ function buyAutoCleaner() {
   sndUpgrade();
   mpTrack('auto_cleaner_bought', { cost: CONFIG.AUTO_CLEANER_COST, day: day }); // [2026-03-19 14:00]
   notify("🤖 Auto-cleaner installed! Runs daily for ₹" + CONFIG.AUTO_CLEANER_DAILY + "/day. Farm stays clean!");
+  addTodayEvent('🤖', 'Auto-cleaner -₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString());
   updateHUD();
 }
 
@@ -1666,10 +1708,12 @@ function vaccinateHens() {
   const cost = unvaccinated.length * CONFIG.VACCINE_COST_PER_HEN;
   if (money < cost) { sndError(); notify("❌ Need ₹" + cost + " to vaccinate " + unvaccinated.length + " hens!"); return; }
   money -= cost;
+  stats.totalVaccinationSpent += cost; // [2026-03-19 17:00] Track vaccination spending
   unvaccinated.forEach(h => { h.vaccinatedUntil = day + CONFIG.VACCINE_DURATION; });
   sndBuy();
   mpTrack('vaccinated', { hens_count: unvaccinated.length, cost: cost, day: day }); // [2026-03-19 14:00]
   notify("💉 Vaccinated " + unvaccinated.length + " hens! Protected for " + CONFIG.VACCINE_DURATION + " days. Sickness chance drops to " + (CONFIG.SICK_CHANCE_WITH_VACCINE * 100) + "%!");
+  addTodayEvent('💉', 'Vaccinated ' + unvaccinated.length + ' hens -₹' + cost);
   updateHUD();
 }
 
@@ -1685,6 +1729,7 @@ function buyHen() {
     const hen = addHenToFarm();
     floatText(hen.el, '🐔 NEW HEN!', '#FFD700');
     notify("🐔 Bought a hen for ₹" + HEN_COST + "! Money left: ₹" + money);
+    addTodayEvent('🐔', 'Bought hen -₹' + HEN_COST);
     updateHUD();
     // [2026-03-18 12:00] Track hen purchase
     mpTrack('hen_bought', { money_left: money, total_hens: hens.filter(h=>h.alive).length, day: day });
@@ -1751,6 +1796,7 @@ function rentFarm() {
     updateFarmVisuals();
     sndUpgrade();
     notify(next.emoji + " Rented " + next.name + "! " + next.cap + " hens. Rent: ₹" + next.rent + "/day");
+    addTodayEvent(next.emoji, 'Rented ' + next.name + ' (₹' + next.rent + '/day)');
     // [2026-03-18 13:30] Track farm upgrade
     mpTrack('farm_upgraded', { action: 'rent', farm_name: next.name, farm_index: nextIdx, capacity: next.cap, day: day });
     floatText(document.getElementById('hud'), next.emoji + ' RENTED!', '#ffaa44');
@@ -1770,6 +1816,7 @@ function buyFarm() {
     farmOwned = true;
     sndUpgrade();
     notify(farm.emoji + " You now OWN " + farm.name + "! No more rent! Saved ₹" + farm.rent + "/day");
+    addTodayEvent(farm.emoji, 'Bought ' + farm.name + ' -₹' + farm.buy.toLocaleString());
     // [2026-03-18 13:30] Track farm purchase
     mpTrack('farm_upgraded', { action: 'buy', farm_name: farm.name, farm_index: farmIndex, capacity: farm.cap, cost: farm.buy, day: day });
     floatText(document.getElementById('hud'), farm.emoji + ' BOUGHT!', '#4ade80');
@@ -1919,6 +1966,7 @@ function buyGuardDog() {
   sndBuy();
   mpTrack('guard_dog_bought', { cost: CONFIG.GUARD_DOG_COST, day: day }); // [2026-03-19 14:00]
   notify("🐕 Guard dog bought! Your farm is protected from predators!");
+  addTodayEvent('🐕', 'Guard dog -₹' + CONFIG.GUARD_DOG_COST);
   document.getElementById('dog-cost').textContent = 'ADOPTED ✅';
   document.getElementById('dog-desc').textContent = '🐕 Guarding your farm!';
   updateHUD();
@@ -2169,12 +2217,25 @@ function updateHUD() {
   else if (totalBirds <= 70) grid.classList.add('hen-grid-lg');
   else grid.classList.add('hen-grid-xl');
 
+  // [2026-03-19 17:00] Show/hide robot cleaner icon
+  const robotEl = document.getElementById('robot-cleaner');
+  if (robotEl) robotEl.style.display = hasAutoCleaner ? 'block' : 'none';
+
   // Dirt display
   const dirtDesc = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? '💩 FILTHY!' :
                    dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? '🟡 Dirty' :
                    dirtLevel >= 15 ? '🟠 Messy' : '✨ Clean';
-  document.getElementById('dirt-display').textContent = dirtDesc + ' (' + Math.round(dirtLevel) + '%)';
-  document.getElementById('clean-cost').textContent = dirtLevel <= 5 ? 'Clean!' : '₹' + getCleaningCost();
+  // [2026-03-19 17:00] Gray out clean button when auto-cleaner installed
+  const cleanBtn = document.querySelector('[data-action="clean"]');
+  if (hasAutoCleaner) {
+    document.getElementById('dirt-display').textContent = '🤖 Auto-clean ✨';
+    document.getElementById('clean-cost').textContent = 'Auto ✅';
+    if (cleanBtn) { cleanBtn.style.opacity = '0.4'; cleanBtn.style.pointerEvents = 'none'; }
+  } else {
+    document.getElementById('dirt-display').textContent = dirtDesc + ' (' + Math.round(dirtLevel) + '%)';
+    document.getElementById('clean-cost').textContent = dirtLevel <= 5 ? 'Clean!' : '₹' + getCleaningCost();
+    if (cleanBtn) { cleanBtn.style.opacity = '1'; cleanBtn.style.pointerEvents = 'auto'; }
+  }
   document.getElementById('autocleaner-cost').textContent = hasAutoCleaner ? 'INSTALLED ✅' : '₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString();
   document.getElementById('autocleaner-desc').textContent = hasAutoCleaner ? 'Running! ₹' + CONFIG.AUTO_CLEANER_DAILY + '/day' : 'Auto-clean daily (₹' + CONFIG.AUTO_CLEANER_DAILY + '/day)';
   const vaccinated = hens.filter(h => h.alive && h.vaccinatedUntil > day).length;
@@ -2202,7 +2263,8 @@ function updateHUD() {
 
   // [2026-03-18 16:00] Shop item attention system — highlight buttons needing kid's action
   const attnMap = {
-    'clean': dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? 'attn-urgent' :
+    'clean': hasAutoCleaner ? '' : // [2026-03-19 17:00] No attention when auto-cleaner handles it
+             dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? 'attn-urgent' :
              dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? 'attn-warning' : '',
     'medicine': unwellCount > 0 ? 'attn-warning' : '',
     'doctor': sickUntreatedCount > 0 ? 'attn-urgent' : '',
@@ -2342,6 +2404,25 @@ function updateHUD() {
       if (ageLabel) ageLabel.textContent = '';
     }
   });
+}
+
+// [2026-03-19 17:00] Today's Events — one-time purchase log, clears each new day
+function addTodayEvent(emoji, text) {
+  const list = document.getElementById('today-events-list');
+  const section = document.getElementById('today-events');
+  if (!list || !section) return;
+  section.style.display = 'block';
+  const row = document.createElement('div');
+  row.className = 'pnl-row';
+  row.style.fontSize = '11px';
+  row.innerHTML = '<span>' + emoji + ' ' + text + '</span>';
+  list.appendChild(row);
+}
+function clearTodayEvents() {
+  const list = document.getElementById('today-events-list');
+  const section = document.getElementById('today-events');
+  if (list) list.innerHTML = '';
+  if (section) section.style.display = 'none';
 }
 
 function notify(msg) {
@@ -2514,7 +2595,7 @@ function gameOver() {
   });
 
   // Spending breakdown
-  const totalSpent = stats.totalFoodSpent + stats.totalMaintenanceSpent + stats.totalRentSpent + stats.totalEMISpent + stats.totalCleaningSpent + stats.totalDoctorSpent + stats.totalMedicineSpent;
+  const totalSpent = stats.totalFoodSpent + stats.totalMaintenanceSpent + stats.totalRentSpent + stats.totalEMISpent + stats.totalCleaningSpent + stats.totalDoctorSpent + stats.totalMedicineSpent + stats.totalVaccinationSpent; // [2026-03-19 17:00] Added vaccination
   html += '<div style="font-family:Bangers,cursive; font-size:18px; color:#FFD700; margin:12px 0 8px; text-align:center;">💸 WHERE DID MY MONEY GO?</div>';
   html += '<div style="font-size:14px; color:#ddd; line-height:1.8;">';
   html += '🌾 Food: ₹' + Math.round(stats.totalFoodSpent).toLocaleString() + '<br>';
@@ -2524,6 +2605,7 @@ function gameOver() {
   html += '🧹 Cleaning: ₹' + Math.round(stats.totalCleaningSpent).toLocaleString() + '<br>';
   html += '👨‍⚕️ Doctor: ₹' + Math.round(stats.totalDoctorSpent).toLocaleString() + '<br>';
   html += '💊 Medicine: ₹' + Math.round(stats.totalMedicineSpent).toLocaleString() + '<br>';
+  html += '💉 Vaccination: ₹' + Math.round(stats.totalVaccinationSpent).toLocaleString() + '<br>';
   html += '<b>Total spent: ₹' + Math.round(totalSpent).toLocaleString() + '</b><br>';
   html += '<b>Total earned: ₹' + totalEarned.toLocaleString() + '</b><br>';
   html += '</div>';
@@ -2546,6 +2628,7 @@ function gameOver() {
     spent_cleaning: Math.round(stats.totalCleaningSpent),
     spent_doctor: Math.round(stats.totalDoctorSpent),
     spent_medicine: Math.round(stats.totalMedicineSpent),
+    spent_vaccination: Math.round(stats.totalVaccinationSpent),
     spent_total: Math.round(totalSpent),
     // Behavior stats
     doctor_calls: stats.doctorCalls, times_cleaned: stats.timesCleanedFarm,
@@ -2630,7 +2713,7 @@ function updatePnL() {
 
   // Totals
   document.getElementById('pnl-total-earned').textContent = '₹' + totalEarned.toLocaleString();
-  const totalAllSpent = Math.round(stats.totalFoodSpent + stats.totalMaintenanceSpent + stats.totalRentSpent + stats.totalEMISpent + stats.totalCleaningSpent + stats.totalDoctorSpent + stats.totalMedicineSpent);
+  const totalAllSpent = Math.round(stats.totalFoodSpent + stats.totalMaintenanceSpent + stats.totalRentSpent + stats.totalEMISpent + stats.totalCleaningSpent + stats.totalDoctorSpent + stats.totalMedicineSpent + stats.totalVaccinationSpent); // [2026-03-19 17:00] Added vaccination
   document.getElementById('pnl-total-spent').textContent = '₹' + totalAllSpent.toLocaleString();
   const avgDaily = day > 0 ? Math.round((totalEarned - totalAllSpent) / day) : 0;
   const avgEl = document.getElementById('pnl-avg-daily');
