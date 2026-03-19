@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.4.0 | 2026-03-19 | Minor | Random events: Festival Bonus, Lucky Day, Mongoose Attack + Guard Dog |
 | v3.3.0 | 2026-03-19 | Minor | Kid UX: readable names, poop dirt, button loan UI, no decimals |
 | v3.2.1 | 2026-03-18 | Patch | Shop item attention system — wobble/bounce/shimmer alerts for kid engagement |
 | v3.2.0 | 2026-03-18 | Minor | Kid-friendly overhaul — pause, big sick indicators, simplified tiles, shortcut bar |
@@ -15,6 +16,33 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.4.0 — Random Events (Mar 19)
+
+### Event System
+- Events pause the game and show a 2-choice modal (big buttons, bouncy emoji)
+- Max 1 event per 10 game-days, starts after day 10, 15% chance per eligible day
+- Events tracked in Mixpanel (event_shown, event_choice)
+
+### 3 Events
+- **Festival Bonus** 🎉 (40% weight): Eggs sell for ₹10! Choice: sell now or save for 3 days
+- **Lucky Day** 🍀 (35% weight): Restaurant wants 10 eggs at ₹8. Choice: sell or decline
+- **Mongoose Attack** 🦡 (25% weight): Kills 1 hen if no guard dog. Auto-blocked if dog owned
+
+### Guard Dog Shop Item
+- 🐕 Guard Dog: ₹500 one-time, permanently protects from mongoose attacks
+- Teaches "insurance" concept — invest now to prevent future losses
+
+### Dynamic Egg Price
+- `getEggPrice()` replaces all direct `EGG_PRICE` usage
+- Festival events temporarily boost egg price to ₹10 for 3 days
+- Sell Eggs button shows festival price indicator
+
+### Game Over Report
+- Events encountered, festivals enjoyed, lucky deals taken
+- Mongoose attacks blocked/unblocked with tip to buy guard dog
 
 ---
 

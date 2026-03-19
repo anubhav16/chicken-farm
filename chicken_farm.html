@@ -349,6 +349,20 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .loan-btn.repay-btn { border-color: #4ade80; color: #4ade80; background: linear-gradient(180deg, rgba(74,222,128,0.3), rgba(74,222,128,0.1)); }
 .loan-btn.repay-btn:hover:not(:disabled) { box-shadow: 0 0 16px rgba(74,222,128,0.4); background: linear-gradient(180deg, rgba(74,222,128,0.5), rgba(74,222,128,0.2)); }
 .loan-btn.close-btn { border-color: #888; color: #aaa; font-size: 16px; padding: 8px 20px; background: rgba(255,255,255,0.05); }
+/* [2026-03-19 12:00] Event modal — random events pause game, 2-choice modal */
+.event-modal { position: absolute; inset: 0; z-index: 57; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.88); gap: 10px; padding: 20px; }
+.event-modal.active { display: flex; }
+.event-modal .event-emoji { font-size: 80px; animation: eventBounce 0.6s ease-in-out infinite alternate; }
+@keyframes eventBounce { 0% { transform: scale(1) rotate(-5deg); } 100% { transform: scale(1.15) rotate(5deg); } }
+.event-modal .event-title { font-family: 'Bangers', cursive; font-size: 32px; color: #FFD700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(255,215,0,0.5); text-align: center; }
+.event-modal .event-desc { font-family: 'Nunito', sans-serif; font-size: 16px; color: #eee; text-align: center; max-width: 300px; line-height: 1.4; }
+.event-modal .event-choices { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+.event-choice-btn { font-family: 'Bangers', cursive; font-size: 20px; letter-spacing: 2px; border: 3px solid; border-radius: 16px; padding: 14px 24px; cursor: pointer; transition: all 0.15s; min-width: 120px; }
+.event-choice-btn:hover { transform: scale(1.08); }
+.event-choice-btn.choice-a { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.15); }
+.event-choice-btn.choice-a:hover { box-shadow: 0 0 16px rgba(74,222,128,0.4); }
+.event-choice-btn.choice-b { border-color: #60A5FA; color: #60A5FA; background: rgba(96,165,250,0.15); }
+.event-choice-btn.choice-b:hover { box-shadow: 0 0 16px rgba(96,165,250,0.4); }
 
 /* [2026-03-18 14:00] Pause overlay — copied from Ronaldo Chicken, adapted for farm theme */
 #pause-overlay { position: absolute; inset: 0; z-index: 55; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.75); pointer-events: none; }
@@ -477,6 +491,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <div class="shop-item" data-action="medicine" onclick="giveMedicine()"><span class="icon">💊</span><div class="info"><div class="name">HOME MEDICINE</div><div class="cost">₹10/hen</div><div class="desc">Treat unwell hens (70% cure)</div></div></div>
       <div class="shop-item" data-action="doctor" onclick="callDoctor()"><span class="icon">👨‍⚕️</span><div class="info"><div class="name">CALL DOCTOR</div><div class="cost">₹150 + ₹5/day</div><div class="desc" id="sick-display">✅ All healthy</div></div></div>
       <div class="shop-item" onclick="vaccinateHens()"><span class="icon">💉</span><div class="info"><div class="name">VACCINATE</div><div class="cost">₹20/hen</div><div class="desc" id="vaccine-desc">Protect for 180 days</div></div></div>
+      <div class="shop-item" onclick="buyGuardDog()"><span class="icon">🐕</span><div class="info"><div class="name">GUARD DOG</div><div class="cost" id="dog-cost">₹500</div><div class="desc" id="dog-desc">Protects from predators</div></div></div>
     </div>
 
     <!-- Buy/Sell -->
@@ -564,6 +579,14 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <div class="stats" id="go-stats"></div>
     <div id="go-report" style="max-width:500px; text-align:left; margin-top:16px; background:rgba(255,255,255,0.06); border-radius:14px; padding:16px; max-height:40vh; overflow-y:auto;"></div>
     <button class="btn btn-gold" onclick="location.reload()" style="margin-top:16px; font-size:24px; padding: 14px 44px;">🔄 TRY AGAIN!</button>
+  </div>
+
+  <!-- [2026-03-19 12:00] Event modal — random events with 2 choices -->
+  <div id="event-modal" class="event-modal">
+    <div class="event-emoji" id="event-emoji"></div>
+    <div class="event-title" id="event-title"></div>
+    <div class="event-desc" id="event-desc"></div>
+    <div class="event-choices" id="event-choices"></div>
   </div>
 
   <!-- [2026-03-19 10:00] Loan modal — big buttons for kids -->
@@ -760,6 +783,16 @@ const CONFIG = {
     { name: 'Chicken Empire',  cap: 250, rent: 200,  buy: 150000,  emoji: '🏰' },
   ],
 
+  // [2026-03-19 12:00] Random events — teaches decision-making, risk management
+  EVENT_MIN_DAY:       10,      // no events before day 10 (learn basics first)
+  EVENT_COOLDOWN:      10,      // minimum days between events
+  EVENT_CHANCE_PER_DAY: 0.15,   // 15% chance per eligible day
+  GUARD_DOG_COST:      500,     // ₹ one-time purchase
+  FESTIVAL_DURATION:   3,       // days of bonus egg price
+  FESTIVAL_EGG_PRICE:  10,      // ₹ per egg during festival
+  LUCKY_EGG_PRICE:     8,       // ₹ per egg for lucky deal
+  LUCKY_EGG_COUNT:     10,      // max eggs for lucky deal
+
   // [2026-03-18 14:20] Hen names — fun names for kids to bond with their hens
   HEN_NAMES: ['Goldie','Pepper','Sunny','Nugget','Coco','Rosie','Daisy','Ginger','Honey','Ruby',
               'Biscuit','Mango','Tikka','Brownie','Chiku','Ladoo','Meera','Chintu','Guddi','Pari',
@@ -779,6 +812,9 @@ const FOOD_COST_PER_CHICK = CONFIG.FOOD_COST_PER_CHICK;
 const HUNGRY_DAYS_TO_DIE  = CONFIG.HUNGRY_DAYS_TO_DIE;
 const FARMS               = CONFIG.FARMS;
 const DAILY_INTEREST_RATE = CONFIG.LOAN_INTEREST_ANNUAL / 365;
+
+// [2026-03-19 12:00] Dynamic egg price — returns festival price when active
+function getEggPrice() { return festivalDaysLeft > 0 ? CONFIG.FESTIVAL_EGG_PRICE : EGG_PRICE; }
 
 // Game State
 let money = 1000;
@@ -808,6 +844,10 @@ let dirtLevel = 0;         // 0-100 farm cleanliness
 // [2026-03-18 16:00] Track previous attention state for resolution flash
 let prevAttn = { clean: '', medicine: '', doctor: '', 'sell-eggs': '' };
 let hasAutoCleaner = false; // auto-cleaning machine installed
+// [2026-03-19 12:00] Random event state
+let lastEventDay = 0;
+let festivalDaysLeft = 0;
+let hasGuardDog = false;
 
 // Tracking for post-mortem report
 let stats = {
@@ -834,6 +874,13 @@ let stats = {
   daysWithDirtyFarm: 0,
   daysWithSickHens: 0,
   daysNegativeMoney: 0,
+  // [2026-03-19 12:00] Event stats
+  eventsEncountered: 0,
+  mongooseAttacks: 0,
+  mongooseBlocked: 0,
+  festivalsEnjoyed: 0,
+  luckyDeals: 0,
+  hensLostToMongoose: 0,
 };
 let loanAmount = 0;        // outstanding loan principal
 let loanInterestAccrued = 0; // interest accumulated
@@ -1002,6 +1049,7 @@ function startGame() {
     Object.keys(stats).forEach(k => stats[k] = 0);
     hasAutoCleaner = false;
     prevAttn = { clean: '', medicine: '', doctor: '', 'sell-eggs': '' }; // [2026-03-18 16:00] Reset attention state
+    lastEventDay = 0; festivalDaysLeft = 0; hasGuardDog = false; // [2026-03-19 12:00] Reset event state
     document.getElementById('hen-grid').innerHTML = '';
     document.getElementById('shortcut-bar').style.display = 'flex'; // [2026-03-18 14:10] Show shortcuts bar
     notify("🌟 Welcome to the farm, Arush! Buy a hen to start!");
@@ -1280,6 +1328,12 @@ function advanceDay() {
     }
   });
 
+  // [2026-03-19 12:00] Festival countdown
+  if (festivalDaysLeft > 0) {
+    festivalDaysLeft--;
+    if (festivalDaysLeft <= 0) notify("🎉 Festival is over. Egg price back to ₹" + EGG_PRICE);
+  }
+
   // Daily stats tracking
   if (dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD) stats.daysWithDirtyFarm++;
   if (dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD) stats.timesDirtWasFilthy++;
@@ -1299,6 +1353,9 @@ function advanceDay() {
 
   updateHUD();
   drawMoneyGraph();
+
+  // [2026-03-19 12:00] Random events — check after all day processing
+  checkForRandomEvent();
 }
 
 function layEgg(hen) {
@@ -1620,7 +1677,8 @@ function sellEggs() {
   const unsold = eggs.filter(e => !e.hatching);
   if (unsold.length === 0) { sndError(); notify("❌ No eggs to sell!"); return; }
 
-  const earnings = unsold.length * EGG_PRICE;
+  const price = getEggPrice(); // [2026-03-19 12:00] Dynamic price for festival events
+  const earnings = unsold.length * price;
   money += earnings;
   totalEarned += earnings;
   totalEggsSold += unsold.length;
@@ -1630,7 +1688,8 @@ function sellEggs() {
   eggs = eggs.filter(e => e.hatching);
   basketEggCount = 0;
 
-  notify(`💰 Sold ${unsold.length} eggs for ₹${earnings}!`);
+  const priceNote = festivalDaysLeft > 0 ? ' (🎉 Festival price!)' : '';
+  notify(`💰 Sold ${unsold.length} eggs for ₹${earnings}!${priceNote}`);
   updateHUD();
   // [2026-03-18 12:00] Track egg sale
   mpTrack('eggs_sold', { eggs_count: unsold.length, earnings: earnings, money: money, day: day });
@@ -1830,6 +1889,191 @@ function executeRepay(repay) {
 
 function closeRepayModal() { document.getElementById('repay-modal').classList.remove('active'); }
 
+// [2026-03-19 12:00] Guard Dog — protects from mongoose attacks
+function buyGuardDog() {
+  if (!gameRunning) return;
+  if (hasGuardDog) { notify("🐕 You already have a guard dog!"); return; }
+  if (money < CONFIG.GUARD_DOG_COST) { sndError(); notify("❌ Need ₹" + CONFIG.GUARD_DOG_COST + " for a guard dog!"); return; }
+  money -= CONFIG.GUARD_DOG_COST;
+  hasGuardDog = true;
+  sndBuy();
+  notify("🐕 Guard dog bought! Your farm is protected from predators!");
+  document.getElementById('dog-cost').textContent = 'ADOPTED ✅';
+  document.getElementById('dog-desc').textContent = '🐕 Guarding your farm!';
+  updateHUD();
+}
+
+// ============================================================
+//  RANDOM EVENTS — teaches decision-making
+// ============================================================
+
+// [2026-03-19 12:00] Event definitions — 2 positive, 1 negative
+const EVENT_DEFS = [
+  {
+    id: 'festival', emoji: '🎉', title: 'FESTIVAL TIME!',
+    desc: 'Diwali is here! Eggs sell for ₹10 each!',
+    weight: 40,
+    choiceA: { text: '🥚 Sell All Eggs Now!', label: 'sell_now' },
+    choiceB: { text: '⏳ Save — Price Lasts 3 Days', label: 'save' },
+    resolve: function(choice) {
+      stats.festivalsEnjoyed++;
+      if (choice === 'a') {
+        // Sell all eggs immediately at festival price
+        const unsold = eggs.filter(e => !e.hatching);
+        if (unsold.length > 0) {
+          const earnings = unsold.length * CONFIG.FESTIVAL_EGG_PRICE;
+          money += earnings; totalEarned += earnings; totalEggsSold += unsold.length;
+          unsold.forEach(e => { if (e.el && e.el.parentNode) e.el.remove(); });
+          eggs = eggs.filter(e => e.hatching); basketEggCount = 0;
+          sndSell();
+          notify("🎉 Festival sale! Sold " + unsold.length + " eggs for ₹" + earnings + "!");
+        } else { notify("🎉 Festival! But no eggs to sell — price stays high for 3 days!"); }
+        festivalDaysLeft = CONFIG.FESTIVAL_DURATION;
+      } else {
+        festivalDaysLeft = CONFIG.FESTIVAL_DURATION;
+        notify("🎉 Smart! Festival price ₹10/egg for " + CONFIG.FESTIVAL_DURATION + " days!");
+      }
+    }
+  },
+  {
+    id: 'lucky_day', emoji: '🍀', title: 'LUCKY DAY!',
+    desc: 'A restaurant wants eggs at ₹8 each!',
+    weight: 35,
+    choiceA: { text: '🤝 Sell Eggs!', label: 'sell' },
+    choiceB: { text: '🙅 No Thanks', label: 'decline' },
+    resolve: function(choice) {
+      if (choice === 'a') {
+        const unsold = eggs.filter(e => !e.hatching);
+        const toSell = Math.min(unsold.length, CONFIG.LUCKY_EGG_COUNT);
+        if (toSell > 0) {
+          stats.luckyDeals++;
+          const earnings = toSell * CONFIG.LUCKY_EGG_PRICE;
+          money += earnings; totalEarned += earnings; totalEggsSold += toSell;
+          for (let i = 0; i < toSell; i++) { if (unsold[i].el && unsold[i].el.parentNode) unsold[i].el.remove(); }
+          eggs = eggs.filter(e => e.hatching || !unsold.slice(0, toSell).includes(e));
+          sndSell();
+          notify("🍀 Sold " + toSell + " eggs at ₹" + CONFIG.LUCKY_EGG_PRICE + " each = ₹" + earnings + "!");
+        } else { notify("🍀 Lucky deal but no eggs! Collect eggs faster next time!"); }
+      } else {
+        notify("🍀 You passed on the deal. Maybe next time!");
+      }
+    }
+  },
+  {
+    id: 'mongoose', emoji: '🦡', title: 'MONGOOSE ATTACK!',
+    desc: 'A mongoose is sneaking into your farm!',
+    weight: 25,
+    choiceA: null, // auto-resolved based on guard dog
+    choiceB: null,
+    resolve: function(choice) {
+      stats.mongooseAttacks++;
+      if (hasGuardDog) {
+        stats.mongooseBlocked++;
+        notify("🐕 Your guard dog chased the mongoose away! Good boy!");
+      } else {
+        const aliveHens = hens.filter(h => h.alive);
+        if (aliveHens.length > 0) {
+          const victim = aliveHens[Math.floor(Math.random() * aliveHens.length)];
+          victim.alive = false;
+          victim.el.classList.add('dead');
+          sndDeath();
+          stats.hensLostToMongoose++;
+          floatText(victim.el, '🦡 Mongoose!', '#ff4444');
+          setTimeout(() => { victim.el.remove(); hens = hens.filter(x => x.id !== victim.id); updateHUD(); }, 2000);
+          notify("🦡 A mongoose killed " + (victim.name || 'a hen') + "! Buy a guard dog (₹500) to protect your farm!");
+        } else {
+          notify("🦡 A mongoose came but found no hens!");
+        }
+      }
+    }
+  }
+];
+
+function showEvent(eventDef) {
+  // Pause game
+  gameRunning = false;
+  clearInterval(dayTimer);
+  clearInterval(tickTimer);
+
+  const modal = document.getElementById('event-modal');
+  document.getElementById('event-emoji').textContent = eventDef.emoji;
+  document.getElementById('event-title').textContent = eventDef.title;
+  document.getElementById('event-desc').textContent = eventDef.desc;
+
+  const choicesDiv = document.getElementById('event-choices');
+  choicesDiv.innerHTML = '';
+
+  stats.eventsEncountered++;
+  mpTrack('event_shown', { event_id: eventDef.id, day: day });
+
+  // Mongoose with guard dog = auto-resolve, no choices
+  if (eventDef.id === 'mongoose' && hasGuardDog) {
+    document.getElementById('event-desc').textContent = 'A mongoose tried to sneak in... but your guard dog chased it away!';
+    document.getElementById('event-emoji').textContent = '🐕';
+    const btn = document.createElement('button');
+    btn.className = 'event-choice-btn choice-a';
+    btn.textContent = '🐕 Good Boy!';
+    btn.onclick = () => { eventDef.resolve('dog'); closeEventModal(); };
+    choicesDiv.appendChild(btn);
+  } else if (eventDef.id === 'mongoose') {
+    // No guard dog — mongoose attacks, just acknowledge
+    document.getElementById('event-desc').textContent = 'A mongoose attacked your farm! You need a guard dog!';
+    const btn = document.createElement('button');
+    btn.className = 'event-choice-btn choice-a';
+    btn.textContent = '😱 Oh No!';
+    btn.onclick = () => { eventDef.resolve('none'); closeEventModal(); };
+    choicesDiv.appendChild(btn);
+  } else {
+    // Normal 2-choice event
+    const btnA = document.createElement('button');
+    btnA.className = 'event-choice-btn choice-a';
+    btnA.textContent = eventDef.choiceA.text;
+    btnA.onclick = () => {
+      mpTrack('event_choice', { event_id: eventDef.id, choice: 'a', day: day });
+      eventDef.resolve('a'); closeEventModal();
+    };
+    choicesDiv.appendChild(btnA);
+
+    const btnB = document.createElement('button');
+    btnB.className = 'event-choice-btn choice-b';
+    btnB.textContent = eventDef.choiceB.text;
+    btnB.onclick = () => {
+      mpTrack('event_choice', { event_id: eventDef.id, choice: 'b', day: day });
+      eventDef.resolve('b'); closeEventModal();
+    };
+    choicesDiv.appendChild(btnB);
+  }
+
+  modal.classList.add('active');
+}
+
+function closeEventModal() {
+  document.getElementById('event-modal').classList.remove('active');
+  // Resume game
+  gameRunning = true;
+  startDayCycle();
+  updateHUD();
+}
+
+function checkForRandomEvent() {
+  if (day < CONFIG.EVENT_MIN_DAY) return;
+  if (day - lastEventDay < CONFIG.EVENT_COOLDOWN) return;
+  if (hens.filter(h => h.alive).length === 0) return; // no hens = no events
+  if (Math.random() >= CONFIG.EVENT_CHANCE_PER_DAY) return;
+
+  // Weighted random pick
+  const totalWeight = EVENT_DEFS.reduce((s, e) => s + e.weight, 0);
+  let roll = Math.random() * totalWeight;
+  let picked = EVENT_DEFS[0];
+  for (const e of EVENT_DEFS) {
+    roll -= e.weight;
+    if (roll <= 0) { picked = e; break; }
+  }
+
+  lastEventDay = day;
+  showEvent(picked);
+}
+
 // ============================================================
 //  UI UPDATES
 // ============================================================
@@ -1913,6 +2157,15 @@ function updateHUD() {
   document.getElementById('autocleaner-desc').textContent = hasAutoCleaner ? 'Running! ₹' + CONFIG.AUTO_CLEANER_DAILY + '/day' : 'Auto-clean daily (₹' + CONFIG.AUTO_CLEANER_DAILY + '/day)';
   const vaccinated = hens.filter(h => h.alive && h.vaccinatedUntil > day).length;
   document.getElementById('vaccine-desc').textContent = vaccinated > 0 ? '💉 ' + vaccinated + ' vaccinated' : 'Protect for ' + CONFIG.VACCINE_DURATION + ' days';
+  // [2026-03-19 12:00] Guard dog display
+  document.getElementById('dog-cost').textContent = hasGuardDog ? 'ADOPTED ✅' : '₹' + CONFIG.GUARD_DOG_COST;
+  document.getElementById('dog-desc').textContent = hasGuardDog ? '🐕 Guarding your farm!' : 'Protects from predators';
+  // [2026-03-19 12:00] Festival price indicator on sell eggs button
+  const sellEggsDesc = document.querySelector('[data-action="sell-eggs"]');
+  if (sellEggsDesc) {
+    const costEl = sellEggsDesc.querySelector('.cost');
+    if (costEl) costEl.textContent = festivalDaysLeft > 0 ? '🎉 ₹' + CONFIG.FESTIVAL_EGG_PRICE + ' each!' : '₹' + EGG_PRICE + ' each';
+  }
 
   // Sick display
   const unwellCount = hens.filter(h => h.alive && h.health === 'unwell').length;
@@ -2199,6 +2452,14 @@ function gameOver() {
   if (stats.maxMoney > CONFIG.STARTING_MONEY * 3) good.push({icon:'💰', text: 'You grew your money to ₹' + stats.maxMoney.toLocaleString() + '!'});
   if (day > 100) good.push({icon:'⏰', text: 'You survived ' + day + ' days — good effort!'});
   if (stats.doctorCalls > 0) good.push({icon:'👨‍⚕️', text: 'You called the doctor ' + stats.doctorCalls + ' times — caring farmer!'});
+  // [2026-03-19 12:00] Event stats in report
+  if (stats.festivalsEnjoyed > 0) good.push({icon:'🎉', text: 'You enjoyed ' + stats.festivalsEnjoyed + ' festival(s) — extra egg money!'});
+  if (stats.luckyDeals > 0) good.push({icon:'🍀', text: 'You took ' + stats.luckyDeals + ' lucky deal(s) — smart business!'});
+  if (stats.mongooseBlocked > 0) good.push({icon:'🐕', text: 'Your guard dog blocked ' + stats.mongooseBlocked + ' mongoose attack(s)!'});
+  if (stats.hensLostToMongoose > 0) {
+    reasons.push({icon:'🦡', text: stats.hensLostToMongoose + ' hen(s) killed by mongooses! A guard dog (₹500) would have saved them.'});
+    tips.push({icon:'💡', text: 'Buy a guard dog for ₹500 — it protects your hens from predators forever!'});
+  }
 
   // If nothing specific went wrong
   if (reasons.length === 0) {
@@ -2285,7 +2546,7 @@ function updatePnL() {
   const dirtMult = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? 0.5 :
                    dirtLevel >= CONFIG.DIRT_CLEAN_THRESHOLD ? 0.8 : 1.0;
   // Healthy hens lay (with dirt penalty), sick don't, healing don't
-  const healthyIncome = Math.round(healthyHens * EGG_PRICE * dirtMult);
+  const healthyIncome = Math.round(healthyHens * getEggPrice() * dirtMult); // [2026-03-19 12:00] Dynamic price
   const effectiveEggIncome = healthyIncome;
 
   document.getElementById('pnl-healthy-count').textContent = healthyHens;
@@ -2496,7 +2757,7 @@ function drawMarker(ctx, x, y, label, color, pos) {
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   // [2026-03-18 14:00] Spacebar pause/resume support
-  // [2026-03-19 10:00] Escape closes loan/repay modals
+  // [2026-03-19 10:00] Escape closes loan/repay modals (NOT event modal — kid must choose)
   if (e.key === 'Escape') { closeLoanModal(); closeRepayModal(); return; }
   if (e.code === 'Space') {
     e.preventDefault();
