@@ -29,6 +29,17 @@ After implementing any change, execute the game script in a Node.js VM sandbox b
 ### Rule F: EXTERNAL DEPS MUST BE GUARDED
 Any external `<script>`, `<link>`, or API dependency must be wrapped in `typeof !== 'undefined'` or try/catch. The game must work fully without them. Analytics, CDN libraries, and fonts are best-effort — the game is not.
 
+### Rule G: POST-MORTEM LEARNING LOOP
+<!-- [2026-03-19 12:00] Added: process improvement - post-mortem learning loop -->
+Every bug fix shipped via `/investigate` → `/ship` must include a Process Autopsy (Phase 6 of `/investigate`). The autopsy must:
+1. Identify the commit that introduced the bug (`git blame`)
+2. Check `.claude/ship_logs/verification_log.md` for what verification ran on that commit
+3. Identify which pipeline stage (`/explore`, `/create-plan`, `/execute`, `/verify`, `/review`) should have caught it
+4. Produce concrete diffs to the skill prompt or CLAUDE.md that would prevent recurrence — fixes must be **principle-level** (catch the class of bug, not just this instance)
+5. Verify the fix by showing the bug scenario would now be caught
+
+**Why**: Fixing bugs without fixing the process that allowed them guarantees repeat failures. Fixing only the specific instance guarantees a variant slips through.
+
 ## Release Notes Protocol
 
 **MANDATORY** on every code change: update `RELEASE_NOTES_CHICKEN_FARM.md` with version bump (patch/minor/major), date, summary, and changes. Update the Version History table at the top.
