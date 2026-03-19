@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v4.0.0 | 2026-03-19 | Major | Festival calendar (7 multi-faith festivals) + cold storage + govt subsidy event |
 | v3.7.0 | 2026-03-19 | Minor | Auto-sell stepper (0-7 day hold period) |
 | v3.6.0 | 2026-03-19 | Minor | Auto-cleaner fix + robot animation + P&L costs + Today's Events |
 | v3.5.0 | 2026-03-19 | Minor | Visual fixes (name contrast, remove age emoji) + egg spoilage system |
@@ -21,6 +22,30 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v4.0.0 — Festival Calendar + Cold Storage (Mar 19)
+
+### Scheduled Festival Calendar (NEW — major gameplay system)
+- **7 multi-faith Indian festivals** on a 300-day repeating cycle:
+  - 🌾 Pongal (day 30), 🌙 Eid (day 70), 🛶 Onam (day 120), 🪔 Diwali (day 170, ₹12/egg, 5 days!), 🙏 Guru Nanak Jayanti (day 210), 🎄 Christmas (day 250), 🎨 Holi (day 280)
+- **Advance notifications** at 10 days and 3 days before each festival
+- **Info panel countdown** always shows next festival with urgency colors (red ≤3d, orange ≤10d)
+- Dynamic egg price per festival (Diwali = ₹12, others = ₹10)
+- Teaches planning, stockpiling, and India's multi-faith culture
+
+### Cold Storage Upgrade (NEW)
+- ₹2,000 one-time + ₹3/day running cost
+- Extends egg shelf life from 7 → 14 days
+- Enables festival stockpiling strategy (save eggs for 10+ days before a festival)
+- Visual warnings shift to day 12 (warning) and day 13 (urgent)
+- Cost shown in daily P&L
+
+### Government Subsidy Event (NEW — replaces random festival)
+- Random event: "Karnataka govt offers free feed for 5 days!"
+- Player chooses to accept or decline
+- Replaces old random festival event (festivals are now scheduled, not random)
 
 ---
 

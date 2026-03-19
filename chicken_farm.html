@@ -440,6 +440,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
         <div class="pnl-row" style="padding-left:16px; font-size:10px; opacity:0.7;"><span>↳ Principal left</span><span class="pnl-val" id="pnl-principal-left" style="color:#ffaa44">₹0</span></div>
         <div class="pnl-row"><span>💊 Medicine</span><span class="pnl-val cost" id="pnl-medicine">-₹0</span></div>
         <div class="pnl-row"><span>🤖 Auto-cleaner</span><span class="pnl-val cost" id="pnl-autocleaner">-₹0</span></div>
+        <div class="pnl-row"><span>❄️ Cold storage</span><span class="pnl-val cost" id="pnl-coldstorage">-₹0</span></div>
       </div>
       <div class="pnl-row total"><span><b>INCOME</b></span><span class="pnl-val income" id="pnl-total-income">+₹0</span></div>
       <div class="pnl-row total" style="border-top:none;margin-top:0;padding-top:0;"><span><b>COST</b></span><span class="pnl-val cost" id="pnl-total-cost-display">-₹0</span></div>
@@ -482,6 +483,12 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <div class="pnl-row total"><span><b>Net worth</b></span><span class="pnl-val" id="pnl-net-worth">₹0</span></div>
     </div>
 
+    <!-- [2026-03-19 18:30] Festival countdown -->
+    <div class="panel-section" id="festival-countdown" style="display:none;">
+      <div class="panel-title" style="color:#FFD700; font-size:12px;">🎉 FESTIVAL</div>
+      <div id="festival-info" style="font-family:'Bangers',cursive; font-size:13px; color:#eee; padding:2px 8px;"></div>
+    </div>
+
     <!-- Graph -->
     <div class="panel-section" id="graph-panel">
       <div id="graph-title" onclick="toggleGraphSize()">📈 MONEY (click to resize)</div>
@@ -500,6 +507,8 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <div class="panel-title" style="color:#4ade80">🧹 FARM CARE</div>
       <div class="shop-item" data-action="clean" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">₹30</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
       <div class="shop-item" onclick="buyAutoCleaner()"><span class="icon">🤖</span><div class="info"><div class="name">AUTO CLEANER</div><div class="cost" id="autocleaner-cost">₹5,000</div><div class="desc" id="autocleaner-desc">Auto-clean daily (₹5/day)</div></div></div>
+      <!-- [2026-03-19 18:30] Cold storage — extends egg shelf life for festival stockpiling -->
+      <div class="shop-item" onclick="buyColdStorage()"><span class="icon">❄️</span><div class="info"><div class="name">COLD STORAGE</div><div class="cost" id="coldstorage-cost">₹2,000</div><div class="desc" id="coldstorage-desc">Eggs last 14 days (₹3/day)</div></div></div>
       <div class="shop-item" data-action="medicine" onclick="giveMedicine()"><span class="icon">💊</span><div class="info"><div class="name">HOME MEDICINE</div><div class="cost">₹10/hen</div><div class="desc">Treat unwell hens (70% cure)</div></div></div>
       <div class="shop-item" data-action="doctor" onclick="callDoctor()"><span class="icon">👨‍⚕️</span><div class="info"><div class="name">CALL DOCTOR</div><div class="cost">₹150 + ₹5/day</div><div class="desc" id="sick-display">✅ All healthy</div></div></div>
       <div class="shop-item" onclick="vaccinateHens()"><span class="icon">💉</span><div class="info"><div class="name">VACCINATE</div><div class="cost">₹20/hen</div><div class="desc" id="vaccine-desc">Protect for 180 days</div></div></div>
@@ -746,6 +755,9 @@ const CONFIG = {
 
   // Timelines (realistic poultry biology)
   EGG_SHELF_LIFE:      7,       // [2026-03-19 16:00] eggs spoil after 7 days unrefrigerated (Indian climate)
+  COLD_STORAGE_COST:   2000,    // [2026-03-19 18:30] ₹ one-time cold storage purchase
+  COLD_STORAGE_DAILY:  3,       // [2026-03-19 18:30] ₹/day running cost
+  COLD_STORAGE_SHELF_LIFE: 14,  // [2026-03-19 18:30] eggs last 14 days with cold storage
   HATCH_DAYS:          21,      // egg → chick: 21 days incubation
   CHICK_GROW_DAYS:     150,     // chick → laying hen: ~5 months (18-22 weeks)
   HUNGRY_DAYS_TO_DIE:  3,       // days without food before death
@@ -805,10 +817,22 @@ const CONFIG = {
   EVENT_COOLDOWN:      10,      // minimum days between events
   EVENT_CHANCE_PER_DAY: 0.15,   // 15% chance per eligible day
   GUARD_DOG_COST:      500,     // ₹ one-time purchase
-  FESTIVAL_DURATION:   3,       // days of bonus egg price
-  FESTIVAL_EGG_PRICE:  10,      // ₹ per egg during festival
   LUCKY_EGG_PRICE:     8,       // ₹ per egg for lucky deal
   LUCKY_EGG_COUNT:     10,      // max eggs for lucky deal
+
+  // [2026-03-19 18:30] Festival calendar — multi-faith Indian festivals, 300-day cycle
+  FESTIVAL_CALENDAR: [
+    { name: 'Pongal',             day: 30,  emoji: '🌾', price: 10, duration: 3 },
+    { name: 'Eid',                day: 70,  emoji: '🌙', price: 10, duration: 3 },
+    { name: 'Onam',               day: 120, emoji: '🛶', price: 10, duration: 3 },
+    { name: 'Diwali',             day: 170, emoji: '🪔', price: 12, duration: 5 },
+    { name: 'Guru Nanak Jayanti', day: 210, emoji: '🙏', price: 10, duration: 3 },
+    { name: 'Christmas',          day: 250, emoji: '🎄', price: 10, duration: 3 },
+    { name: 'Holi',               day: 280, emoji: '🎨', price: 10, duration: 3 },
+  ],
+  FESTIVAL_CYCLE:      300,     // cycle repeats every 300 days
+  FESTIVAL_WARN_EARLY: 10,      // notify 10 days before
+  FESTIVAL_WARN_LATE:  3,       // notify 3 days before
 
   // [2026-03-18 14:20] Hen names — fun names for kids to bond with their hens
   HEN_NAMES: ['Goldie','Pepper','Sunny','Nugget','Coco','Rosie','Daisy','Ginger','Honey','Ruby',
@@ -830,8 +854,30 @@ const HUNGRY_DAYS_TO_DIE  = CONFIG.HUNGRY_DAYS_TO_DIE;
 const FARMS               = CONFIG.FARMS;
 const DAILY_INTEREST_RATE = CONFIG.LOAN_INTEREST_ANNUAL / 365;
 
-// [2026-03-19 12:00] Dynamic egg price — returns festival price when active
-function getEggPrice() { return festivalDaysLeft > 0 ? CONFIG.FESTIVAL_EGG_PRICE : EGG_PRICE; }
+// [2026-03-19 18:30] Dynamic egg price — returns scheduled festival price when active
+function getEggPrice() { return festivalDaysLeft > 0 ? currentFestivalPrice : EGG_PRICE; }
+
+// [2026-03-19 18:30] Festival calendar helpers
+function getNextFestival(currentDay) {
+  const cycle = CONFIG.FESTIVAL_CYCLE;
+  const dayInCycle = currentDay % cycle;
+  // Find next festival in current cycle
+  for (const f of CONFIG.FESTIVAL_CALENDAR) {
+    if (f.day > dayInCycle) return { ...f, startsIn: f.day - dayInCycle };
+  }
+  // Wrap to first festival of next cycle
+  const first = CONFIG.FESTIVAL_CALENDAR[0];
+  return { ...first, startsIn: (cycle - dayInCycle) + first.day };
+}
+
+function getActiveFestival(currentDay) {
+  const cycle = CONFIG.FESTIVAL_CYCLE;
+  const dayInCycle = currentDay % cycle;
+  for (const f of CONFIG.FESTIVAL_CALENDAR) {
+    if (dayInCycle >= f.day && dayInCycle < f.day + f.duration) return f;
+  }
+  return null;
+}
 
 // Game State
 let money = 1000;
@@ -861,9 +907,13 @@ let dirtLevel = 0;         // 0-100 farm cleanliness
 // [2026-03-18 16:00] Track previous attention state for resolution flash
 let prevAttn = { clean: '', medicine: '', doctor: '', 'sell-eggs': '' };
 let hasAutoCleaner = false; // auto-cleaning machine installed
+let hasColdStorage = false;  // [2026-03-19 18:30] cold storage extends egg shelf life
 // [2026-03-19 12:00] Random event state
 let lastEventDay = 0;
 let festivalDaysLeft = 0;
+let currentFestival = null;   // [2026-03-19 18:30] Active festival object from calendar
+let currentFestivalPrice = 0; // [2026-03-19 18:30] Price during active festival
+let subsidyDaysLeft = 0;      // [2026-03-19 18:30] Free feed days from govt subsidy event
 let hasGuardDog = false;
 
 // Tracking for post-mortem report
@@ -1068,6 +1118,7 @@ function startGame() {
     hasAutoCleaner = false;
     prevAttn = { clean: '', medicine: '', doctor: '', 'sell-eggs': '' }; // [2026-03-18 16:00] Reset attention state
     lastEventDay = 0; festivalDaysLeft = 0; hasGuardDog = false; // [2026-03-19 12:00] Reset event state
+    currentFestival = null; currentFestivalPrice = 0; subsidyDaysLeft = 0; hasColdStorage = false; // [2026-03-19 18:30] Reset festival + subsidy + cold storage
     autoSellInterval = 0; // [2026-03-19 18:00] Reset auto-sell stepper
     document.getElementById('hen-grid').innerHTML = '';
     document.getElementById('shortcut-bar').style.display = 'flex'; // [2026-03-18 14:10] Show shortcuts bar
@@ -1132,8 +1183,11 @@ function advanceDay() {
 
   // Food + maintenance cost — auto-deducted daily
   const aliveHens = hens.filter(h => h.alive);
-  const henFoodBill = aliveHens.length * FOOD_COST_PER_HEN;
-  const chickFoodBill = chicks.length * FOOD_COST_PER_CHICK;
+  // [2026-03-19 18:30] Govt subsidy = free food
+  const subsidyActive = subsidyDaysLeft > 0;
+  if (subsidyActive) { subsidyDaysLeft--; if (subsidyDaysLeft <= 0) notify("🏛️ Government subsidy ended. Feed costs resume."); }
+  const henFoodBill = subsidyActive ? 0 : aliveHens.length * FOOD_COST_PER_HEN;
+  const chickFoodBill = subsidyActive ? 0 : chicks.length * FOOD_COST_PER_CHICK;
   const totalFoodBill = henFoodBill + chickFoodBill;
   if (totalFoodBill > 0 && money >= totalFoodBill) {
     money -= totalFoodBill;
@@ -1206,8 +1260,9 @@ function advanceDay() {
     }
   }
 
-  // [2026-03-19 16:00] Egg spoilage — eggs go bad after EGG_SHELF_LIFE days (hatching eggs exempt)
-  const spoiled = eggs.filter(e => !e.hatching && e.laidDay && (day - e.laidDay) >= CONFIG.EGG_SHELF_LIFE);
+  // [2026-03-19 18:30] Egg spoilage — dynamic shelf life based on cold storage
+  const effectiveShelfLife = hasColdStorage ? CONFIG.COLD_STORAGE_SHELF_LIFE : CONFIG.EGG_SHELF_LIFE;
+  const spoiled = eggs.filter(e => !e.hatching && e.laidDay && (day - e.laidDay) >= effectiveShelfLife);
   if (spoiled.length > 0) {
     spoiled.forEach(e => { if (e.el && e.el.parentNode) e.el.remove(); });
     eggs = eggs.filter(e => !spoiled.includes(e));
@@ -1310,6 +1365,10 @@ function advanceDay() {
       }
     }
   }
+  // [2026-03-19 18:30] Cold storage daily cost
+  if (hasColdStorage && hens.filter(h=>h.alive).length > 0) {
+    money -= CONFIG.COLD_STORAGE_DAILY;
+  }
   updateDirtVisual();
 
   // === SICKNESS SYSTEM ===
@@ -1378,10 +1437,31 @@ function advanceDay() {
     }
   });
 
-  // [2026-03-19 12:00] Festival countdown
-  if (festivalDaysLeft > 0) {
+  // [2026-03-19 18:30] Scheduled festival calendar — check start, countdown, end
+  const activeFest = getActiveFestival(day);
+  if (activeFest && !currentFestival) {
+    // Festival starts today
+    currentFestival = activeFest;
+    currentFestivalPrice = activeFest.price;
+    festivalDaysLeft = activeFest.duration;
+    stats.festivalsEnjoyed++;
+    notify(activeFest.emoji + ' ' + activeFest.name + ' is here! Eggs sell for ₹' + activeFest.price + ' for ' + activeFest.duration + ' days!');
+  } else if (festivalDaysLeft > 0) {
     festivalDaysLeft--;
-    if (festivalDaysLeft <= 0) notify("🎉 Festival is over. Egg price back to ₹" + EGG_PRICE);
+    if (festivalDaysLeft <= 0) {
+      notify(currentFestival ? currentFestival.emoji + ' ' + currentFestival.name + ' is over. Egg price back to ₹' + EGG_PRICE : '🎉 Festival over.');
+      currentFestival = null;
+      currentFestivalPrice = 0;
+    }
+  }
+  // Advance warnings
+  const nextFest = getNextFestival(day);
+  if (nextFest) {
+    if (nextFest.startsIn === CONFIG.FESTIVAL_WARN_EARLY) {
+      notify(nextFest.emoji + ' ' + nextFest.name + ' in ' + nextFest.startsIn + ' days! Egg price ₹' + nextFest.price + ' — start saving eggs!');
+    } else if (nextFest.startsIn === CONFIG.FESTIVAL_WARN_LATE) {
+      notify(nextFest.emoji + ' ' + nextFest.name + ' in ' + nextFest.startsIn + ' days! Get ready!');
+    }
   }
 
   // Daily stats tracking
@@ -1567,7 +1647,7 @@ function changeAutoSell(delta) {
   if (warn) {
     if (autoSellInterval >= 5) {
       warn.style.display = 'block';
-      warn.textContent = '⚠️ Eggs spoil at ' + CONFIG.EGG_SHELF_LIFE + ' days!';
+      warn.textContent = '⚠️ Eggs spoil at ' + (hasColdStorage ? CONFIG.COLD_STORAGE_SHELF_LIFE : CONFIG.EGG_SHELF_LIFE) + ' days!'; // [2026-03-19 18:30] Dynamic
     } else {
       warn.style.display = 'none';
     }
@@ -1722,6 +1802,20 @@ function buyAutoCleaner() {
   mpTrack('auto_cleaner_bought', { cost: CONFIG.AUTO_CLEANER_COST, day: day }); // [2026-03-19 14:00]
   notify("🤖 Auto-cleaner installed! Runs daily for ₹" + CONFIG.AUTO_CLEANER_DAILY + "/day. Farm stays clean!");
   addTodayEvent('🤖', 'Auto-cleaner -₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString());
+  updateHUD();
+}
+
+// [2026-03-19 18:30] Cold storage — extends egg shelf life from 7→14 days
+function buyColdStorage() {
+  if (!gameRunning) return;
+  if (hasColdStorage) { notify("✅ Cold storage already installed!"); return; }
+  if (money < CONFIG.COLD_STORAGE_COST) { sndError(); notify("❌ Need ₹" + CONFIG.COLD_STORAGE_COST.toLocaleString() + " for cold storage!"); return; }
+  money -= CONFIG.COLD_STORAGE_COST;
+  hasColdStorage = true;
+  sndUpgrade();
+  mpTrack('cold_storage_bought', { cost: CONFIG.COLD_STORAGE_COST, day: day });
+  notify("❄️ Cold storage installed! Eggs now last " + CONFIG.COLD_STORAGE_SHELF_LIFE + " days. Runs ₹" + CONFIG.COLD_STORAGE_DAILY + "/day.");
+  addTodayEvent('❄️', 'Cold storage -₹' + CONFIG.COLD_STORAGE_COST.toLocaleString());
   updateHUD();
 }
 
@@ -2000,31 +2094,21 @@ function buyGuardDog() {
 //  RANDOM EVENTS — teaches decision-making
 // ============================================================
 
-// [2026-03-19 12:00] Event definitions — 2 positive, 1 negative
+// [2026-03-19 18:30] Event definitions — festivals moved to scheduled calendar, replaced with subsidy
 const EVENT_DEFS = [
   {
-    id: 'festival', emoji: '🎉', title: 'FESTIVAL TIME!',
-    desc: 'Diwali is here! Eggs sell for ₹10 each!',
+    id: 'subsidy', emoji: '🏛️', title: 'GOVERNMENT SUBSIDY!',
+    desc: 'Karnataka govt offers free feed for 5 days!',
     weight: 40,
-    choiceA: { text: '🥚 Sell All Eggs Now!', label: 'sell_now' },
-    choiceB: { text: '⏳ Save — Price Lasts 3 Days', label: 'save' },
+    choiceA: { text: '🎁 Accept Subsidy!', label: 'accept' },
+    choiceB: { text: '🙅 No Thanks', label: 'decline' },
     resolve: function(choice) {
-      stats.festivalsEnjoyed++;
       if (choice === 'a') {
-        // Sell all eggs immediately at festival price
-        const unsold = eggs.filter(e => !e.hatching);
-        if (unsold.length > 0) {
-          const earnings = unsold.length * CONFIG.FESTIVAL_EGG_PRICE;
-          money += earnings; totalEarned += earnings; totalEggsSold += unsold.length;
-          unsold.forEach(e => { if (e.el && e.el.parentNode) e.el.remove(); });
-          eggs = eggs.filter(e => e.hatching); basketEggCount = 0;
-          sndSell();
-          notify("🎉 Festival sale! Sold " + unsold.length + " eggs for ₹" + earnings + "!");
-        } else { notify("🎉 Festival! But no eggs to sell — price stays high for 3 days!"); }
-        festivalDaysLeft = CONFIG.FESTIVAL_DURATION;
+        // Free food for 5 days — set a counter
+        subsidyDaysLeft = 5;
+        notify("🏛️ Free feed for 5 days! Save money while hens eat free!");
       } else {
-        festivalDaysLeft = CONFIG.FESTIVAL_DURATION;
-        notify("🎉 Smart! Festival price ₹10/egg for " + CONFIG.FESTIVAL_DURATION + " days!");
+        notify("🏛️ You declined the subsidy. Self-reliant farmer!");
       }
     }
   },
@@ -2262,6 +2346,9 @@ function updateHUD() {
   }
   document.getElementById('autocleaner-cost').textContent = hasAutoCleaner ? 'INSTALLED ✅' : '₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString();
   document.getElementById('autocleaner-desc').textContent = hasAutoCleaner ? 'Running! ₹' + CONFIG.AUTO_CLEANER_DAILY + '/day' : 'Auto-clean daily (₹' + CONFIG.AUTO_CLEANER_DAILY + '/day)';
+  // [2026-03-19 18:30] Cold storage display
+  document.getElementById('coldstorage-cost').textContent = hasColdStorage ? 'INSTALLED ✅' : '₹' + CONFIG.COLD_STORAGE_COST.toLocaleString();
+  document.getElementById('coldstorage-desc').textContent = hasColdStorage ? 'Running! Eggs last ' + CONFIG.COLD_STORAGE_SHELF_LIFE + 'd (₹' + CONFIG.COLD_STORAGE_DAILY + '/day)' : 'Eggs last ' + CONFIG.COLD_STORAGE_SHELF_LIFE + ' days (₹' + CONFIG.COLD_STORAGE_DAILY + '/day)';
   const vaccinated = hens.filter(h => h.alive && h.vaccinatedUntil > day).length;
   document.getElementById('vaccine-desc').textContent = vaccinated > 0 ? '💉 ' + vaccinated + ' vaccinated' : 'Protect for ' + CONFIG.VACCINE_DURATION + ' days';
   // [2026-03-19 12:00] Guard dog display
@@ -2271,7 +2358,7 @@ function updateHUD() {
   const sellEggsDesc = document.querySelector('[data-action="sell-eggs"]');
   if (sellEggsDesc) {
     const costEl = sellEggsDesc.querySelector('.cost');
-    if (costEl) costEl.textContent = festivalDaysLeft > 0 ? '🎉 ₹' + CONFIG.FESTIVAL_EGG_PRICE + ' each!' : '₹' + EGG_PRICE + ' each';
+    if (costEl) costEl.textContent = festivalDaysLeft > 0 ? '🎉 ₹' + currentFestivalPrice + ' each!' : '₹' + EGG_PRICE + ' each'; // [2026-03-19 18:30] Use dynamic festival price
   }
 
   // Sick display
@@ -2415,7 +2502,7 @@ function updateHUD() {
     }
     // Spoilage visual — warning at shelfLife-2, urgent at shelfLife-1
     const eggAge = e.laidDay ? day - e.laidDay : 0;
-    const shelfLife = CONFIG.EGG_SHELF_LIFE;
+    const shelfLife = hasColdStorage ? CONFIG.COLD_STORAGE_SHELF_LIFE : CONFIG.EGG_SHELF_LIFE; // [2026-03-19 18:30] Dynamic
     const ageLabel = e.el.querySelector('.egg-age');
     e.el.classList.remove('egg-warning', 'egg-urgent');
     if (eggAge >= shelfLife - 1) {
@@ -2428,6 +2515,25 @@ function updateHUD() {
       if (ageLabel) ageLabel.textContent = '';
     }
   });
+
+  // [2026-03-19 18:30] Festival countdown display
+  const festSection = document.getElementById('festival-countdown');
+  const festInfo = document.getElementById('festival-info');
+  if (festSection && festInfo) {
+    if (currentFestival && festivalDaysLeft > 0) {
+      festSection.style.display = 'block';
+      festInfo.innerHTML = '<span style="color:#FFD700;">' + currentFestival.emoji + ' ' + currentFestival.name + ' NOW!</span><br><span style="font-size:11px;">' + festivalDaysLeft + ' day' + (festivalDaysLeft > 1 ? 's' : '') + ' left — ₹' + currentFestivalPrice + '/egg</span>';
+    } else {
+      const next = getNextFestival(day);
+      if (next && day > 0) {
+        festSection.style.display = 'block';
+        const urgency = next.startsIn <= 3 ? 'color:#ff4444;' : next.startsIn <= 10 ? 'color:#ff9900;' : 'color:#aaa;';
+        festInfo.innerHTML = '<span style="' + urgency + '">' + next.emoji + ' ' + next.name + ' in ' + next.startsIn + ' days</span><br><span style="font-size:11px;color:#888;">₹' + next.price + '/egg for ' + next.duration + ' days</span>';
+      } else {
+        festSection.style.display = 'none';
+      }
+    }
+  }
 }
 
 // [2026-03-19 17:00] Today's Events — one-time purchase log, clears each new day
@@ -2725,9 +2831,12 @@ function updatePnL() {
   document.getElementById('pnl-medicine').textContent = medicineCost > 0 ? '-₹' + medicineCost : '-₹0';
   const autoCleanCost = hasAutoCleaner && hens.filter(h=>h.alive).length > 0 ? CONFIG.AUTO_CLEANER_DAILY : 0;
   document.getElementById('pnl-autocleaner').textContent = autoCleanCost > 0 ? '-₹' + autoCleanCost : '-₹0';
+  // [2026-03-19 18:30] Cold storage cost
+  const coldStorageCost = hasColdStorage && hens.filter(h=>h.alive).length > 0 ? CONFIG.COLD_STORAGE_DAILY : 0;
+  document.getElementById('pnl-coldstorage').textContent = coldStorageCost > 0 ? '-₹' + coldStorageCost : '-₹0';
 
   // Summaries
-  const totalCost = henFood + chickFood + maint + rent + emi + medicineCost + autoCleanCost;
+  const totalCost = henFood + chickFood + maint + rent + emi + medicineCost + autoCleanCost + coldStorageCost;
   const net = eggIncome - totalCost;
   document.getElementById('pnl-total-income').textContent = '+₹' + eggIncome;
   document.getElementById('pnl-total-cost-display').textContent = '-₹' + Math.round(totalCost); // [2026-03-19 10:00] No decimals
