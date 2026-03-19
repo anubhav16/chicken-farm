@@ -138,6 +138,8 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 
 /* [2026-03-19 10:00] Dirt visual — poop emojis + flies instead of dark overlay (kids find poop hilarious + clearly not night) */
 #dirt-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+/* [2026-03-19 23:00] Brown tint scales with dirt % — makes 15% vs 50% instantly visible */
+#dirt-tint { position: absolute; inset: 0; background: rgba(101,67,33,0.0); pointer-events: none; z-index: 1; transition: background 0.5s; border-radius: 0; }
 .dirt-particle { position: absolute; pointer-events: none; z-index: 2; font-size: 20px; opacity: 0.9; transition: opacity 0.3s; }
 /* [2026-03-19 22:00] Poop mini-game — clickable targets at Backyard for free cleaning */
 .poop-target { position: absolute; z-index: 20; font-size: 28px; cursor: pointer; pointer-events: auto; transition: transform 0.15s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
@@ -160,15 +162,26 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 @keyframes robotSweep { 0% { right: 8px; } 50% { right: calc(100% - 40px); } 100% { right: 8px; } }
 .robot-sparkle { position: absolute; font-size: 14px; z-index: 14; pointer-events: none; animation: sparkleFade 0.8s ease-out forwards; }
 @keyframes sparkleFade { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }
+/* [2026-03-19 23:00] Mongoose dash animation — runs across farm */
+.mongoose-anim { position: absolute; font-size: 36px; z-index: 50; pointer-events: none; top: 50%; }
+.mongoose-anim.dash { animation: mongooseDash 1.5s ease-in-out forwards; }
+@keyframes mongooseDash { 0% { left: -40px; opacity: 1; } 50% { left: 50%; } 100% { left: calc(100% + 40px); opacity: 0; } }
+.mongoose-anim.chased { animation: mongooseChased 1.5s ease-in-out forwards; }
+@keyframes mongooseChased { 0% { left: -40px; } 30% { left: 40%; } 100% { left: -60px; opacity: 0; } }
+/* [2026-03-19 23:00] Broom sweep animation — reuses robotSweep pattern */
+.broom-anim { position: absolute; bottom: 85px; font-size: 32px; z-index: 15; pointer-events: none; right: 8px; }
+.broom-anim.sweeping { animation: broomSweep 1.2s ease-in-out forwards; }
+@keyframes broomSweep { 0% { right: 8px; opacity: 1; } 50% { right: calc(100% - 40px); } 100% { right: 8px; opacity: 0; } }
 
 /* Sick bay — compact fixed-size tiles */
 #sick-bay { background: rgba(192,132,252,0.06); border: 2px dashed rgba(192,132,252,0.4); border-radius: 10px; padding: 4px 6px; margin: 4px 8px; display: none; flex-shrink: 0; }
 #sick-bay .sb-label { font-family: 'Bangers', cursive; font-size: 12px; color: #c084fc; text-align: center; letter-spacing: 1px; margin-bottom: 3px; }
 #sick-bay .sb-hens { display: flex; flex-wrap: wrap; gap: 3px; justify-content: flex-start; }
 /* Sick bay tiles are always small regardless of grid size */
-#sick-bay .hen-tile { width: 44px !important; height: 52px !important; padding: 2px !important; border-width: 2px !important; border-radius: 6px !important; }
-#sick-bay .ht-body { width: 24px !important; height: 22px !important; }
-#sick-bay .ht-status { font-size: 7px !important; }
+/* [2026-03-19 23:00] Bumped sick bay tile SVG from 24x22 to 30x28, status 7→8px for readability */
+#sick-bay .hen-tile { width: 48px !important; height: 56px !important; padding: 2px !important; border-width: 2px !important; border-radius: 6px !important; }
+#sick-bay .ht-body { width: 30px !important; height: 28px !important; }
+#sick-bay .ht-status { font-size: 8px !important; }
 /* [2026-03-18 14:30] BIG & LOUD sick indicators — full-tile color floods for kids */
 .hen-tile.unwell { border-color: rgba(251,191,36,0.8) !important; background: rgba(255,235,0,0.35) !important; border-width: 3px !important; }
 .hen-tile.unwell .ht-body { animation: unwellPulse 0.8s ease-in-out infinite; }
@@ -178,7 +191,9 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 @keyframes sickShakeBig { 0%,100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-6px) rotate(-8deg); } 75% { transform: translateX(6px) rotate(8deg); } }
 .hen-tile.healing { border-color: rgba(96,165,250,0.7) !important; background: rgba(50,150,255,0.3) !important; border-width: 3px !important; }
 /* Sick emoji overlay — giant centered emoji on tile */
-.sick-emoji-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; z-index: 2; pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+/* [2026-03-19 23:00] Shrunk from 40px centered to 18px corner badge — was burying hen and name */
+.sick-emoji-overlay { position: absolute; top: 2px; left: 2px; font-size: 18px; z-index: 2; pointer-events: none; text-shadow: 0 1px 4px rgba(0,0,0,0.5); line-height: 1; }
+#sick-bay .sick-emoji-overlay { font-size: 14px; } /* [2026-03-19 23:00] Even smaller in sick bay */
 /* Action button on sick tile */
 .tile-action-btn { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 3; font-family: 'Bangers', cursive; font-size: 10px; padding: 2px 8px; border-radius: 8px; cursor: pointer; border: 2px solid rgba(255,255,255,0.6); color: #fff; white-space: nowrap; }
 .tile-action-btn.medicine-btn { background: rgba(255,180,0,0.85); }
@@ -186,7 +201,8 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .hen-tile.healing .ht-body { animation: healPulse 1.5s ease-in-out infinite; }
 @keyframes healPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 .hen-tile.vaccinated { position: relative; }
-.hen-tile.vaccinated::after { content: '💉'; position: absolute; top: 1px; right: 1px; font-size: 8px; }
+/* [2026-03-19 23:00] Bumped vaccination icon from 8px to 13px for visibility */
+.hen-tile.vaccinated::after { content: '💉'; position: absolute; top: 1px; right: 1px; font-size: 13px; }
 
 /* Hen sprite — 2D SVG style */
 .hen { position: absolute; bottom: 0; cursor: pointer; transition: left 2s ease-in-out, bottom 0.3s; z-index: 12; display: flex; flex-direction: column; align-items: center; }
@@ -358,6 +374,14 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .loan-modal { position: absolute; inset: 0; z-index: 58; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); gap: 12px; }
 .loan-modal.active { display: flex; }
 .loan-modal h3 { font-family: 'Bangers', cursive; font-size: 36px; color: #FFD700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(255,215,0,0.5); margin: 0; }
+/* [2026-03-19 23:00] Loan stepper — big +/- buttons for kids */
+.loan-stepper { display: flex; align-items: center; gap: 16px; margin: 12px 0; }
+.loan-stepper .step-btn { width: 52px; height: 52px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.4); font-size: 28px; font-weight: 900; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; transition: transform 0.1s, opacity 0.2s; }
+.loan-stepper .step-btn:active { transform: scale(0.9); }
+.loan-stepper .step-btn:disabled { opacity: 0.3; cursor: default; }
+.loan-stepper .step-btn.minus { background: #ff4444; }
+.loan-stepper .step-btn.plus { background: #4ade80; }
+.loan-stepper .step-amount { font-family: 'Bangers', cursive; font-size: 32px; color: #FFD700; min-width: 100px; text-align: center; }
 .loan-modal .loan-info { font-family: 'Nunito', sans-serif; font-size: 14px; color: #ccc; text-align: center; line-height: 1.6; }
 .loan-modal .loan-info .gold { color: #FFD700; font-weight: 900; }
 .loan-modal .loan-info .red { color: #ff6666; font-weight: 900; }
@@ -436,6 +460,12 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <div id="badge-grid"></div>
     </div>
 
+    <!-- [2026-03-19 23:00] Festival countdown moved above P&L — context before numbers -->
+    <div class="panel-section" id="festival-countdown" style="display:none;">
+      <div class="panel-title" style="color:#FFD700; font-size:12px;">🎉 FESTIVAL</div>
+      <div id="festival-info" style="font-family:'Bangers',cursive; font-size:13px; color:#eee; padding:2px 8px;"></div>
+    </div>
+
     <!-- Daily P&L -->
     <div class="panel-section" id="pnl-panel">
       <div class="panel-title" style="color:#FFD700">💰 DAILY P&L</div>
@@ -502,12 +532,6 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <div class="pnl-row total"><span><b>Net worth</b></span><span class="pnl-val" id="pnl-net-worth">₹0</span></div>
     </div>
 
-    <!-- [2026-03-19 18:30] Festival countdown -->
-    <div class="panel-section" id="festival-countdown" style="display:none;">
-      <div class="panel-title" style="color:#FFD700; font-size:12px;">🎉 FESTIVAL</div>
-      <div id="festival-info" style="font-family:'Bangers',cursive; font-size:13px; color:#eee; padding:2px 8px;"></div>
-    </div>
-
     <!-- Graph -->
     <div class="panel-section" id="graph-panel">
       <div id="graph-title" onclick="toggleGraphSize()">📈 MONEY (click to resize)</div>
@@ -570,6 +594,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 
   <div id="farm-area">
     <div id="dirt-overlay"></div>
+    <div id="dirt-tint"></div><!-- [2026-03-19 23:00] Brown tint overlay for dirt visibility -->
     <!-- [2026-03-19 17:00] Auto-cleaner robot — persistent icon + sweep animation -->
     <div id="robot-cleaner" style="display:none;">🤖</div>
     <div id="sick-bay"><div class="sb-label">🏥 SICK BAY</div><div class="sb-hens" id="sick-bay-hens"></div></div>
@@ -1265,7 +1290,9 @@ function startDayCycle() {
     hens.forEach(h => {
       if (!h.alive) return;
       if (Math.random() < 0.05) {
-        h.el.style.transform = Math.random() > 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
+        // [2026-03-19 23:00] Flip only SVG body, not name — prevents mirrored unreadable text
+        const body = h.el.querySelector('.ht-body');
+        if (body) body.style.transform = Math.random() > 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
       }
     });
   }, 500);
@@ -1796,6 +1823,9 @@ function toggleShop() { /* shop always visible in sidebar */ }
 // [2026-03-19 10:00] Dirt visual — poop + flies, no dark overlay. Kids laugh at poop, instantly understand "dirty"
 function updateDirtVisual() {
   const overlay = document.getElementById('dirt-overlay');
+  // [2026-03-19 23:00] Brown tint scales with dirt level — max 40% opacity at 100% dirt
+  const tint = document.getElementById('dirt-tint');
+  if (tint) tint.style.background = 'rgba(101,67,33,' + (dirtLevel / 100 * 0.4).toFixed(2) + ')';
   // Target counts: poop scales with dirt, flies only at filthy
   const poopTarget = dirtLevel < 15 ? 0 :
                      dirtLevel < CONFIG.DIRT_CLEAN_THRESHOLD ? Math.floor(dirtLevel / 10) :
@@ -1902,6 +1932,9 @@ function cleanFarm() {
   const oldDirt = Math.round(dirtLevel);
   dirtLevel = 0;
   sndBuy();
+  // [2026-03-19 23:00] Broom sweep animation on manual clean
+  const farmArea = document.getElementById('farm-area');
+  if (farmArea) { const b = document.createElement('div'); b.textContent = '🧹'; b.className = 'broom-anim sweeping'; farmArea.appendChild(b); setTimeout(() => b.remove(), 1300); }
   updateDirtVisual();
   mpTrack('farm_cleaned', { cost: cost, dirt_before: oldDirt, dirt_after: 0, day: day }); // [2026-03-19 14:00]
   notify("✨ Cleaned " + oldDirt + "% dirt for ₹" + cost + "! Clean early = cheaper!");
@@ -2155,6 +2188,7 @@ function getMaxLoan() {
 }
 
 // [2026-03-19 10:00] Loan modal UI — big buttons for kids, no prompt()
+// [2026-03-19 23:00] Reworked with +/- stepper (₹500 steps) for kid-friendly UX
 function takeLoan() {
   if (!gameRunning) return;
   const maxLoan = getMaxLoan();
@@ -2163,21 +2197,33 @@ function takeLoan() {
 
   const totalDebt = Math.round(loanAmount + loanInterestAccrued);
   const modal = document.getElementById('loan-modal');
+  const STEP = 500;
+  let amt = Math.min(STEP, available);
+  const maxAmt = Math.floor(available / STEP) * STEP || available;
+
   document.getElementById('loan-modal-info').innerHTML =
     'Interest: <span class="gold">9% per year</span><br>' +
     (totalDebt > 0 ? 'Current debt: <span class="red">₹' + totalDebt.toLocaleString() + '</span><br>' : '') +
-    'Max you can borrow: <span class="gold">₹' + available.toLocaleString() + '</span>';
+    'Max: <span class="gold">₹' + available.toLocaleString() + '</span>';
 
   const btnGrid = document.getElementById('loan-modal-buttons');
   btnGrid.innerHTML = '';
-  [1000, 5000, 10000].forEach(amt => {
-    const btn = document.createElement('button');
-    btn.className = 'loan-btn';
-    btn.textContent = '₹' + amt.toLocaleString();
-    btn.disabled = amt > available;
-    btn.onclick = () => { executeLoan(amt); closeLoanModal(); };
-    btnGrid.appendChild(btn);
-  });
+  const stepper = document.createElement('div');
+  stepper.className = 'loan-stepper';
+  const minusBtn = document.createElement('button'); minusBtn.className = 'step-btn minus'; minusBtn.textContent = '−';
+  const amtEl = document.createElement('div'); amtEl.className = 'step-amount'; amtEl.textContent = '₹' + amt.toLocaleString();
+  const plusBtn = document.createElement('button'); plusBtn.className = 'step-btn plus'; plusBtn.textContent = '+';
+  function updateStepper() { amtEl.textContent = '₹' + amt.toLocaleString(); minusBtn.disabled = amt <= STEP; plusBtn.disabled = amt >= maxAmt; }
+  minusBtn.onclick = () => { amt = Math.max(STEP, amt - STEP); updateStepper(); };
+  plusBtn.onclick = () => { amt = Math.min(maxAmt, amt + STEP); updateStepper(); };
+  updateStepper();
+  stepper.append(minusBtn, amtEl, plusBtn);
+  btnGrid.appendChild(stepper);
+
+  const confirmBtn = document.createElement('button'); confirmBtn.className = 'loan-btn';
+  confirmBtn.textContent = '🏦 BORROW'; confirmBtn.style.marginTop = '8px';
+  confirmBtn.onclick = () => { executeLoan(amt); closeLoanModal(); };
+  btnGrid.appendChild(confirmBtn);
   modal.classList.add('active');
 }
 
@@ -2196,6 +2242,7 @@ function executeLoan(amount) {
 
 function closeLoanModal() { document.getElementById('loan-modal').classList.remove('active'); }
 
+// [2026-03-19 23:00] Reworked with +/- stepper for partial repayment (₹500 steps, min ₹100)
 function repayLoan() {
   if (!gameRunning) return;
   const totalDebt = Math.round(loanAmount + loanInterestAccrued);
@@ -2209,18 +2256,31 @@ function repayLoan() {
 
   const btnGrid = document.getElementById('repay-modal-buttons');
   btnGrid.innerHTML = '';
-  const btn = document.createElement('button');
-  btn.className = 'loan-btn repay-btn';
-  if (canPay >= totalDebt) {
-    btn.textContent = '💸 Pay All ₹' + totalDebt.toLocaleString();
-  } else if (canPay > 0) {
-    btn.textContent = '💸 Pay ₹' + canPay.toLocaleString() + ' (all you have)';
-  } else {
-    btn.textContent = '😢 No money!';
-    btn.disabled = true;
+
+  if (canPay <= 0) {
+    const btn = document.createElement('button'); btn.className = 'loan-btn repay-btn';
+    btn.textContent = '😢 No money!'; btn.disabled = true;
+    btnGrid.appendChild(btn);
+    modal.classList.add('active'); return;
   }
-  btn.onclick = () => { executeRepay(canPay); closeRepayModal(); };
-  btnGrid.appendChild(btn);
+
+  const STEP = 500; const MIN = Math.min(100, canPay);
+  let amt = Math.min(canPay, STEP);
+  const stepper = document.createElement('div'); stepper.className = 'loan-stepper';
+  const minusBtn = document.createElement('button'); minusBtn.className = 'step-btn minus'; minusBtn.textContent = '−';
+  const amtEl = document.createElement('div'); amtEl.className = 'step-amount'; amtEl.textContent = '₹' + amt.toLocaleString();
+  const plusBtn = document.createElement('button'); plusBtn.className = 'step-btn plus'; plusBtn.textContent = '+';
+  function updateStepper() { amtEl.textContent = '₹' + amt.toLocaleString(); minusBtn.disabled = amt <= MIN; plusBtn.disabled = amt >= canPay; }
+  minusBtn.onclick = () => { amt = Math.max(MIN, amt - STEP); updateStepper(); };
+  plusBtn.onclick = () => { amt = Math.min(canPay, amt + STEP); updateStepper(); };
+  updateStepper();
+  stepper.append(minusBtn, amtEl, plusBtn);
+  btnGrid.appendChild(stepper);
+
+  const payBtn = document.createElement('button'); payBtn.className = 'loan-btn repay-btn';
+  payBtn.textContent = '💸 PAY'; payBtn.style.marginTop = '8px';
+  payBtn.onclick = () => { executeRepay(amt); closeRepayModal(); };
+  btnGrid.appendChild(payBtn);
   modal.classList.add('active');
 }
 
@@ -2320,6 +2380,22 @@ const EVENT_DEFS = [
     choiceB: null,
     resolve: function(choice) {
       stats.mongooseAttacks++;
+      // [2026-03-19 23:00] Mongoose dash animation
+      const farmArea = document.getElementById('farm-area');
+      if (farmArea) {
+        const m = document.createElement('div'); m.textContent = '🦡'; m.className = 'mongoose-anim';
+        farmArea.appendChild(m);
+        if (hasGuardDog) {
+          m.classList.add('chased');
+          const d = document.createElement('div'); d.textContent = '🐕'; d.className = 'mongoose-anim';
+          d.style.top = 'calc(50% + 30px)'; d.classList.add('dash');
+          farmArea.appendChild(d);
+          setTimeout(() => { m.remove(); d.remove(); }, 1600);
+        } else {
+          m.classList.add('dash');
+          setTimeout(() => m.remove(), 1600);
+        }
+      }
       if (hasGuardDog) {
         stats.mongooseBlocked++;
         mpTrack('mongoose_blocked', { day: day }); // [2026-03-19 14:00]
@@ -2984,11 +3060,17 @@ function updatePnL() {
   const rent = (!farmOwned && farmIndex > 0) ? FARMS[farmIndex].rent : 0;
   const emi = dailyEMI;
 
-  document.getElementById('pnl-hen-food').textContent = henFood > 0 ? '-₹' + henFood : '-₹0';
-  document.getElementById('pnl-chick-food').textContent = chickFood > 0 ? '-₹' + chickFood : '-₹0';
-  document.getElementById('pnl-maint').textContent = maint > 0 ? '-₹' + maint : '-₹0';
-  document.getElementById('pnl-rent').textContent = rent > 0 ? '-₹' + rent : '-₹0';
-  document.getElementById('pnl-emi').textContent = emi > 0 ? '-₹' + Math.round(emi) : '-₹0'; // [2026-03-19 10:00] No decimals
+  // [2026-03-19 23:00] Hide zero-value cost rows — keeps P&L clean for kids
+  function pnlRow(id, val, fmt) {
+    const el = document.getElementById(id);
+    el.textContent = fmt || (val > 0 ? '-₹' + Math.round(val) : '-₹0');
+    el.closest('.pnl-row').style.display = val > 0 ? '' : 'none';
+  }
+  pnlRow('pnl-hen-food', henFood);
+  pnlRow('pnl-chick-food', chickFood);
+  pnlRow('pnl-maint', maint);
+  pnlRow('pnl-rent', rent);
+  pnlRow('pnl-emi', emi, emi > 0 ? '-₹' + Math.round(emi) : '-₹0');
   // EMI breakdown: interest portion = daily interest on outstanding, principal = EMI - interest
   if (emi > 0 && loanAmount > 0) {
     const dailyInt = (loanAmount + loanInterestAccrued) * DAILY_INTEREST_RATE;
@@ -2996,21 +3078,24 @@ function updatePnL() {
     document.getElementById('pnl-emi-principal').textContent = '-₹' + Math.round(principalPortion);
     document.getElementById('pnl-emi-interest').textContent = '-₹' + Math.round(dailyInt);
     document.getElementById('pnl-principal-left').textContent = '₹' + Math.round(loanAmount).toLocaleString();
+    ['pnl-emi-principal','pnl-emi-interest','pnl-principal-left'].forEach(id => document.getElementById(id).closest('.pnl-row').style.display = '');
   } else {
-    document.getElementById('pnl-emi-principal').textContent = '-₹0';
-    document.getElementById('pnl-emi-interest').textContent = '-₹0';
-    document.getElementById('pnl-principal-left').textContent = '₹0';
+    ['pnl-emi-principal','pnl-emi-interest','pnl-principal-left'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = id === 'pnl-principal-left' ? '₹0' : '-₹0';
+      el.closest('.pnl-row').style.display = 'none';
+    });
   }
 
   // Medicine
   const treatedCount = hens.filter(h => h.alive && h.sick && h.treated).length;
   const medicineCost = treatedCount * CONFIG.MEDICINE_PER_DAY;
-  document.getElementById('pnl-medicine').textContent = medicineCost > 0 ? '-₹' + medicineCost : '-₹0';
+  pnlRow('pnl-medicine', medicineCost);
   const autoCleanCost = hasAutoCleaner && hens.filter(h=>h.alive).length > 0 ? CONFIG.AUTO_CLEANER_DAILY : 0;
-  document.getElementById('pnl-autocleaner').textContent = autoCleanCost > 0 ? '-₹' + autoCleanCost : '-₹0';
+  pnlRow('pnl-autocleaner', autoCleanCost);
   // [2026-03-19 18:30] Cold storage cost
   const coldStorageCost = hasColdStorage && hens.filter(h=>h.alive).length > 0 ? CONFIG.COLD_STORAGE_DAILY : 0;
-  document.getElementById('pnl-coldstorage').textContent = coldStorageCost > 0 ? '-₹' + coldStorageCost : '-₹0';
+  pnlRow('pnl-coldstorage', coldStorageCost);
 
   // Summaries
   const totalCost = henFood + chickFood + maint + rent + emi + medicineCost + autoCleanCost + coldStorageCost;

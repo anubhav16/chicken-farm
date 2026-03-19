@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v4.2.0 | 2026-03-19 | Minor | Visual polish: readability, dirt tint, loan steppers, P&L cleanup, animations |
 | v4.1.0 | 2026-03-19 | Minor | Economics rebalance (₹15 cleaning) + poop mini-game + 20 badges |
 | v4.0.0 | 2026-03-19 | Major | Festival calendar (7 multi-faith festivals) + cold storage + govt subsidy event |
 | v3.7.0 | 2026-03-19 | Minor | Auto-sell stepper (0-7 day hold period) |
@@ -23,6 +24,30 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v4.2.0 — Visual Polish + UX Fixes (Mar 19)
+
+### Readability Fixes
+- **Hen names no longer flip** when hens turn — `scaleX` now targets SVG body only, not the whole tile
+- **Sick emoji overlay shrunk** from 40px centered (burying hen) to 18px corner badge (14px in sick bay)
+- **Vaccination icon** bumped from 8px to 13px for visibility
+- **Sick bay tiles enlarged** — SVG 24×22→30×28, status text 7→8px
+
+### Visual Feedback
+- **Dirt tint overlay** — brown tint scales with dirt % (max 40% opacity at 100% dirt), makes 15% vs 50% instantly distinguishable
+- **Festival calendar moved above Daily P&L** — context before numbers
+- **P&L hides zero-cost rows** — no more "Medicine: -₹0" clutter. Income rows always visible.
+
+### Loan UX
+- **+/- stepper buttons** for both Take Loan and Repay Loan (₹500 increments)
+- **Partial repayment** now possible (min ₹100) — teaches kids you can pay back in chunks
+- Big round buttons, kid-friendly colors
+
+### Animations
+- **Mongoose attack** — 🦡 dashes across farm. If guard dog present, 🐕 chases it away.
+- **Manual cleaning** — 🧹 broom sweep animation on button click (similar to robot sweep)
 
 ---
 
