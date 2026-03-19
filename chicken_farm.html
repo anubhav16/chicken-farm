@@ -81,31 +81,26 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 /* 1-5 hens: extra large */
 .hen-grid-xs .hen-tile { width: 110px; height: 120px; padding: 6px; }
 .hen-grid-xs .ht-body { width: 60px; height: 54px; }
-.hen-grid-xs .ht-age { font-size: 20px; } /* [2026-03-18 14:20] Bigger for emoji age stages */
-.hen-grid-xs .ht-status { font-size: 13px; }
+.hen-grid-xs .ht-status { font-size: 13px; } /* [2026-03-19 16:00] Removed ht-age emoji — age shown via border color */
 /* [2026-03-18 14:20] 6-15 hens — bumped ~15% for kid readability */
 .hen-grid-sm .hen-tile { width: 95px; height: 105px; padding: 5px; }
 .hen-grid-sm .ht-body { width: 50px; height: 46px; }
-.hen-grid-sm .ht-age { font-size: 16px; }
 .hen-grid-sm .ht-status { font-size: 11px; }
 /* [2026-03-18 14:20] 16-35 hens — bumped ~15% for kid readability */
 .hen-grid-md .hen-tile { width: 75px; height: 85px; padding: 4px; }
 .hen-grid-md .ht-body { width: 40px; height: 35px; }
-.hen-grid-md .ht-age { font-size: 14px; }
 .hen-grid-md .ht-status { font-size: 9px; }
 /* 36-70 hens */
 .hen-grid-lg .hen-tile { width: 48px; height: 56px; padding: 2px; border-width: 2px; }
 .hen-grid-lg .ht-body { width: 26px; height: 24px; }
-.hen-grid-lg .ht-age { font-size: 8px; }
 .hen-grid-lg .ht-status { font-size: 8px; } /* [2026-03-19 10:00] Min 8px for readability */
 /* 71+ hens */
 .hen-grid-xl .hen-tile { width: 36px; height: 42px; padding: 1px; border-width: 1px; border-radius: 5px; }
 .hen-grid-xl .ht-body { width: 20px; height: 18px; }
-.hen-grid-xl .ht-age { font-size: 7px; }
 .hen-grid-xl .ht-status { font-size: 8px; } /* [2026-03-19 10:00] Min 8px for readability */
-.ht-age { font-family: 'Bangers', cursive; color: #ddd; }
+/* [2026-03-19 16:00] Removed .ht-age — duplicate icon removed, age shown via border color */
 .ht-status { font-family: 'Bangers', cursive; padding: 1px 4px; border-radius: 4px; font-weight: 900; text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.8); } /* [2026-03-19 10:00] Dark shadow for contrast on all backgrounds */
-.hen-tile.young .ht-status { color: #86efac; text-shadow: 0 0 4px rgba(74,222,128,0.5); }
+.hen-tile.young .ht-status { color: #fff; } /* [2026-03-19 16:00] White text for contrast on all sky backgrounds — was light green #86efac, invisible on blue sky */
 .hen-tile.young { border-color: rgba(74,222,128,0.4); }
 .hen-tile.declining .ht-status { color: #ffaa44; }
 .hen-tile.declining { border-color: rgba(255,170,68,0.4); }
@@ -129,6 +124,12 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .tray-egg svg { width: 100%; height: 100%; }
 .tray-egg.hatching { opacity: 0.6; filter: hue-rotate(40deg); cursor: default; }
 .tray-egg .te-timer { font-family: 'Bangers', cursive; font-size: 7px; color: #ff6fd8; text-align: center; margin-top: -2px; }
+/* [2026-03-19 16:00] Egg spoilage visual warnings — reuse shop attention animations */
+.tray-egg.egg-warning { outline: 2px solid #ff9900; border-radius: 4px; animation: shopShimmer 1.5s ease-in-out infinite; }
+.tray-egg.egg-warning .egg-age { color: #ff9900; }
+.tray-egg.egg-urgent { outline: 2px solid #ff4444; border-radius: 4px; animation: shopWobble 0.4s ease-in-out infinite; }
+.tray-egg.egg-urgent .egg-age { color: #ff4444; }
+.tray-egg .egg-age { font-family: 'Bangers', cursive; font-size: 7px; color: #aaa; text-align: center; margin-top: -2px; }
 
 /* Sick bay */
 #sick-bay { position: absolute; top: 8px; right: 8px; background: rgba(192,132,252,0.1); border: 2px solid rgba(192,132,252,0.3); border-radius: 12px; padding: 6px; min-width: 90px; z-index: 12; }
@@ -148,7 +149,6 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 /* Sick bay tiles are always small regardless of grid size */
 #sick-bay .hen-tile { width: 44px !important; height: 52px !important; padding: 2px !important; border-width: 2px !important; border-radius: 6px !important; }
 #sick-bay .ht-body { width: 24px !important; height: 22px !important; }
-#sick-bay .ht-age { font-size: 8px !important; }
 #sick-bay .ht-status { font-size: 7px !important; }
 /* [2026-03-18 14:30] BIG & LOUD sick indicators — full-tile color floods for kids */
 .hen-tile.unwell { border-color: rgba(251,191,36,0.8) !important; background: rgba(255,235,0,0.35) !important; border-width: 3px !important; }
@@ -730,6 +730,7 @@ const CONFIG = {
   MAINTENANCE_PER_HEN: 1,      // ₹/hen/day — water, electricity, misc
 
   // Timelines (realistic poultry biology)
+  EGG_SHELF_LIFE:      7,       // [2026-03-19 16:00] eggs spoil after 7 days unrefrigerated (Indian climate)
   HATCH_DAYS:          21,      // egg → chick: 21 days incubation
   CHICK_GROW_DAYS:     150,     // chick → laying hen: ~5 months (18-22 weeks)
   HUNGRY_DAYS_TO_DIE:  3,       // days without food before death
@@ -1187,6 +1188,16 @@ function advanceDay() {
     }
   }
 
+  // [2026-03-19 16:00] Egg spoilage — eggs go bad after EGG_SHELF_LIFE days (hatching eggs exempt)
+  const spoiled = eggs.filter(e => !e.hatching && e.laidDay && (day - e.laidDay) >= CONFIG.EGG_SHELF_LIFE);
+  if (spoiled.length > 0) {
+    spoiled.forEach(e => { if (e.el && e.el.parentNode) e.el.remove(); });
+    eggs = eggs.filter(e => !spoiled.includes(e));
+    basketEggCount = Math.max(0, basketEggCount - spoiled.length);
+    document.getElementById('basket-count').textContent = basketEggCount + ' egg' + (basketEggCount !== 1 ? 's' : '');
+    notify('🤢 ' + spoiled.length + ' egg' + (spoiled.length > 1 ? 's' : '') + ' went bad! Sell faster next time!');
+  }
+
   // Hatch eggs
   eggs.forEach(e => {
     if (e.hatching) {
@@ -1364,11 +1375,11 @@ function layEgg(hen) {
   const eggId = nextId++;
   const el = document.createElement('div');
   el.className = 'tray-egg';
-  el.innerHTML = svgEgg();
+  el.innerHTML = svgEgg() + '<div class="egg-age"></div>'; // [2026-03-19 16:00] Age label for spoilage warning
   el.onclick = () => eggAction(egg);
   document.getElementById('egg-tray').appendChild(el);
 
-  const egg = { id: eggId, x: 0, y: 0, henId: hen.id, hatching: false, hatchDay: 0, collected: true, el };
+  const egg = { id: eggId, x: 0, y: 0, henId: hen.id, hatching: false, hatchDay: 0, collected: true, laidDay: day, el }; // [2026-03-19 16:00] laidDay for spoilage tracking
   eggs.push(egg);
   basketEggCount++;
   document.getElementById('basket-count').textContent = basketEggCount + ' egg' + (basketEggCount !== 1 ? 's' : '');
@@ -1408,7 +1419,7 @@ function hatchEgg(egg) {
   const el = document.createElement('div');
   el.className = 'hen-tile young';
   el.style.borderColor = 'rgba(255,235,59,0.4)';
-  el.innerHTML = '<div class="ht-body">' + svgChick() + '</div><div class="ht-age">0d</div><div class="ht-status" style="color:#FFEB3B">🐤 Growing</div>';
+  el.innerHTML = '<div class="ht-body">' + svgChick() + '</div><div class="ht-status" style="color:#FFEB3B">🐤 Growing</div>'; // [2026-03-19 16:00] Removed ht-age
   document.getElementById('hen-grid').appendChild(el);
 
   const chick = { id: chickId, x: 0, bornDay: day, el };
@@ -1445,8 +1456,8 @@ function addHenToFarm(x) {
 
   const el = document.createElement('div');
   el.className = 'hen-tile young';
-  // [2026-03-18 14:20] Emoji age stages instead of "0d", show hen name
-  el.innerHTML = '<div class="ht-body">' + svgHen() + '</div><div class="ht-age">🐔</div><div class="ht-status">' + name + '</div>';
+  // [2026-03-19 16:00] Removed ht-age emoji — age communicated via border color (green/orange/red)
+  el.innerHTML = '<div class="ht-body">' + svgHen() + '</div><div class="ht-status">' + name + '</div>';
   el.onclick = () => henInfo(hen);
   document.getElementById('hen-grid').appendChild(el);
 
@@ -2229,19 +2240,11 @@ function updateHUD() {
     }
   });
 
-  // [2026-03-18 14:20] Update hen tiles — emoji age stages, names, simplified for kids
+  // [2026-03-19 16:00] Update hen tiles — names + border color for age, no emoji icon
   hens.forEach(h => {
     if (!h.alive) return;
     const age = day - h.bornDay;
-    const ageEl = h.el.querySelector('.ht-age');
     const statusEl = h.el.querySelector('.ht-status');
-
-    // Emoji age stage instead of numeric days
-    if (ageEl) {
-      if (age >= CONFIG.HEN_OLD_AGE) ageEl.textContent = '👴';
-      else if (age >= CONFIG.HEN_PEAK_LAYING_AGE) ageEl.textContent = '🐓';
-      else ageEl.textContent = '🐔';
-    }
 
     // Remove old classes
     h.el.classList.remove('young', 'declining', 'old', 'sick', 'hungry', 'unwell', 'in-sick-bay', 'healing', 'vaccinated');
@@ -2313,17 +2316,31 @@ function updateHUD() {
   // Update chick tiles
   chicks.forEach(c => {
     const left = Math.max(0, CHICK_GROW_DAYS - (day - c.bornDay));
-    const ageEl = c.el.querySelector('.ht-age');
-    const statusEl = c.el.querySelector('.ht-status');
-    if (ageEl) ageEl.textContent = (day - c.bornDay) + 'd';
-    if (statusEl) statusEl.textContent = left <= 0 ? '🐔 Ready!' : '🐤 ' + left + 'd to grow';
+    const statusEl = c.el.querySelector('.ht-status'); // [2026-03-19 16:00] Removed ht-age, days shown in status
+    if (statusEl) statusEl.textContent = left <= 0 ? '🐔 Ready!' : '🐤 ' + left + 'd';
   });
 
-  // Update hatching egg timers
+  // [2026-03-19 16:00] Update egg visuals — hatching timers + spoilage warnings
   eggs.forEach(e => {
-    if (!e.hatching) return;
-    const timer = e.el.querySelector('.te-timer');
-    if (timer) timer.textContent = Math.max(0, e.hatchDay - day) + 'd';
+    if (e.hatching) {
+      const timer = e.el.querySelector('.te-timer');
+      if (timer) timer.textContent = Math.max(0, e.hatchDay - day) + 'd';
+      return;
+    }
+    // Spoilage visual — warning at shelfLife-2, urgent at shelfLife-1
+    const eggAge = e.laidDay ? day - e.laidDay : 0;
+    const shelfLife = CONFIG.EGG_SHELF_LIFE;
+    const ageLabel = e.el.querySelector('.egg-age');
+    e.el.classList.remove('egg-warning', 'egg-urgent');
+    if (eggAge >= shelfLife - 1) {
+      e.el.classList.add('egg-urgent');
+      if (ageLabel) ageLabel.textContent = eggAge + 'd!';
+    } else if (eggAge >= shelfLife - 2) {
+      e.el.classList.add('egg-warning');
+      if (ageLabel) ageLabel.textContent = eggAge + 'd';
+    } else {
+      if (ageLabel) ageLabel.textContent = '';
+    }
   });
 }
 

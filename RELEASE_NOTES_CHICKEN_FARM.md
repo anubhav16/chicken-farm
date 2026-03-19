@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.5.0 | 2026-03-19 | Minor | Visual fixes (name contrast, remove age emoji) + egg spoilage system |
 | v3.4.2 | 2026-03-19 | Patch | Fix: Mixpanel SDK crash kills game when CDN blocked |
 | v3.4.1 | 2026-03-19 | Patch | Mixpanel JS SDK + session recording + 11 missing events |
 | v3.4.0 | 2026-03-19 | Minor | Random events: Festival Bonus, Lucky Day, Mongoose Attack + Guard Dog |
@@ -18,6 +19,23 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.5.0 — Visual Fixes + Egg Spoilage (Mar 19)
+
+### Visual Fixes
+- **Hen name contrast**: Young hen names changed from light green (#86efac) to white (#fff) with dark text-shadow — now readable on all sky backgrounds
+- **Removed duplicate age emoji**: Tiles no longer show both SVG hen body AND 🐔/🐓/👴 emoji. Age communicated via border color (green=young, orange=declining, red=old)
+- **Chick tiles**: Simplified — removed age-in-days display, shows "🐤 Xd" in status text
+
+### Egg Spoilage System (NEW)
+- Eggs spoil after **7 days** (`CONFIG.EGG_SHELF_LIFE`) — realistic for unrefrigerated Indian climate
+- Each egg tracks `laidDay` for age calculation
+- **Visual warnings**: Day 5-6 = orange shimmer outline + age label. Day 6 = red wobble + "6d!" label
+- Spoiled eggs auto-removed from tray with notification: "🤢 X egg(s) went bad!"
+- Hatching eggs are exempt from spoilage (incubating = different biology)
+- Auto-sell protects against spoilage (eggs sold before they can rot)
 
 ---
 

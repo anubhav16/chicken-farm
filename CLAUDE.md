@@ -12,7 +12,7 @@ A business simulation game for 7-year-olds, teaching farming economics, money ma
 | `ideas.md` | Game ideas and feature backlog |
 
 ## Current Version
-**Chicken Farm:** v3.4.2 (2026-03-19)
+**Chicken Farm:** v3.5.0 (2026-03-19)
 
 ## Release Notes Protocol
 
