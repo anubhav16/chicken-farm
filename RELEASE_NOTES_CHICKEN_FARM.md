@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.7.0 | 2026-03-19 | Minor | Auto-sell stepper (0-7 day hold period) |
 | v3.6.0 | 2026-03-19 | Minor | Auto-cleaner fix + robot animation + P&L costs + Today's Events |
 | v3.5.0 | 2026-03-19 | Minor | Visual fixes (name contrast, remove age emoji) + egg spoilage system |
 | v3.4.2 | 2026-03-19 | Patch | Fix: Mixpanel SDK crash kills game when CDN blocked |
@@ -20,6 +21,18 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.7.0 — Auto-sell Stepper (Mar 19)
+
+### Auto-sell Stepper (replaces ON/OFF toggle)
+- **Stepper UI**: `−` / `+` buttons to set sell interval from 0-7 days
+- 0 = OFF, 1 = DAILY, 2-7 = sell every N days
+- **Spoilage warning** at 5+ days: "⚠️ Eggs spoil at 7 days!"
+- **A key shortcut** cycles through 0→1→2→...→7→0
+- Teaches hold-period economics: accumulate eggs for festivals, balance vs spoilage risk
+- Game reset properly clears to 0
 
 ---
 
