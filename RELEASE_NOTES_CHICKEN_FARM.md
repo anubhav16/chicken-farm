@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v4.1.0 | 2026-03-19 | Minor | Economics rebalance (₹15 cleaning) + poop mini-game + 20 badges |
 | v4.0.0 | 2026-03-19 | Major | Festival calendar (7 multi-faith festivals) + cold storage + govt subsidy event |
 | v3.7.0 | 2026-03-19 | Minor | Auto-sell stepper (0-7 day hold period) |
 | v3.6.0 | 2026-03-19 | Minor | Auto-cleaner fix + robot animation + P&L costs + Today's Events |
@@ -22,6 +23,35 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v4.1.0 — Economics Rebalance + Poop Mini-Game + Badges (Mar 19)
+
+### Economics Rebalance
+- **Cleaning cost halved**: ₹30 → ₹15 base. Simulation proved ₹30 made Backyard and Coop farms unprofitable even with perfect play. At ₹15, all farm levels are profitable with best practices (vaccinate, clean early, high utilization), while neglect still causes losses.
+- **Backyard cleaning is now free** via the poop mini-game (see below). Higher farms still pay ₹15+.
+
+### Poop Mini-Game (NEW — Backyard only)
+- At Backyard level, clicking "Clean Farm" spawns 3-8 clickable 💩 emojis across the farm
+- Tap each poop to clear it (💩→✨ with pop sound)
+- All poops cleared = farm clean, no cost — effort is time, not money
+- Teaches kids the hygiene habit without bankrupting them at the starter farm
+- Higher farm levels still require paid cleaning (₹15 base, scales with dirt)
+
+### Badge/Achievement System (NEW — 20 badges)
+- 🏆 **20 badges** across all game activities, persisted via localStorage
+- Golden toast notification with upgrade sound on each badge earned
+- Badge shelf in info panel shows earned (golden glow) and unearned (greyed out)
+- Badges:
+  - 🥚 First Egg, 🛒 First Sale, 💰 First Profit
+  - 📈 Profit Streak (3 days), 🔥 On Fire! (7 days)
+  - 🧹 Clean Freak (10 cleans), ✨ Spotless Week (7 clean days)
+  - 💊 Good Doctor, 💉 Vaccinator
+  - 🏠 Moving Up, 🐣 First Hatch, 🐥 Full House
+  - 🏦 Borrowed, 🎉 Debt Free, 💪 Comeback Kid
+  - 🎪 Festival Seller, 👵 Retirement Plan, 🤖 Automated
+  - 💎 10K Club, 🏰 Empire Builder
 
 ---
 

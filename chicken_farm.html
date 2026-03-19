@@ -139,6 +139,19 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 /* [2026-03-19 10:00] Dirt visual — poop emojis + flies instead of dark overlay (kids find poop hilarious + clearly not night) */
 #dirt-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .dirt-particle { position: absolute; pointer-events: none; z-index: 2; font-size: 20px; opacity: 0.9; transition: opacity 0.3s; }
+/* [2026-03-19 22:00] Poop mini-game — clickable targets at Backyard for free cleaning */
+.poop-target { position: absolute; z-index: 20; font-size: 28px; cursor: pointer; pointer-events: auto; transition: transform 0.15s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+.poop-target:hover { transform: scale(1.3); }
+.poop-target.popped { transform: scale(1.5); opacity: 0; transition: all 0.3s ease-out; pointer-events: none; }
+/* [2026-03-19 22:00] Badge system — achievement shelf + toast */
+#badge-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.badge-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); cursor: default; position: relative; }
+.badge-icon.earned { border-color: #FFD700; background: rgba(255,215,0,0.15); animation: badgeGlow 2s ease-in-out infinite alternate; }
+.badge-icon.unearned { filter: grayscale(1) brightness(0.4); }
+@keyframes badgeGlow { 0% { box-shadow: 0 0 4px rgba(255,215,0,0.3); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.6); } }
+.badge-toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #FFD700, #ff6fd8); color: #1a0533; font-family: 'Bangers', cursive; font-size: 22px; padding: 12px 24px; border-radius: 12px; z-index: 999; text-align: center; animation: badgeToastAnim 3s ease-out forwards; pointer-events: none; }
+.badge-toast .badge-toast-emoji { font-size: 36px; display: block; }
+@keyframes badgeToastAnim { 0% { opacity: 0; transform: translateX(-50%) scale(0.5); } 15% { opacity: 1; transform: translateX(-50%) scale(1.1); } 25% { transform: translateX(-50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-30px); } }
 .dirt-particle.fly { animation: flyBuzz 1.5s ease-in-out infinite alternate; font-size: 16px; }
 @keyframes flyBuzz { 0% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(8px,-6px) rotate(15deg); } 50% { transform: translate(-4px,4px) rotate(-10deg); } 75% { transform: translate(6px,2px) rotate(8deg); } 100% { transform: translate(-3px,-5px) rotate(-5deg); } }
 /* [2026-03-19 17:00] Auto-cleaner robot — sits in corner, sweeps across farm each day */
@@ -417,6 +430,12 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <div class="quick-stat"><div class="qs-val" id="chick-display">0</div><div class="qs-label">CHICKS</div></div>
     </div>
 
+    <!-- [2026-03-19 22:00] Badge shelf — earned badges glow, unearned greyed out -->
+    <div class="panel-section" id="badge-shelf" style="display:none;">
+      <div class="panel-title" style="color:#FFD700">🏆 BADGES <span id="badge-count" style="font-size:12px; color:rgba(255,255,255,0.5);">0/20</span></div>
+      <div id="badge-grid"></div>
+    </div>
+
     <!-- Daily P&L -->
     <div class="panel-section" id="pnl-panel">
       <div class="panel-title" style="color:#FFD700">💰 DAILY P&L</div>
@@ -505,7 +524,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <!-- Farm Care — top priority -->
     <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
       <div class="panel-title" style="color:#4ade80">🧹 FARM CARE</div>
-      <div class="shop-item" data-action="clean" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">₹30</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
+      <div class="shop-item" data-action="clean" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">Free 💩</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
       <div class="shop-item" onclick="buyAutoCleaner()"><span class="icon">🤖</span><div class="info"><div class="name">AUTO CLEANER</div><div class="cost" id="autocleaner-cost">₹5,000</div><div class="desc" id="autocleaner-desc">Auto-clean daily (₹5/day)</div></div></div>
       <!-- [2026-03-19 18:30] Cold storage — extends egg shelf life for festival stockpiling -->
       <div class="shop-item" onclick="buyColdStorage()"><span class="icon">❄️</span><div class="info"><div class="name">COLD STORAGE</div><div class="cost" id="coldstorage-cost">₹2,000</div><div class="desc" id="coldstorage-desc">Eggs last 14 days (₹3/day)</div></div></div>
@@ -782,7 +801,7 @@ const CONFIG = {
   SICK_DEATH_DAYS:     10,      // untreated sick hen dies
 
   // Cleaning
-  CLEANING_COST:       30,      // ₹ base manual cleaning
+  CLEANING_COST:       15,      // [2026-03-19 22:00] ₹ base manual cleaning — halved from ₹30, simulation proved ₹30 made Backyard/Coop unprofitable even with perfect play
   AUTO_CLEANER_COST:   5000,    // ₹ one-time auto-cleaning machine
   AUTO_CLEANER_DAILY:  5,       // ₹/day running cost for machine
   DIRT_RATE:           1,       // dirt per hen per day (0-100 scale)
@@ -954,6 +973,100 @@ let loanAmount = 0;        // outstanding loan principal
 let loanInterestAccrued = 0; // interest accumulated
 let dailyEMI = 0;          // daily EMI payment (auto-deducted)
 
+// [2026-03-19 22:00] Badge/Achievement system — 20 badges across all game activities
+const BADGES = [
+  { id: 'first_egg',       emoji: '🥚', name: 'First Egg',       desc: 'Your hen laid an egg!' },
+  { id: 'first_sale',      emoji: '🛒', name: 'First Sale',      desc: 'Sold eggs for the first time' },
+  { id: 'first_profit',    emoji: '💰', name: 'First Profit',    desc: 'Ended a day richer than you started' },
+  { id: 'streak_3',        emoji: '📈', name: 'Profit Streak',   desc: '3 profitable days in a row' },
+  { id: 'streak_7',        emoji: '🔥', name: 'On Fire!',        desc: '7 profitable days in a row' },
+  { id: 'clean_freak',     emoji: '🧹', name: 'Clean Freak',     desc: 'Cleaned the farm 10 times' },
+  { id: 'spotless_week',   emoji: '✨', name: 'Spotless Week',   desc: '7 days without dirty farm' },
+  { id: 'good_doctor',     emoji: '💊', name: 'Good Doctor',     desc: 'Cured a sick hen' },
+  { id: 'vaccinator',      emoji: '💉', name: 'Vaccinator',      desc: 'Vaccinated all your hens' },
+  { id: 'moving_up',       emoji: '🏠', name: 'Moving Up',       desc: 'Upgraded to a bigger farm' },
+  { id: 'first_hatch',     emoji: '🐣', name: 'First Hatch',     desc: 'Hatched an egg into a chick' },
+  { id: 'full_house',      emoji: '🐥', name: 'Full House',      desc: 'Filled your farm to capacity' },
+  { id: 'borrowed',        emoji: '🏦', name: 'Borrowed',        desc: 'Took your first loan' },
+  { id: 'debt_free',       emoji: '🎉', name: 'Debt Free',       desc: 'Paid off a loan completely' },
+  { id: 'comeback',        emoji: '💪', name: 'Comeback Kid',    desc: 'Made profit after a loss day' },
+  { id: 'festival_seller', emoji: '🎪', name: 'Festival Seller', desc: 'Sold eggs during a festival' },
+  { id: 'retirement',      emoji: '👵', name: 'Retirement Plan', desc: 'Sold an old hen before she died' },
+  { id: 'automated',       emoji: '🤖', name: 'Automated',       desc: 'Bought the auto-cleaner' },
+  { id: 'ten_k',           emoji: '💎', name: '10K Club',        desc: 'Reached ₹10,000 balance' },
+  { id: 'empire',          emoji: '🏰', name: 'Empire Builder',  desc: 'Reached Chicken Empire level' },
+];
+let earnedBadges = new Set();
+let profitStreak = 0;       // consecutive profitable days
+let cleanStreak = 0;        // consecutive days without dirty threshold
+let prevDayMoney = 0;       // money at start of previous day for profit detection
+let hadLossDay = false;     // tracks if player had a loss day (for comeback badge)
+
+// Load badges from localStorage
+try { const saved = localStorage.getItem('chickenFarmBadges'); if (saved) earnedBadges = new Set(JSON.parse(saved)); } catch(e) {}
+
+function earnBadge(id) {
+  if (earnedBadges.has(id)) return;
+  const badge = BADGES.find(b => b.id === id);
+  if (!badge) return;
+  earnedBadges.add(id);
+  try { localStorage.setItem('chickenFarmBadges', JSON.stringify([...earnedBadges])); } catch(e) {}
+  // Toast notification
+  const toast = document.createElement('div');
+  toast.className = 'badge-toast';
+  toast.innerHTML = '<span class="badge-toast-emoji">' + badge.emoji + '</span>🏆 ' + badge.name + '!<br><span style="font-size:14px;">' + badge.desc + '</span>';
+  document.body.appendChild(toast);
+  sndUpgrade();
+  setTimeout(() => toast.remove(), 3200);
+  updateBadgeShelf();
+  mpTrack('badge_earned', { badge_id: id, badge_name: badge.name, day: day, total_badges: earnedBadges.size });
+}
+
+function updateBadgeShelf() {
+  const shelf = document.getElementById('badge-shelf');
+  const grid = document.getElementById('badge-grid');
+  if (!shelf || !grid) return;
+  shelf.style.display = 'block';
+  document.getElementById('badge-count').textContent = earnedBadges.size + '/' + BADGES.length;
+  grid.innerHTML = '';
+  BADGES.forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'badge-icon ' + (earnedBadges.has(b.id) ? 'earned' : 'unearned');
+    el.textContent = b.emoji;
+    el.title = b.name + ': ' + b.desc;
+    grid.appendChild(el);
+  });
+}
+
+// Check badges that trigger at end of each day
+function checkDailyBadges() {
+  const dayProfit = money - prevDayMoney;
+  if (dayProfit > 0) {
+    earnBadge('first_profit');
+    profitStreak++;
+    if (profitStreak >= 3) earnBadge('streak_3');
+    if (profitStreak >= 7) earnBadge('streak_7');
+    if (hadLossDay) earnBadge('comeback');
+  } else {
+    profitStreak = 0;
+    if (dayProfit < 0) hadLossDay = true;
+  }
+  prevDayMoney = money;
+
+  // Clean freak: cleaned 10 times total
+  if (stats.timesCleanedFarm >= 10) earnBadge('clean_freak');
+
+  // Spotless week
+  if (dirtLevel < CONFIG.DIRT_CLEAN_THRESHOLD) { cleanStreak++; if (cleanStreak >= 7) earnBadge('spotless_week'); }
+  else cleanStreak = 0;
+
+  // 10K club
+  if (money >= 10000) earnBadge('ten_k');
+
+  // Full house
+  if (hens.filter(h => h.alive).length >= farmCapacity && farmCapacity > 0) earnBadge('full_house');
+}
+
 const farmArea = document.getElementById('farm-area');
 
 // ============================================================
@@ -1120,6 +1233,9 @@ function startGame() {
     lastEventDay = 0; festivalDaysLeft = 0; hasGuardDog = false; // [2026-03-19 12:00] Reset event state
     currentFestival = null; currentFestivalPrice = 0; subsidyDaysLeft = 0; hasColdStorage = false; // [2026-03-19 18:30] Reset festival + subsidy + cold storage
     autoSellInterval = 0; // [2026-03-19 18:00] Reset auto-sell stepper
+    poopMiniGameActive = false; // [2026-03-19 22:00] Reset poop mini-game state
+    profitStreak = 0; cleanStreak = 0; prevDayMoney = CONFIG.STARTING_MONEY; hadLossDay = false; // [2026-03-19 22:00] Reset badge tracking
+    updateBadgeShelf(); // [2026-03-19 22:00] Render badge shelf (badges persist across games via localStorage)
     document.getElementById('hen-grid').innerHTML = '';
     document.getElementById('shortcut-bar').style.display = 'flex'; // [2026-03-18 14:10] Show shortcuts bar
     notify("🌟 Welcome to the farm, Arush! Buy a hen to start!");
@@ -1327,6 +1443,7 @@ function advanceDay() {
       // Recalc EMI if loan fully paid
       if (loanAmount <= 0 && loanInterestAccrued <= 0) {
         loanAmount = 0; loanInterestAccrued = 0; dailyEMI = 0;
+        earnBadge('debt_free'); // [2026-03-19 22:00] Badge: paid off loan
         notify("🎉 Loan fully repaid via EMI! You're debt-free!");
       }
     } else {
@@ -1414,6 +1531,7 @@ function advanceDay() {
         if (day - h.sickDay >= healDuration) {
           h.health = 'healthy';
           h.treated = false;
+          earnBadge('good_doctor'); // [2026-03-19 22:00] Badge: cured a sick hen
           notify("🎉 A hen recovered!");
         }
       } else {
@@ -1432,6 +1550,7 @@ function advanceDay() {
     else if (h.health === 'healing') {
       if (day - h.sickDay >= 2) { // 2 days to recover from unwell with home remedy
         h.health = 'healthy';
+        earnBadge('good_doctor'); // [2026-03-19 22:00] Badge: cured via home remedy
         notify("🎉 Home remedy worked! Hen is healthy again!");
       }
     }
@@ -1481,6 +1600,7 @@ function advanceDay() {
     return;
   }
 
+  checkDailyBadges(); // [2026-03-19 22:00] Badge checks after all day processing
   updateHUD();
   drawMoneyGraph();
 
@@ -1501,6 +1621,7 @@ function layEgg(hen) {
   eggs.push(egg);
   basketEggCount++;
   document.getElementById('basket-count').textContent = basketEggCount + ' egg' + (basketEggCount !== 1 ? 's' : '');
+  earnBadge('first_egg'); // [2026-03-19 22:00] Badge: first egg laid
 
   updateHUD();
 }
@@ -1529,6 +1650,7 @@ function eggAction(egg) {
 function hatchEgg(egg) {
   sndHatch();
   floatText(egg.el, '🐣 HATCHED!', '#FFD700');
+  earnBadge('first_hatch'); // [2026-03-19 22:00] Badge: first egg hatched
   egg.el.remove();
   eggs = eggs.filter(e => e.id !== egg.id);
 
@@ -1718,8 +1840,51 @@ function updateDirtVisual() {
 }
 
 function getCleaningCost() {
-  // Base ₹20, scales with dirt: ₹20 at 10%, ₹60 at 50%, ₹100 at 100%
+  // [2026-03-19 22:00] Backyard = free (poop mini-game), others scale from ₹15 base
+  if (farmIndex === 0) return 0;
   return Math.round(CONFIG.CLEANING_COST + (dirtLevel / 100) * CONFIG.CLEANING_COST * 4);
+}
+
+// [2026-03-19 22:00] Poop mini-game — tap poop emojis to clean Backyard for free. Effort = time not money.
+let poopMiniGameActive = false;
+function startPoopMiniGame() {
+  if (poopMiniGameActive) return;
+  poopMiniGameActive = true;
+  const farmArea = document.getElementById('farm-area');
+  const poopCount = Math.max(3, Math.floor(dirtLevel / 10));
+  let remaining = poopCount;
+  const oldDirt = Math.round(dirtLevel);
+
+  for (let i = 0; i < poopCount; i++) {
+    const p = document.createElement('div');
+    p.className = 'poop-target';
+    p.textContent = '💩';
+    p.style.left = (8 + Math.random() * 75) + '%';
+    p.style.top = (10 + Math.random() * 60) + '%';
+    p.onclick = function() {
+      if (p.classList.contains('popped')) return;
+      p.classList.add('popped');
+      p.textContent = '✨';
+      playTone(600 + Math.random() * 400, 0.08, 'sine', 0.15); // pop sound
+      remaining--;
+      if (remaining <= 0) {
+        // All poops cleared — farm clean!
+        poopMiniGameActive = false;
+        dirtLevel = 0;
+        stats.timesCleanedFarm++;
+        sndBuy();
+        updateDirtVisual();
+        updateHUD();
+        mpTrack('farm_cleaned', { cost: 0, dirt_before: oldDirt, dirt_after: 0, day: day, method: 'poop_minigame' });
+        notify("✨ You cleaned all the poop! Farm is spotless!");
+        addTodayEvent('🧹', 'Cleaned farm (free!)');
+        // Remove all targets after brief delay
+        setTimeout(() => farmArea.querySelectorAll('.poop-target').forEach(el => el.remove()), 400);
+      }
+    };
+    farmArea.appendChild(p);
+  }
+  notify("💩 Tap all the poop to clean your farm!");
 }
 
 function cleanFarm() {
@@ -1727,6 +1892,8 @@ function cleanFarm() {
   // [2026-03-19 17:00] Block manual cleaning when auto-cleaner handles it
   if (hasAutoCleaner) { notify("🤖 Auto-cleaner handles it!"); return; }
   if (dirtLevel <= 5) { notify("✨ Farm is already clean!"); return; }
+  // [2026-03-19 22:00] Backyard = free poop mini-game
+  if (farmIndex === 0) { startPoopMiniGame(); return; }
   const cost = getCleaningCost();
   if (money < cost) { sndError(); notify("❌ Need ₹" + cost + " for cleaning!"); return; }
   money -= cost;
@@ -1799,6 +1966,7 @@ function buyAutoCleaner() {
   money -= CONFIG.AUTO_CLEANER_COST;
   hasAutoCleaner = true;
   sndUpgrade();
+  earnBadge('automated'); // [2026-03-19 22:00] Badge: bought auto-cleaner
   mpTrack('auto_cleaner_bought', { cost: CONFIG.AUTO_CLEANER_COST, day: day }); // [2026-03-19 14:00]
   notify("🤖 Auto-cleaner installed! Runs daily for ₹" + CONFIG.AUTO_CLEANER_DAILY + "/day. Farm stays clean!");
   addTodayEvent('🤖', 'Auto-cleaner -₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString());
@@ -1830,6 +1998,8 @@ function vaccinateHens() {
   unvaccinated.forEach(h => { h.vaccinatedUntil = day + CONFIG.VACCINE_DURATION; });
   sndBuy();
   mpTrack('vaccinated', { hens_count: unvaccinated.length, cost: cost, day: day }); // [2026-03-19 14:00]
+  // [2026-03-19 22:00] Badge: vaccinated all hens (check if all alive hens are now vaccinated)
+  if (hens.filter(h => h.alive).every(h => h.vaccinatedUntil > day)) earnBadge('vaccinator');
   notify("💉 Vaccinated " + unvaccinated.length + " hens! Protected for " + CONFIG.VACCINE_DURATION + " days. Sickness chance drops to " + (CONFIG.SICK_CHANCE_WITH_VACCINE * 100) + "%!");
   addTodayEvent('💉', 'Vaccinated ' + unvaccinated.length + ' hens -₹' + cost);
   updateHUD();
@@ -1871,6 +2041,8 @@ function sellEggs() {
 
   const priceNote = festivalDaysLeft > 0 ? ' (🎉 Festival price!)' : '';
   notify(`💰 Sold ${unsold.length} eggs for ₹${earnings}!${priceNote}`);
+  earnBadge('first_sale'); // [2026-03-19 22:00] Badge: first egg sale
+  if (festivalDaysLeft > 0) earnBadge('festival_seller'); // [2026-03-19 22:00] Badge: sold during festival
   updateHUD();
   // [2026-03-18 12:00] Track egg sale
   mpTrack('eggs_sold', { eggs_count: unsold.length, earnings: earnings, egg_price: price, is_festival: festivalDaysLeft > 0, money: money, day: day }); // [2026-03-19 14:00] Added egg_price
@@ -1895,7 +2067,7 @@ function sellChicken() {
   hens = hens.filter(h => h.id !== hen.id);
 
   stats.hensSold++;
-  if (isOld) stats.oldHensSold++;
+  if (isOld) { stats.oldHensSold++; earnBadge('retirement'); } // [2026-03-19 22:00] Badge: sold old hen
   mpTrack('hen_sold', { price: price, age: age, was_old: isOld, day: day }); // [2026-03-19 14:00]
   const label = isOld ? '👵 Sold old hen for ₹' + price + ' (not laying)' : '🍗 Sold hen for ₹' + price + '!';
   notify(label);
@@ -1913,6 +2085,8 @@ function rentFarm() {
     farmCapacity = next.cap;
     updateFarmVisuals();
     sndUpgrade();
+    earnBadge('moving_up'); // [2026-03-19 22:00] Badge: upgraded farm
+    if (nextIdx === FARMS.length - 1) earnBadge('empire'); // [2026-03-19 22:00] Badge: reached Empire
     notify(next.emoji + " Rented " + next.name + "! " + next.cap + " hens. Rent: ₹" + next.rent + "/day");
     addTodayEvent(next.emoji, 'Rented ' + next.name + ' (₹' + next.rent + '/day)');
     // [2026-03-18 13:30] Track farm upgrade
@@ -2013,6 +2187,7 @@ function executeLoan(amount) {
   money += amount;
   dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
   sndBuy();
+  earnBadge('borrowed'); // [2026-03-19 22:00] Badge: took first loan
   mpTrack('loan_taken', { amount: amount, total_debt: Math.round(loanAmount + loanInterestAccrued), daily_emi: Math.round(dailyEMI), day: day });
   notify("🏦 Loan ₹" + amount.toLocaleString() + "! EMI: ₹" + Math.round(dailyEMI) + "/day for " + CONFIG.LOAN_TENURE_DAYS + " days");
   floatText(document.getElementById('hud'), '+₹' + amount.toLocaleString() + ' 🏦', '#60A5FA');
@@ -2065,6 +2240,7 @@ function executeRepay(repay) {
   mpTrack('loan_repaid', { amount: repay, remaining_debt: remaining, day: day }); // [2026-03-19 14:00]
   if (remaining <= 0) {
     dailyEMI = 0;
+    earnBadge('debt_free'); // [2026-03-19 22:00] Badge: paid off loan
     notify("🎉 Loan fully repaid! You're debt-free!");
   } else {
     notify("💸 Repaid ₹" + repay + "! Remaining: ₹" + remaining.toLocaleString());
@@ -2341,7 +2517,8 @@ function updateHUD() {
     if (cleanBtn) { cleanBtn.style.opacity = '0.4'; cleanBtn.style.pointerEvents = 'none'; }
   } else {
     document.getElementById('dirt-display').textContent = dirtDesc + ' (' + Math.round(dirtLevel) + '%)';
-    document.getElementById('clean-cost').textContent = dirtLevel <= 5 ? 'Clean!' : '₹' + getCleaningCost();
+    // [2026-03-19 22:00] Backyard shows "Free 💩" — poop mini-game instead of ₹ cost
+    document.getElementById('clean-cost').textContent = dirtLevel <= 5 ? 'Clean!' : (farmIndex === 0 ? 'Free 💩' : '₹' + getCleaningCost());
     if (cleanBtn) { cleanBtn.style.opacity = '1'; cleanBtn.style.pointerEvents = 'auto'; }
   }
   document.getElementById('autocleaner-cost').textContent = hasAutoCleaner ? 'INSTALLED ✅' : '₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString();
