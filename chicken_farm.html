@@ -617,6 +617,9 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
   </div>
 </div>
 
+<!-- [2026-03-19 14:00] Mixpanel JS SDK — enables session recording + full analytics -->
+<script src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js"></script>
+
 <script>
 // ============================================================
 //  ARUSH'S CHICKEN FARM — Business Simulation Game
@@ -650,59 +653,47 @@ function sndUpgrade(){ playTone(523, 0.1); setTimeout(()=>playTone(659, 0.1), 10
 function sndCluck()  { playTone(400 + Math.random()*200, 0.06, 'sine', 0.08); }
 
 // ============================================================
-//  MIXPANEL ANALYTICS — pixel-based, no SDK needed
-//  [2026-03-18 12:00] Added Mixpanel tracking for game analytics
+//  MIXPANEL ANALYTICS — JS SDK with session recording
+//  [2026-03-19 14:00] Upgraded from pixel tracking to full SDK
 // ============================================================
-const MP_TOKEN = '9b80be99d5592e53cb3b693faf1cb07e'; // [2026-03-18 13:00] Chicken Farm project token
+const MP_TOKEN = '9b80be99d5592e53cb3b693faf1cb07e';
 const MP_API = 'https://api-eu.mixpanel.com';
 
-const DEVICE_ID = (()=>{
-  let id = localStorage.getItem('cf_device_id');
-  if (!id) {
-    id = 'device_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-    localStorage.setItem('cf_device_id', id);
-  }
-  return id;
-})();
-
-const SESSION_ID = (()=>{
-  let id = sessionStorage.getItem('cf_session');
-  if (!id) {
-    id = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-    sessionStorage.setItem('cf_session', id);
-  }
-  return id;
-})();
+// [2026-03-19 14:00] Initialize Mixpanel SDK with session recording
+mixpanel.init(MP_TOKEN, {
+  api_host: MP_API,
+  record_sessions_percent: 100,
+  persistence: 'localStorage',
+  track_pageview: true,
+});
 
 let mpGameCount = parseInt(sessionStorage.getItem('cf_game_count') || '0');
 
+// [2026-03-19 14:00] Wrapper functions — same signature as before, SDK internals
 function mpTrack(event, props={}) {
   try {
-    const data = btoa(JSON.stringify({
-      event: event,
-      properties: {
-        token: MP_TOKEN, distinct_id: DEVICE_ID, session_id: SESSION_ID,
-        game_count: mpGameCount, game_title: 'Chicken Farm', game_version: 'v3.1.0',
-        ...props
-      }
-    }));
-    new Image().src = MP_API + '/track/?data=' + encodeURIComponent(data) + '&ip=1&_=' + Date.now();
+    mixpanel.track(event, {
+      game_count: mpGameCount, game_title: 'Chicken Farm', game_version: 'v3.4.1',
+      ...props
+    });
   } catch(e) {}
 }
 
 function mpEngage(ops) {
   try {
-    const payload = { '$token': MP_TOKEN, '$distinct_id': DEVICE_ID, ...ops };
-    const data = btoa(JSON.stringify(payload));
-    new Image().src = MP_API + '/engage/?data=' + encodeURIComponent(data) + '&_=' + Date.now();
+    if (ops['$set']) mixpanel.people.set(ops['$set']);
+    if (ops['$set_once']) mixpanel.people.set_once(ops['$set_once']);
+    if (ops['$add']) {
+      Object.entries(ops['$add']).forEach(([k, v]) => mixpanel.people.increment(k, v));
+    }
   } catch(e) {}
 }
 
 const MP_SESSION_START = Date.now();
 mpTrack('game_loaded');
 mpEngage({
-  '$set_once': { '$created': new Date().toISOString(), 'first_device': DEVICE_ID },
-  '$set': { '$name': 'Farmer ' + DEVICE_ID.slice(-6) }
+  '$set_once': { '$created': new Date().toISOString() },
+  '$set': { '$name': 'Farmer ' + (mixpanel.get_distinct_id() || '').slice(-6) }
 });
 
 window.addEventListener('beforeunload', () => {
@@ -1502,6 +1493,7 @@ function toggleAutoSell() {
   document.getElementById('autosell-display').textContent = autoSell ? 'ON' : 'OFF';
   document.getElementById('autosell-btn').style.borderColor = autoSell ? '#4ade80' : 'rgba(255,179,71,0.3)';
   notify(autoSell ? '🥚 Auto-sell ON — eggs sold each day!' : '🥚 Auto-sell OFF');
+  mpTrack('auto_sell_toggled', { enabled: autoSell, day: day }); // [2026-03-19 14:00]
 }
 
 function toggleSpeed() {
@@ -1513,6 +1505,7 @@ function toggleSpeed() {
   clearInterval(dayTimer);
   dayTimer = setInterval(() => { if (gameRunning) advanceDay(); }, DAY_MS / speedMultiplier);
   notify(speedMultiplier === 10 ? '⏩ FAST MODE! 10x speed' : '▶️ Normal speed');
+  mpTrack('speed_changed', { multiplier: speedMultiplier, day: day }); // [2026-03-19 14:00]
 }
 
 function toggleShop() { /* shop always visible in sidebar */ }
@@ -1580,6 +1573,7 @@ function cleanFarm() {
   dirtLevel = 0;
   sndBuy();
   updateDirtVisual();
+  mpTrack('farm_cleaned', { cost: cost, dirt_before: oldDirt, dirt_after: 0, day: day }); // [2026-03-19 14:00]
   notify("✨ Cleaned " + oldDirt + "% dirt for ₹" + cost + "! Clean early = cheaper!");
   updateHUD();
 }
@@ -1602,6 +1596,7 @@ function giveMedicine() {
     }
   });
   sndBuy();
+  mpTrack('medicine_given', { hens_treated: unwellHens.length, cured: cured, failed: failed, cost: cost, day: day }); // [2026-03-19 14:00]
   if (failed > 0) notify("💊 Treated " + unwellHens.length + ": " + cured + " cured, " + failed + " still unwell (may need doctor!)");
   else notify("💊 Home remedy worked on all " + cured + " hens!");
   updateHUD();
@@ -1638,6 +1633,7 @@ function buyAutoCleaner() {
   money -= CONFIG.AUTO_CLEANER_COST;
   hasAutoCleaner = true;
   sndUpgrade();
+  mpTrack('auto_cleaner_bought', { cost: CONFIG.AUTO_CLEANER_COST, day: day }); // [2026-03-19 14:00]
   notify("🤖 Auto-cleaner installed! Runs daily for ₹" + CONFIG.AUTO_CLEANER_DAILY + "/day. Farm stays clean!");
   updateHUD();
 }
@@ -1651,6 +1647,7 @@ function vaccinateHens() {
   money -= cost;
   unvaccinated.forEach(h => { h.vaccinatedUntil = day + CONFIG.VACCINE_DURATION; });
   sndBuy();
+  mpTrack('vaccinated', { hens_count: unvaccinated.length, cost: cost, day: day }); // [2026-03-19 14:00]
   notify("💉 Vaccinated " + unvaccinated.length + " hens! Protected for " + CONFIG.VACCINE_DURATION + " days. Sickness chance drops to " + (CONFIG.SICK_CHANCE_WITH_VACCINE * 100) + "%!");
   updateHUD();
 }
@@ -1692,7 +1689,7 @@ function sellEggs() {
   notify(`💰 Sold ${unsold.length} eggs for ₹${earnings}!${priceNote}`);
   updateHUD();
   // [2026-03-18 12:00] Track egg sale
-  mpTrack('eggs_sold', { eggs_count: unsold.length, earnings: earnings, money: money, day: day });
+  mpTrack('eggs_sold', { eggs_count: unsold.length, earnings: earnings, egg_price: price, is_festival: festivalDaysLeft > 0, money: money, day: day }); // [2026-03-19 14:00] Added egg_price
 }
 
 function sellChicken() {
@@ -1715,6 +1712,7 @@ function sellChicken() {
 
   stats.hensSold++;
   if (isOld) stats.oldHensSold++;
+  mpTrack('hen_sold', { price: price, age: age, was_old: isOld, day: day }); // [2026-03-19 14:00]
   const label = isOld ? '👵 Sold old hen for ₹' + price + ' (not laying)' : '🍗 Sold hen for ₹' + price + '!';
   notify(label);
   updateHUD();
@@ -1878,6 +1876,7 @@ function executeRepay(repay) {
   dailyEMI = calcDailyEMI(loanAmount, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
   sndSell();
   const remaining = Math.round(loanAmount + loanInterestAccrued);
+  mpTrack('loan_repaid', { amount: repay, remaining_debt: remaining, day: day }); // [2026-03-19 14:00]
   if (remaining <= 0) {
     dailyEMI = 0;
     notify("🎉 Loan fully repaid! You're debt-free!");
@@ -1897,6 +1896,7 @@ function buyGuardDog() {
   money -= CONFIG.GUARD_DOG_COST;
   hasGuardDog = true;
   sndBuy();
+  mpTrack('guard_dog_bought', { cost: CONFIG.GUARD_DOG_COST, day: day }); // [2026-03-19 14:00]
   notify("🐕 Guard dog bought! Your farm is protected from predators!");
   document.getElementById('dog-cost').textContent = 'ADOPTED ✅';
   document.getElementById('dog-desc').textContent = '🐕 Guarding your farm!';
@@ -1969,6 +1969,7 @@ const EVENT_DEFS = [
       stats.mongooseAttacks++;
       if (hasGuardDog) {
         stats.mongooseBlocked++;
+        mpTrack('mongoose_blocked', { day: day }); // [2026-03-19 14:00]
         notify("🐕 Your guard dog chased the mongoose away! Good boy!");
       } else {
         const aliveHens = hens.filter(h => h.alive);

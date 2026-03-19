@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v3.4.1 | 2026-03-19 | Patch | Mixpanel JS SDK + session recording + 11 missing events |
 | v3.4.0 | 2026-03-19 | Minor | Random events: Festival Bonus, Lucky Day, Mongoose Attack + Guard Dog |
 | v3.3.0 | 2026-03-19 | Minor | Kid UX: readable names, poop dirt, button loan UI, no decimals |
 | v3.2.1 | 2026-03-18 | Patch | Shop item attention system — wobble/bounce/shimmer alerts for kid engagement |
@@ -16,6 +17,24 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v3.4.1 — Mixpanel Full SDK + Complete Event Coverage (Mar 19)
+
+### Mixpanel JS SDK
+- Replaced pixel-based tracking with official Mixpanel JS SDK (CDN)
+- Session recording enabled at 100% (`record_sessions_percent: 100`)
+- `mpTrack()` and `mpEngage()` wrappers preserved — all existing call sites unchanged
+
+### 11 New Events
+- `hen_sold`, `farm_cleaned`, `auto_cleaner_bought`, `medicine_given`
+- `vaccinated`, `guard_dog_bought`, `loan_repaid`
+- `auto_sell_toggled`, `speed_changed`, `mongoose_blocked`
+- Added `egg_price` + `is_festival` to existing `eggs_sold` event
+
+### Total Events: 25
+Every player decision is now tracked for product analytics.
 
 ---
 
