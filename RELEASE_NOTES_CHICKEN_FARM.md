@@ -4,6 +4,7 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v5.1.0 | 2026-06-19 | Minor | Realistic sprites — baked-in transparent images for the Shih Tzu dog, mongoose, and hen (emoji fallback retained) |
 | v5.0.0 | 2026-06-19 | Major | Living Farm — Arush's 11 requests: touch-friendly broom, cleaning sound, loan daily-₹ breakdown, floating money, mood/time background music, roaming dog+hens, bigger scary mongoose + danger/rescue sounds, hen birthdays + treats, day/night greetings + sleep, bigger fonts |
 | v4.4.0 | 2026-03-19 | Minor | Dramatic mongoose attack — 3-phase arc with sounds, scared hens, chase, outcome modal |
 | v4.3.0 | 2026-03-19 | Minor | Badge celebration modal + broom cleaning + vaccination icon fix + feathers + 3 new badges |
@@ -29,6 +30,20 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v5.1.0 — Realistic Sprites (Jun 19)
+
+Completes request #8's art track. The dog, mongoose, and hen now render as **realistic illustrated images** instead of system emoji.
+
+- **Source:** generated as transparent PNGs (cute Shih Tzu, alert realistic mongoose, friendly brown hen), background keyed out, and **baked into the HTML as base64 data URIs** — so they work offline, never link-rot, and keep the game a single self-contained file.
+- **Where they show:** the roaming dog & free-range hens, plus the mongoose and rescue dog during a predator attack (all use the shared `SPRITE_IMAGES` swap).
+- **Rule F preserved:** if a data URI ever fails to decode, `onerror` falls back to the original emoji — the game never breaks.
+- Each sprite was visually verified before shipping. Grid hen tiles keep their crisp SVG (sharper than a photo at 20px).
+- Bumped `game_version` v5.0.0 → v5.1.0.
+
+> To change any sprite later: replace the corresponding entry in the `SPRITE_IMAGES` object near the roaming module. A plain URL works too (with automatic emoji fallback).
 
 ---
 
