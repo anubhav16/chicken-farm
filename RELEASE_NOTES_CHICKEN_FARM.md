@@ -4,6 +4,10 @@
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
+| v5.0.0 | 2026-06-19 | Major | Living Farm — Arush's 11 requests: touch-friendly broom, cleaning sound, loan daily-₹ breakdown, floating money, mood/time background music, roaming dog+hens, bigger scary mongoose + danger/rescue sounds, hen birthdays + treats, day/night greetings + sleep, bigger fonts |
+| v4.4.0 | 2026-03-19 | Minor | Dramatic mongoose attack — 3-phase arc with sounds, scared hens, chase, outcome modal |
+| v4.3.0 | 2026-03-19 | Minor | Badge celebration modal + broom cleaning + vaccination icon fix + feathers + 3 new badges |
+| v4.2.2 | 2026-03-19 | Patch | Fix: Badges not resetting on new game |
 | v4.2.1 | 2026-03-19 | Patch | Fix: Clean Farm button permanently broken after poop mini-game not completed |
 | v4.2.0 | 2026-03-19 | Minor | Visual polish: readability, dirt tint, loan steppers, P&L cleanup, animations |
 | v4.1.0 | 2026-03-19 | Minor | Economics rebalance (₹15 cleaning) + poop mini-game + 20 badges |
@@ -25,6 +29,84 @@
 | v1.1.0 | 2026-03-17 | Minor | Bank loans, rent/buy farm system, auto-sell, 10x speed |
 | v1.0.0 | 2026-03-17 | Major | Full game with CONFIG, SVG chickens, sound, day/night cycle |
 | v0.1.0 | 2026-03-17 | Major | Initial prototype — basic chicken farming simulation |
+
+---
+
+## v5.0.0 — Living Farm (Jun 19) — Arush's 11 Requests
+
+A major update built directly from Arush's play-testing feedback. All 11 requests delivered. Every sound is generated with the Web Audio API and guarded — the game works fully even if audio is unavailable (Rule F). Verified with the standard runtime smoke test **and** a deep headless harness that runs the whole game loop (start → 45 in-game days → birthdays → broom → loan → roaming → mongoose) with zero crashes.
+
+> Audio/visual *feel* (does it sound nice, look right, read well) is for Arush to confirm in play — those cannot be verified headlessly.
+
+### 🧹 Cleaning (requests #1, #2, #3)
+- **#3 — All poop is now sweepable (the real bug fix).** The old broom ended on `pointerdown`, so on a tablet the first finger-touch to start sweeping *immediately ended* the broom — you could only clear the 1-2 poops under the initial touch ("only 2 of 5"). Rebuilt: continuous drag-sweep, taps also sweep (and no longer end), `touch-action:none` stops the page scrolling mid-sweep, and sweep radius 35→55px so fast sweeps don't skip dirt.
+- **#1 — The broom clearly "comes out."** Bigger broom cursor (44→60px) with a sweeping wiggle, plus a big pulsing **✓ DONE** button so cleaning can never get stuck.
+- **#2 — Satisfying cleaning sound.** New `sndSweep()` whoosh (filtered white-noise burst) on every sweep, throttled so it sounds like real sweeping.
+
+### 💰 Money clarity (requests #4, #5)
+- **#4 — Loan shown in rupees, not just %.** The Take-Loan modal now shows, live as you change the amount: daily repayment ₹/day, split into loan-part ₹ and interest ₹, the total you'll repay, and the extra interest paid.
+- **#5 — Floating money animations.** Each day a big centered **+₹ / −₹** number shows the day's net profit/loss; individual cost tickers (food, rent, EMI, maintenance) now float over the farm instead of an invisible anchor.
+
+### 🎵 Atmosphere & sound (requests #6, #10)
+- **#6 — Background soundscape that never gets boring.** A soft continuous pad with periodic birdsong (day) and crickets (night). Mood shifts automatically: **day / night / happy** (rich) **/ sad** (broke or sick hens) **/ danger** (mongoose). New **🎵 MUSIC** toggle in Settings (state remembered).
+- **#10 — Day & night come alive.** The sky cycle was decoupled from the 10-second economic day to a gentle 60-second cycle so morning/night feel meaningful. Each morning a cheerful Claude-written greeting + sunrise/birdsong + yawn; each night a "sweet dreams" message + lullaby + yawn. **Animals sleep at night** (hens dim with 💤, roaming dog & hens lie down) and wake by day.
+
+### 🐔🐕 Living farm (requests #7, #8)
+- **#7 — Roaming dog & chickens.** A new decorative roaming layer: a couple of free-range hens wander the farm, and once you adopt the guard dog it roams too — running up to hens to play (hearts + happy woof). They sleep at night. (Purely cosmetic — no effect on economics.)
+- **#8 — Bigger, scarier predator + distinct sounds.** Mongoose enlarged (52→78px) with a drop-shadow; hens (including free-range ones) get scared. New **`sndDanger()`** when the mongoose appears (menacing) and a clearly different **`sndRescue()`** when the dog charges in. Tense "danger" background music during the attack.
+- **#8 — Realistic-image swap, ready for the art track.** Every sprite (roaming hen/dog, mongoose, attack dog) now renders an emoji by default but will swap to a real image the moment a URL is added to the `SPRITE_IMAGES` config — with automatic emoji fallback if the image is missing or fails to load (Rule F). Drop in a Shih Tzu / mongoose / hen PNG later, no code change.
+
+### 🎂 Birthdays (request #9)
+- **#9 — Every hen has its own birthday.** Each hen gets a random birthday on a 30-day cycle (so hens are *not* twins). Tap a hen any time to see "🎂 Birthday in N days". On the day, the hen throws a party (cake badge, glow, birthday tune) — tap her to give a **treat** (₹10): she lays 2 bonus eggs with hearts.
+
+### 🔤 Readability (request #11)
+- **#11 — Bigger, more readable fonts** across panels, buttons, shop items, P&L/farm numbers, stat labels, and hen-tile names (min size raised 8→10px). Sizes raised within the fixed-width scrolling panels so nothing is cut off.
+
+### Housekeeping
+- Fixed a long-standing version-string drift: the Mixpanel `game_version` tag was stuck at `v3.4.2`; now `v5.0.0`.
+
+---
+
+## v4.4.0 — Dramatic Mongoose Attack (Mar 19)
+
+### New Feature
+- **3-phase dramatic mongoose attack** replacing the old 1.5s silent dash:
+  - **Phase 1 — Warning (2s):** Mongoose peeks from edge, all hens shake with fear, low rumble sound
+  - **Phase 2 — Chase (3-4s):** Mongoose charges, hens scatter to random positions, target hen flashes red, hen chirp and mongoose chitter sounds play
+  - **Phase 3 — Outcome:** With guard dog: dog chases mongoose away, happy ascending chord, triumph modal. Without: mongoose takes hen off-screen, sad descending chord, somber modal with hen's name
+- **Game paused** during entire 8-10s sequence — child must watch and process
+- **Hen death deferred** until after modal dismiss — child acknowledges loss before UI changes
+- **Guard dog bark** sound effect when dog appears
+- **Safety timeout:** 15s auto-cleanup prevents stuck animations
+- **`customEvent` flag** — mongoose bypasses normal event modal, runs its own dramatic sequence
+
+---
+
+## v4.3.0 — Badge Celebration + Broom Cleaning + Visual Fixes (Mar 19)
+
+### Badge Celebration Modal
+- **Full-screen badge celebration:** Earning a badge now pauses the game and shows a large modal with 80px emoji, sparkle particles, badge name/description, and a big "AWESOME! 🎉" button. Child controls when to dismiss.
+- **Badge queue system:** Multiple badges earned on the same day are shown one at a time — each gets its own celebration moment.
+- **Pause-aware:** Stores pre-modal pause state. If game was already paused, it stays paused after dismissing. If running, it resumes.
+
+### Broom Cleaning Mechanic
+- **Interactive broom sweep** replaces old poop mini-game. Click "Clean Farm" → broom attaches to cursor → sweep over poops/feathers/flies to clean them with sparkle effects.
+- **All farm levels:** Backyard is free, larger farms charge ₹ on broom pickup. Auto-cleaner still disables manual cleaning.
+- **3 new badges:** Broom Beginner (1st clean), Broom Pro (5th), Broom Master (15th). Total badges: 23.
+
+### Visual Fixes
+- **Vaccination icon:** Bumped from 13px to 20px with drop-shadow for visibility on hen tiles.
+- **Feather particles:** 🪶 feathers now appear alongside poops in dirt overlay with gentle float animation. Cleanable by broom.
+- **Earlier dirt feedback:** Poop particles now visible at dirtLevel >= 5 (was 15). Kids see consequences sooner.
+
+---
+
+## v4.2.2 — Fix: Badges Not Resetting on New Game (Mar 19)
+
+### Bug Fix
+- **CRITICAL**: Starting a new game did not reset `earnedBadges` Set or clear `localStorage`. All badges from previous game carried over — child sees all badges already earned with no way to re-earn them.
+- **Fix**: `startGame()` now clears `earnedBadges` and removes `chickenFarmBadges` from `localStorage` before rendering the badge shelf.
+- **Root cause**: v4.1.0 added badge persistence via `localStorage` (line 1031/1038) and the `startGame()` reset block (line 1262) only reset tracking counters (`profitStreak`, `cleanStreak`) but not the badges themselves.
 
 ---
 

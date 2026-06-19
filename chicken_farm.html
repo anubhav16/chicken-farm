@@ -51,7 +51,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 
 /* Shared panel styles — BIG fonts for 7 year old */
 .panel-section { padding: 10px 12px; border-bottom: 2px solid rgba(255,255,255,0.08); }
-.panel-title { font-family: 'Bangers', cursive; font-size: 18px; letter-spacing: 1px; margin-bottom: 6px; }
+.panel-title { font-family: 'Bangers', cursive; font-size: 21px; letter-spacing: 1px; margin-bottom: 6px; } /* [2026-06-19] #11 bigger for readability */
 
 /* Big money display at top of info panel */
 #money-hero { text-align: center; padding: 14px 8px 8px; background: rgba(0,0,0,0.2); }
@@ -63,7 +63,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .quick-stats { display: flex; justify-content: space-around; padding: 8px 4px; background: rgba(0,0,0,0.15); }
 .quick-stat { text-align: center; }
 .quick-stat .qs-val { font-family: 'Bangers', cursive; font-size: 28px; color: #fff; }
-.quick-stat .qs-label { font-family: 'Bangers', cursive; font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+.quick-stat .qs-label { font-family: 'Bangers', cursive; font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 1px; } /* [2026-06-19] #11 */
 
 /* Farm area — center, between panels, MUST contain children */
 #farm-area { position: absolute; bottom: 0; left: 260px; right: 240px; top: 0; z-index: 10; display: flex; flex-direction: column; overflow: hidden; }
@@ -85,19 +85,19 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 /* [2026-03-18 14:20] 6-15 hens — bumped ~15% for kid readability */
 .hen-grid-sm .hen-tile { width: 95px; height: 105px; padding: 5px; }
 .hen-grid-sm .ht-body { width: 50px; height: 46px; }
-.hen-grid-sm .ht-status { font-size: 11px; }
+.hen-grid-sm .ht-status { font-size: 13px; } /* [2026-06-19] #11 */
 /* [2026-03-18 14:20] 16-35 hens — bumped ~15% for kid readability */
 .hen-grid-md .hen-tile { width: 75px; height: 85px; padding: 4px; }
 .hen-grid-md .ht-body { width: 40px; height: 35px; }
-.hen-grid-md .ht-status { font-size: 9px; }
+.hen-grid-md .ht-status { font-size: 11px; } /* [2026-06-19] #11 */
 /* 36-70 hens */
 .hen-grid-lg .hen-tile { width: 48px; height: 56px; padding: 2px; border-width: 2px; }
 .hen-grid-lg .ht-body { width: 26px; height: 24px; }
-.hen-grid-lg .ht-status { font-size: 8px; } /* [2026-03-19 10:00] Min 8px for readability */
+.hen-grid-lg .ht-status { font-size: 10px; } /* [2026-06-19] #11 bumped 8→10px */
 /* 71+ hens */
 .hen-grid-xl .hen-tile { width: 36px; height: 42px; padding: 1px; border-width: 1px; border-radius: 5px; }
 .hen-grid-xl .ht-body { width: 20px; height: 18px; }
-.hen-grid-xl .ht-status { font-size: 8px; } /* [2026-03-19 10:00] Min 8px for readability */
+.hen-grid-xl .ht-status { font-size: 10px; } /* [2026-06-19] #11 bumped 8→10px */
 /* [2026-03-19 16:00] Removed .ht-age — duplicate icon removed, age shown via border color */
 .ht-status { font-family: 'Bangers', cursive; padding: 1px 4px; border-radius: 4px; font-weight: 900; text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.8); } /* [2026-03-19 10:00] Dark shadow for contrast on all backgrounds */
 .hen-tile.young .ht-status { color: #fff; } /* [2026-03-19 16:00] White text for contrast on all sky backgrounds — was light green #86efac, invisible on blue sky */
@@ -141,19 +141,43 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 /* [2026-03-19 23:00] Brown tint scales with dirt % — makes 15% vs 50% instantly visible */
 #dirt-tint { position: absolute; inset: 0; background: rgba(101,67,33,0.0); pointer-events: none; z-index: 1; transition: background 0.5s; border-radius: 0; }
 .dirt-particle { position: absolute; pointer-events: none; z-index: 2; font-size: 20px; opacity: 0.9; transition: opacity 0.3s; }
-/* [2026-03-19 22:00] Poop mini-game — clickable targets at Backyard for free cleaning */
-.poop-target { position: absolute; z-index: 20; font-size: 28px; cursor: pointer; pointer-events: auto; transition: transform 0.15s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-.poop-target:hover { transform: scale(1.3); }
-.poop-target.popped { transform: scale(1.5); opacity: 0; transition: all 0.3s ease-out; pointer-events: none; }
+/* [2026-03-19 24:00] Old poop-target CSS removed — replaced by broom mechanic */
 /* [2026-03-19 22:00] Badge system — achievement shelf + toast */
 #badge-grid { display: flex; flex-wrap: wrap; gap: 4px; }
 .badge-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); cursor: default; position: relative; }
 .badge-icon.earned { border-color: #FFD700; background: rgba(255,215,0,0.15); animation: badgeGlow 2s ease-in-out infinite alternate; }
 .badge-icon.unearned { filter: grayscale(1) brightness(0.4); }
 @keyframes badgeGlow { 0% { box-shadow: 0 0 4px rgba(255,215,0,0.3); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.6); } }
-.badge-toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #FFD700, #ff6fd8); color: #1a0533; font-family: 'Bangers', cursive; font-size: 22px; padding: 12px 24px; border-radius: 12px; z-index: 999; text-align: center; animation: badgeToastAnim 3s ease-out forwards; pointer-events: none; }
-.badge-toast .badge-toast-emoji { font-size: 36px; display: block; }
-@keyframes badgeToastAnim { 0% { opacity: 0; transform: translateX(-50%) scale(0.5); } 15% { opacity: 1; transform: translateX(-50%) scale(1.1); } 25% { transform: translateX(-50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-30px); } }
+/* [2026-03-19 24:00] Badge celebration modal — full-screen, pauses game, kid-friendly accept button */
+.badge-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; animation: badgeBackdropIn 0.3s ease-out; }
+@keyframes badgeBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+.badge-modal-card { background: linear-gradient(135deg, #1a0533, #2d1b69); border: 3px solid #FFD700; border-radius: 20px; padding: 32px 28px 24px; text-align: center; max-width: 340px; width: 90%; box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 20px 60px rgba(0,0,0,0.5); animation: badgeCardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
+@keyframes badgeCardIn { from { opacity: 0; transform: scale(0.3) rotate(-5deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+.badge-modal-emoji { font-size: 80px; display: block; margin-bottom: 8px; animation: badgeEmojiPulse 1.5s ease-in-out infinite alternate; }
+@keyframes badgeEmojiPulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+.badge-modal-title { font-family: 'Bangers', cursive; font-size: 32px; color: #FFD700; margin: 8px 0 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+.badge-modal-desc { font-size: 18px; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
+.badge-modal-btn { background: linear-gradient(135deg, #FFD700, #ff6fd8); color: #1a0533; font-family: 'Bangers', cursive; font-size: 26px; border: none; border-radius: 14px; padding: 14px 0; width: 220px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,215,0,0.4); transition: transform 0.15s; }
+.badge-modal-btn:hover { transform: scale(1.08); }
+.badge-modal-btn:active { transform: scale(0.95); }
+/* Sparkle particles inside modal card */
+.badge-sparkle { position: absolute; font-size: 14px; pointer-events: none; animation: badgeSparkleDrift 2s ease-out forwards; }
+@keyframes badgeSparkleDrift { 0% { opacity: 1; transform: translate(0,0) scale(1); } 100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.3); } }
+/* [2026-03-19 24:00] Broom cursor — follows pointer during sweep cleaning */
+/* [2026-06-19] #1 Bigger broom + sweeping wiggle so it clearly "comes out" when cleaning (Arush request) */
+.broom-cursor { position: fixed; font-size: 60px; z-index: 100; pointer-events: none; transform: translate(-50%, -50%) rotate(-30deg); filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)); transition: none; }
+.broom-cursor.sweeping { animation: broomWiggle 0.25s ease-in-out infinite; }
+@keyframes broomWiggle { 0%,100% { transform: translate(-50%,-50%) rotate(-38deg); } 50% { transform: translate(-50%,-50%) rotate(-16deg); } }
+/* [2026-06-19] #1/#3 Big DONE button so the broom can never get "stuck" and all dirt is reachable */
+#broom-done-btn { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 101; pointer-events: auto; font-family: 'Bangers', cursive; font-size: 26px; letter-spacing: 2px; padding: 12px 32px; border-radius: 30px; border: 3px solid #fff; background: linear-gradient(135deg, #4ade80, #16a34a); color: #fff; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.4); animation: pausePulse 0.8s ease-in-out infinite alternate; }
+/* [2026-06-19] #5 Big centered money float — the day's profit/loss is impossible to miss */
+.float-text.big-float { font-size: 44px; font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,0.85), 0 0 18px currentColor; animation: bigFloatUp 1.8s ease-out forwards; white-space: nowrap; }
+@keyframes bigFloatUp { 0% { opacity: 0; transform: translateX(-50%) translateY(24px) scale(0.6); } 20% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.12); } 80% { opacity: 1; transform: translateX(-50%) translateY(-30px) scale(1); } 100% { opacity: 0; transform: translateX(-50%) translateY(-80px) scale(1); } }
+.swept-sparkle { position: absolute; font-size: 18px; pointer-events: none; z-index: 3; animation: sweptPop 0.4s ease-out forwards; }
+@keyframes sweptPop { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8) translateY(-10px); } }
+/* [2026-03-19 24:00] Feather particles — gentle float animation, cleanable by broom */
+.dirt-particle.feather { animation: featherFloat 3s ease-in-out infinite alternate; font-size: 14px; opacity: 0.8; }
+@keyframes featherFloat { 0% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(5px, -4px) rotate(10deg); } 100% { transform: translate(-3px, 3px) rotate(-5deg); } }
 .dirt-particle.fly { animation: flyBuzz 1.5s ease-in-out infinite alternate; font-size: 16px; }
 @keyframes flyBuzz { 0% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(8px,-6px) rotate(15deg); } 50% { transform: translate(-4px,4px) rotate(-10deg); } 75% { transform: translate(6px,2px) rotate(8deg); } 100% { transform: translate(-3px,-5px) rotate(-5deg); } }
 /* [2026-03-19 17:00] Auto-cleaner robot — sits in corner, sweeps across farm each day */
@@ -162,16 +186,30 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 @keyframes robotSweep { 0% { right: 8px; } 50% { right: calc(100% - 40px); } 100% { right: 8px; } }
 .robot-sparkle { position: absolute; font-size: 14px; z-index: 14; pointer-events: none; animation: sparkleFade 0.8s ease-out forwards; }
 @keyframes sparkleFade { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }
-/* [2026-03-19 23:00] Mongoose dash animation — runs across farm */
-.mongoose-anim { position: absolute; font-size: 36px; z-index: 50; pointer-events: none; top: 50%; }
-.mongoose-anim.dash { animation: mongooseDash 1.5s ease-in-out forwards; }
-@keyframes mongooseDash { 0% { left: -40px; opacity: 1; } 50% { left: 50%; } 100% { left: calc(100% + 40px); opacity: 0; } }
-.mongoose-anim.chased { animation: mongooseChased 1.5s ease-in-out forwards; }
-@keyframes mongooseChased { 0% { left: -40px; } 30% { left: 40%; } 100% { left: -60px; opacity: 0; } }
+/* [2026-03-19 24:00] Mongoose dramatic attack — 3-phase arc with scared hens, chase, outcome */
+/* [2026-06-19] #8 Bigger, scarier mongoose + bigger hero dog (Arush request) */
+.mongoose-actor { position: absolute; font-size: 78px; z-index: 50; pointer-events: none; top: 38%; transition: left 2s ease-in-out; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+.mongoose-actor.dog-actor { font-size: 68px; }
+.hen-scared { animation: henScared 0.3s ease-in-out infinite; }
+@keyframes henScared { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px) rotate(-5deg); } 75% { transform: translateX(4px) rotate(5deg); } }
+.hen-scatter { transition: transform 0.5s ease-out; }
+.hen-flash-red { animation: henFlashRed 0.4s ease-in-out infinite; }
+@keyframes henFlashRed { 0%,100% { box-shadow: 0 0 0 transparent; } 50% { box-shadow: 0 0 12px 4px rgba(255,0,0,0.6); } }
+/* [2026-03-19 24:00] Mongoose outcome modal — somber/triumph variants */
+.mongoose-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; display: flex; align-items: center; justify-content: center; animation: badgeBackdropIn 0.3s ease-out; }
+.mongoose-modal-card { background: linear-gradient(135deg, #1a0533, #2d1b69); border: 3px solid #ff6666; border-radius: 20px; padding: 32px 28px 24px; text-align: center; max-width: 340px; width: 90%; box-shadow: 0 0 40px rgba(255,100,100,0.3), 0 20px 60px rgba(0,0,0,0.5); animation: badgeCardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mongoose-modal-card.triumph { border-color: #4CAF50; box-shadow: 0 0 40px rgba(76,175,80,0.3), 0 20px 60px rgba(0,0,0,0.5); }
+.mongoose-modal-emoji { font-size: 64px; display: block; margin-bottom: 8px; }
+.mongoose-modal-title { font-family: 'Bangers', cursive; font-size: 28px; margin: 8px 0 4px; }
+.mongoose-modal-card .mongoose-modal-title { color: #ff6666; }
+.mongoose-modal-card.triumph .mongoose-modal-title { color: #4CAF50; }
+.mongoose-modal-desc { font-size: 16px; color: rgba(255,255,255,0.8); margin-bottom: 20px; }
+.mongoose-modal-btn { font-family: 'Bangers', cursive; font-size: 24px; border: none; border-radius: 14px; padding: 14px 0; width: 220px; cursor: pointer; transition: transform 0.15s; }
+.mongoose-modal-btn:hover { transform: scale(1.08); }
+.mongoose-modal-btn.sad { background: linear-gradient(135deg, #ff6666, #cc3333); color: white; }
+.mongoose-modal-btn.happy { background: linear-gradient(135deg, #4CAF50, #81C784); color: white; }
 /* [2026-03-19 23:00] Broom sweep animation — reuses robotSweep pattern */
-.broom-anim { position: absolute; bottom: 85px; font-size: 32px; z-index: 15; pointer-events: none; right: 8px; }
-.broom-anim.sweeping { animation: broomSweep 1.2s ease-in-out forwards; }
-@keyframes broomSweep { 0% { right: 8px; opacity: 1; } 50% { right: calc(100% - 40px); } 100% { right: 8px; opacity: 0; } }
+/* [2026-03-19 24:00] Old broom-anim CSS removed — replaced by interactive broom-cursor */
 
 /* Sick bay — compact fixed-size tiles */
 #sick-bay { background: rgba(192,132,252,0.06); border: 2px dashed rgba(192,132,252,0.4); border-radius: 10px; padding: 4px 6px; margin: 4px 8px; display: none; flex-shrink: 0; }
@@ -202,7 +240,8 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 @keyframes healPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 .hen-tile.vaccinated { position: relative; }
 /* [2026-03-19 23:00] Bumped vaccination icon from 8px to 13px for visibility */
-.hen-tile.vaccinated::after { content: '💉'; position: absolute; top: 1px; right: 1px; font-size: 13px; }
+/* [2026-03-19 24:00] Bumped vaccination icon from 13px to 20px — still too small for kids */
+.hen-tile.vaccinated::after { content: '💉'; position: absolute; top: -2px; right: -2px; font-size: 20px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
 
 /* Hen sprite — 2D SVG style */
 .hen { position: absolute; bottom: 0; cursor: pointer; transition: left 2s ease-in-out, bottom 0.3s; z-index: 12; display: flex; flex-direction: column; align-items: center; }
@@ -265,13 +304,13 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 @keyframes shopResolved { 0% { border-color: #4ade80; box-shadow: 0 0 16px rgba(74,222,128,0.6); transform: scale(1.06); } 100% { border-color: rgba(255,179,71,0.3); box-shadow: none; transform: scale(1); } }
 .shop-item .icon { font-size: 32px; }
 .shop-item .info { flex: 1; }
-.shop-item .info .name { font-family: 'Bangers', cursive; font-size: 16px; color: #fff; letter-spacing: 1px; }
-.shop-item .info .cost { font-family: 'Nunito', sans-serif; font-size: 14px; color: #FFD700; font-weight: 900; }
-.shop-item .info .desc { font-size: 11px; color: #bbb; }
+.shop-item .info .name { font-family: 'Bangers', cursive; font-size: 19px; color: #fff; letter-spacing: 1px; } /* [2026-06-19] #11 bigger button labels */
+.shop-item .info .cost { font-family: 'Nunito', sans-serif; font-size: 16px; color: #FFD700; font-weight: 900; }
+.shop-item .info .desc { font-size: 13px; color: #c8c8c8; }
 
 /* Action buttons */
 #actions { position: absolute; bottom: 210px; left: 50%; transform: translateX(-50%); z-index: 35; display: none; gap: 8px; }
-.btn { font-family: 'Bangers', cursive; font-size: 16px; letter-spacing: 2px; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.15s; }
+.btn { font-family: 'Bangers', cursive; font-size: 19px; letter-spacing: 2px; border: none; padding: 11px 22px; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.15s; } /* [2026-06-19] #11 */
 .btn:hover { transform: scale(1.05); }
 .btn:active { transform: scale(0.95); }
 .btn-gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: #1a0050; }
@@ -294,7 +333,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 60; background: linear-gradient(135deg, #1a0050, #3a0080, #1a0050); pointer-events: all; }
 .screen h1 { font-family: 'Bangers', cursive; font-size: 42px; color: #FFD700; text-shadow: 0 0 20px #ff6000; letter-spacing: 3px; margin-bottom: 4px; }
 .screen h2 { font-family: 'Bangers', cursive; font-size: 22px; color: #ff6fd8; letter-spacing: 2px; margin-bottom: 16px; }
-.screen .subtitle { font-size: 14px; color: #ccc; margin-bottom: 20px; text-align: center; line-height: 1.6; max-width: 400px; }
+.screen .subtitle { font-size: 16px; color: #ddd; margin-bottom: 20px; text-align: center; line-height: 1.6; max-width: 420px; } /* [2026-06-19] #11 */
 .screen .rules { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,179,71,0.3); border-radius: 14px; padding: 16px; max-width: 420px; margin-bottom: 20px; text-align: left; }
 .screen .rules h3 { font-family: 'Bangers', cursive; font-size: 16px; color: #FFD700; margin-bottom: 8px; }
 .screen .rules p { font-size: 16px; color: #ddd; line-height: 2; }
@@ -307,16 +346,16 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 /* Farm info — kid-friendly */
 #farm-info { padding: 0; }
 #farm-info h3 { font-family: 'Bangers', cursive; font-size: 18px; color: #7b2ff7; letter-spacing: 1px; margin-bottom: 6px; }
-.farm-stat { display: flex; justify-content: space-between; font-size: 14px; color: #ddd; margin-bottom: 3px; padding: 2px 0; }
-.farm-stat .fval { color: #FFD700; font-weight: 900; font-size: 15px; }
+.farm-stat { display: flex; justify-content: space-between; font-size: 16px; color: #e6e6e6; margin-bottom: 3px; padding: 2px 0; } /* [2026-06-19] #11 */
+.farm-stat .fval { color: #FFD700; font-weight: 900; font-size: 17px; }
 
 /* P&L Panel — kid-friendly big fonts */
 #pnl-panel { padding: 0; }
 #pnl-panel h3 { font-family: 'Bangers', cursive; font-size: 18px; letter-spacing: 1px; margin-bottom: 6px; }
 #pnl-panel .pnl-section { margin-bottom: 8px; }
 #pnl-panel .pnl-section-title { font-family: 'Bangers', cursive; font-size: 14px; letter-spacing: 1px; margin-bottom: 3px; padding-bottom: 3px; border-bottom: 2px solid rgba(255,255,255,0.1); }
-.pnl-row { display: flex; justify-content: space-between; font-size: 14px; color: #ddd; margin-bottom: 3px; padding: 2px 0; }
-.pnl-row .pnl-val { font-weight: 900; font-family: 'Nunito', sans-serif; font-size: 15px; }
+.pnl-row { display: flex; justify-content: space-between; font-size: 16px; color: #e6e6e6; margin-bottom: 3px; padding: 2px 0; } /* [2026-06-19] #11 */
+.pnl-row .pnl-val { font-weight: 900; font-family: 'Nunito', sans-serif; font-size: 17px; }
 .pnl-row .pnl-val.income { color: #4ade80; }
 .pnl-row .pnl-val.cost { color: #ff6666; }
 .pnl-row.total { border-top: 3px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px; font-size: 16px; font-weight: 900; }
@@ -425,6 +464,34 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 #first-hen-cta .cta-text { font-family: 'Bangers', cursive; font-size: 36px; color: #FFD700; text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,111,216,0.3); animation: pausePulse 0.8s ease-in-out infinite alternate; letter-spacing: 3px; }
 #first-hen-cta .cta-hint { font-family: 'Nunito', sans-serif; font-size: 16px; color: #ccc; margin-top: 8px; }
 
+/* [2026-06-19] #10 Sleeping animals at night — hens dim + 💤, roaming sprites lie down (Arush request) */
+#hen-grid.night-sleep .ht-body { animation: none !important; opacity: 0.65; filter: brightness(0.7) saturate(0.7); }
+#hen-grid.night-sleep .hen-tile::before { content: '💤'; position: absolute; top: -4px; right: 3px; font-size: 16px; animation: zzz 2.6s ease-in-out infinite; z-index: 4; pointer-events: none; }
+@keyframes zzz { 0%,100% { opacity: 0.25; transform: translateY(0) scale(0.85); } 50% { opacity: 1; transform: translateY(-7px) scale(1.15); } }
+
+/* [2026-06-19] #9 Birthday hen — party glow + cake badge, tap to give a treat (Arush request) */
+.hen-tile.birthday { border-color: #ff6fd8 !important; background: rgba(255,111,216,0.18) !important; animation: bdayGlow 1s ease-in-out infinite alternate; }
+@keyframes bdayGlow { 0% { box-shadow: 0 0 6px rgba(255,111,216,0.4); } 100% { box-shadow: 0 0 18px rgba(255,111,216,0.85); } }
+.hen-tile.birthday::before { content: '🎂'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 22px; z-index: 5; animation: bdayBounce 0.7s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes bdayBounce { 0% { transform: translateX(-50%) translateY(0); } 100% { transform: translateX(-50%) translateY(-5px); } }
+
+/* [2026-06-19] #7 Free-range roaming layer — dog + a few hens wander the farm for life & fun (Arush request) */
+#roam-layer { position: absolute; inset: 0; z-index: 8; pointer-events: none; overflow: hidden; }
+.roamer { position: absolute; bottom: 200px; font-size: 46px; transition: left 2.4s linear, bottom 2.4s linear; will-change: left, bottom; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4)); }
+.roam-img { width: 1em; height: 1em; display: none; vertical-align: middle; } /* [2026-06-19] #8 image swap target — hidden until a real image loads; emoji is the fallback (Rule F) */
+.has-img .roam-emoji { display: none; }
+.has-img .roam-img { display: inline-block; }
+.roamer.flip { transform: scaleX(-1); }
+.roamer.hop { animation: roamHop 0.6s ease-in-out infinite; }
+@keyframes roamHop { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.roamer.flip.hop { animation: roamHopFlip 0.6s ease-in-out infinite; }
+@keyframes roamHopFlip { 0%,100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-8px); } }
+.roamer.dog { font-size: 58px; bottom: 200px; z-index: 9; } /* dog is bigger & in front */
+.roamer.sleeping { animation: none !important; filter: brightness(0.7) saturate(0.7); transform: rotate(0deg); }
+.roamer.sleeping::after { content: '💤'; position: absolute; top: -14px; right: -6px; font-size: 20px; animation: zzz 2.6s ease-in-out infinite; }
+.roamer.happy::after { content: '❤️'; position: absolute; top: -16px; left: 50%; font-size: 18px; animation: roamHeart 1s ease-out forwards; } /* dog & hen playing */
+@keyframes roamHeart { 0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -26px) scale(1.2); } }
+
 </style>
 </head>
 <body>
@@ -456,7 +523,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
 
     <!-- [2026-03-19 22:00] Badge shelf — earned badges glow, unearned greyed out -->
     <div class="panel-section" id="badge-shelf" style="display:none;">
-      <div class="panel-title" style="color:#FFD700">🏆 BADGES <span id="badge-count" style="font-size:12px; color:rgba(255,255,255,0.5);">0/20</span></div>
+      <div class="panel-title" style="color:#FFD700">🏆 BADGES <span id="badge-count" style="font-size:12px; color:rgba(255,255,255,0.5);">0/23</span></div>
       <div id="badge-grid"></div>
     </div>
 
@@ -548,7 +615,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <!-- Farm Care — top priority -->
     <div class="panel-section" style="display:flex; flex-direction:column; gap:6px;">
       <div class="panel-title" style="color:#4ade80">🧹 FARM CARE</div>
-      <div class="shop-item" data-action="clean" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">Free 💩</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
+      <div class="shop-item" data-action="clean" onclick="cleanFarm()"><span class="icon">🧹</span><div class="info"><div class="name">CLEAN FARM</div><div class="cost" id="clean-cost">Free 🧹</div><div class="desc" id="dirt-display">Clean ✨</div></div></div>
       <div class="shop-item" onclick="buyAutoCleaner()"><span class="icon">🤖</span><div class="info"><div class="name">AUTO CLEANER</div><div class="cost" id="autocleaner-cost">₹5,000</div><div class="desc" id="autocleaner-desc">Auto-clean daily (₹5/day)</div></div></div>
       <!-- [2026-03-19 18:30] Cold storage — extends egg shelf life for festival stockpiling -->
       <div class="shop-item" onclick="buyColdStorage()"><span class="icon">❄️</span><div class="info"><div class="name">COLD STORAGE</div><div class="cost" id="coldstorage-cost">₹2,000</div><div class="desc" id="coldstorage-desc">Eggs last 14 days (₹3/day)</div></div></div>
@@ -586,6 +653,8 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
       <!-- [2026-03-19 18:00] Auto-sell stepper: 0-7 day hold period -->
       <div class="shop-item" id="autosell-btn" style="cursor:default"><span class="icon">🥚</span><div class="info"><div class="name">AUTO SELL</div><div style="display:flex;align-items:center;gap:6px;"><button onclick="changeAutoSell(-1)" style="font-size:16px;width:24px;height:24px;border-radius:50%;border:2px solid #FFD700;background:rgba(255,215,0,0.15);color:#FFD700;cursor:pointer;font-weight:bold;">−</button><span id="autosell-display" style="font-family:'Bangers',cursive;font-size:14px;color:#FFD700;min-width:50px;text-align:center;">OFF</span><button onclick="changeAutoSell(1)" style="font-size:16px;width:24px;height:24px;border-radius:50%;border:2px solid #FFD700;background:rgba(255,215,0,0.15);color:#FFD700;cursor:pointer;font-weight:bold;">+</button></div><div class="desc" id="autosell-warn" style="font-size:10px;color:#ff9900;display:none;"></div></div></div>
       <div class="shop-item" id="speed-btn" onclick="toggleSpeed()" style="cursor:pointer"><span class="icon">⏩</span><div class="info"><div class="name">SPEED</div><div class="cost" id="speed-display">1x</div></div></div>
+      <!-- [2026-06-19] #6 Music toggle — background soundscape on/off (parents can mute) -->
+      <div class="shop-item" id="music-btn" onclick="toggleMusic()" style="cursor:pointer"><span class="icon">🎵</span><div class="info"><div class="name">MUSIC</div><div class="cost" id="music-display">ON 🔊</div></div></div>
     </div>
   </div>
 
@@ -597,6 +666,7 @@ body { background: #1a0533; font-family: 'Nunito', sans-serif; overflow: hidden;
     <div id="dirt-tint"></div><!-- [2026-03-19 23:00] Brown tint overlay for dirt visibility -->
     <!-- [2026-03-19 17:00] Auto-cleaner robot — persistent icon + sweep animation -->
     <div id="robot-cleaner" style="display:none;">🤖</div>
+    <div id="roam-layer"></div><!-- [2026-06-19] #7 free-range roaming dog + chickens -->
     <div id="sick-bay"><div class="sb-label">🏥 SICK BAY</div><div class="sb-hens" id="sick-bay-hens"></div></div>
     <div id="hen-grid"></div>
     <!-- [2026-03-18 14:40] First hen CTA — shown when 0 hens to create urgency -->
@@ -721,6 +791,109 @@ function sndUpgrade(){ playTone(523, 0.1); setTimeout(()=>playTone(659, 0.1), 10
 function sndCluck()  { playTone(400 + Math.random()*200, 0.06, 'sine', 0.08); }
 
 // ============================================================
+//  [2026-06-19] EXTENDED SOUND FX — Arush requests #2,#8,#9,#10
+//  Every node creation guarded: game works fully if Web Audio missing (Rule F)
+// ============================================================
+function audioReady() { return !!(actx && actx.createOscillator); }
+
+// White-noise burst through a sweeping bandpass — for broom swoosh + mongoose hiss
+function playNoise(dur, vol, f0, f1, type='bandpass') {
+  try {
+    if (!audioReady() || !actx.createBuffer) return;
+    const sr = actx.sampleRate || 44100;
+    const buf = actx.createBuffer(1, Math.max(1, Math.floor(sr * dur)), sr);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const src = actx.createBufferSource(); src.buffer = buf;
+    const filt = actx.createBiquadFilter(); filt.type = type;
+    filt.frequency.setValueAtTime(f0, actx.currentTime);
+    filt.frequency.exponentialRampToValueAtTime(Math.max(40, f1), actx.currentTime + dur);
+    const g = actx.createGain();
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+    src.connect(filt); filt.connect(g); g.connect(actx.destination);
+    src.start(); src.stop(actx.currentTime + dur);
+  } catch(e) {}
+}
+function sndSweep()    { playNoise(0.22, 0.20, 2600, 600); }                                                                   // #2 broom swish
+function sndBirthday() { [523,587,659,784,880].forEach((f,i)=>setTimeout(()=>playTone(f,0.18,'triangle',0.16),i*120)); }       // #9 party chime
+function sndTreat()    { playTone(880,0.1,'sine',0.18); setTimeout(()=>playTone(1175,0.12,'sine',0.18),90); setTimeout(()=>playTone(1568,0.18,'sine',0.2),180); } // #9
+function sndMorning()  { playTone(523,0.15,'sine',0.12); setTimeout(()=>playTone(784,0.15,'sine',0.12),150); setTimeout(()=>playTone(1047,0.25,'sine',0.14),300); for(let i=0;i<4;i++) setTimeout(()=>playTone(1600+Math.random()*600,0.05,'sine',0.05),520+i*120); } // #10 sunrise + birds
+function sndNight()    { playTone(659,0.3,'sine',0.1); setTimeout(()=>playTone(523,0.3,'sine',0.1),250); setTimeout(()=>playTone(392,0.5,'sine',0.1),500); }      // #10 lullaby
+function sndYawn()     { try { if(!audioReady())return; const o=actx.createOscillator(),g=actx.createGain(); o.type='sine'; o.frequency.setValueAtTime(500,actx.currentTime); o.frequency.linearRampToValueAtTime(260,actx.currentTime+0.35); o.frequency.linearRampToValueAtTime(430,actx.currentTime+0.7); g.gain.setValueAtTime(0.0001,actx.currentTime); g.gain.linearRampToValueAtTime(0.12,actx.currentTime+0.2); g.gain.linearRampToValueAtTime(0.0001,actx.currentTime+0.75); o.connect(g);g.connect(actx.destination); o.start();o.stop(actx.currentTime+0.8);}catch(e){} } // #10 yawn glide
+function sndDanger()   { playTone(110,0.5,'sawtooth',0.12); setTimeout(()=>playTone(116,0.5,'sawtooth',0.1),60); playNoise(0.5,0.08,1800,500); setTimeout(()=>playTone(98,0.6,'sawtooth',0.12),300); } // #8 mongoose menace
+function sndRescue()   { playTone(392,0.14,'square',0.12); setTimeout(()=>playTone(523,0.14,'square',0.12),120); setTimeout(()=>playTone(659,0.2,'square',0.14),240); setTimeout(()=>{playTone(180,0.12,'square',0.14); setTimeout(()=>playTone(230,0.14,'square',0.14),140);},420); } // #8 dog hero + bark
+function sndBark()     { playTone(190,0.1,'square',0.1); setTimeout(()=>playTone(150,0.12,'square',0.09),130); }                // #7/#8 playful woof
+
+// ============================================================
+//  [2026-06-19] #6 BACKGROUND AMBIENT — continuous mood/time soundscape
+//  Soft looping pad + periodic accents (birds by day, crickets by night).
+//  Mood shifts with day/night and game state. Muted state persisted.
+//  Fully guarded; game runs silently if audio unavailable (Rule F).
+// ============================================================
+const ambient = {
+  on: true, started: false, mood: 'day', forced: null, osc: [], master: null, lp: null, accentTimer: null,
+  chords: {
+    day:    [196.00, 246.94, 293.66],  // G-ish, calm & bright
+    night:  [146.83, 174.61, 220.00],  // D minor-ish, soft & dark
+    happy:  [261.63, 329.63, 392.00],  // C major, uplifting
+    sad:    [196.00, 233.08, 293.66],  // G minor, melancholy
+    danger: [123.47, 130.81, 185.00],  // dissonant, tense
+  },
+};
+try { ambient.on = localStorage.getItem('cf_music') !== 'off'; } catch(e) {}
+
+function ambientStart() {
+  try {
+    if (!audioReady() || ambient.started) return;
+    ambient.master = actx.createGain();
+    ambient.master.gain.value = ambient.on ? 0.05 : 0.0001;
+    ambient.master.connect(actx.destination);
+    ambient.lp = actx.createBiquadFilter(); ambient.lp.type = 'lowpass'; ambient.lp.frequency.value = 900; ambient.lp.connect(ambient.master);
+    const freqs = ambient.chords[ambient.mood] || ambient.chords.day;
+    ambient.osc = freqs.map((f, i) => {
+      const o = actx.createOscillator(); o.type = i === 0 ? 'sine' : 'triangle'; o.frequency.value = f;
+      const g = actx.createGain(); g.gain.value = 0.5 / freqs.length;
+      o.connect(g); g.connect(ambient.lp); o.start();
+      return { o, g };
+    });
+    ambient.started = true;
+    ambientScheduleAccent();
+  } catch(e) {}
+}
+function ambientSetMood(mood) {
+  if (!ambient.chords[mood]) return;
+  if (ambient.mood === mood) return;
+  ambient.mood = mood;
+  try {
+    if (!ambient.started || !audioReady()) return;
+    const freqs = ambient.chords[mood];
+    ambient.osc.forEach((node, i) => { if (freqs[i] != null) node.o.frequency.exponentialRampToValueAtTime(freqs[i], actx.currentTime + 1.5); });
+    // [2026-06-19] danger gets a touch louder & brighter; calm moods stay subtle
+    const targetVol = ambient.on ? (mood === 'danger' ? 0.08 : 0.05) : 0.0001;
+    if (ambient.master) ambient.master.gain.exponentialRampToValueAtTime(targetVol, actx.currentTime + 1.0);
+    if (ambient.lp) ambient.lp.frequency.exponentialRampToValueAtTime(mood === 'danger' ? 1600 : 900, actx.currentTime + 1.0);
+  } catch(e) {}
+}
+function ambientScheduleAccent() {
+  if (ambient.accentTimer) clearInterval(ambient.accentTimer);
+  ambient.accentTimer = setInterval(() => {
+    if (!ambient.on || !ambient.started || !gameRunning) return;
+    if (Math.random() > 0.5) return;
+    if (ambient.mood === 'night') { playTone(2400 + Math.random()*300, 0.04, 'sine', 0.025); setTimeout(()=>playTone(2400, 0.03, 'sine', 0.02), 90); } // crickets
+    else if (ambient.mood === 'day' || ambient.mood === 'happy') { const n = 2 + Math.floor(Math.random()*2); for (let i=0;i<n;i++) setTimeout(()=>playTone(1800+Math.random()*900, 0.05, 'sine', 0.03), i*120); } // birds
+  }, 4000);
+}
+function toggleMusic() {
+  ambient.on = !ambient.on;
+  try { localStorage.setItem('cf_music', ambient.on ? 'on' : 'off'); } catch(e) {}
+  if (ambient.on && !ambient.started) ambientStart();
+  try { if (ambient.master && audioReady()) ambient.master.gain.exponentialRampToValueAtTime(ambient.on ? 0.05 : 0.0001, actx.currentTime + 0.4); } catch(e) {}
+  const el = document.getElementById('music-display'); if (el) el.textContent = ambient.on ? 'ON 🔊' : 'OFF 🔇';
+  notify(ambient.on ? '🎵 Music ON' : '🔇 Music OFF');
+}
+
+// ============================================================
 //  MIXPANEL ANALYTICS — JS SDK with session recording
 //  [2026-03-19 14:00] Upgraded from pixel tracking to full SDK
 // ============================================================
@@ -746,7 +919,7 @@ let mpGameCount = parseInt(sessionStorage.getItem('cf_game_count') || '0');
 function mpTrack(event, props={}) {
   try {
     if (mpAvailable) mixpanel.track(event, {
-      game_count: mpGameCount, game_title: 'Chicken Farm', game_version: 'v3.4.2',
+      game_count: mpGameCount, game_title: 'Chicken Farm', game_version: 'v5.0.0',
       ...props
     });
   } catch(e) {}
@@ -959,6 +1132,10 @@ let currentFestival = null;   // [2026-03-19 18:30] Active festival object from 
 let currentFestivalPrice = 0; // [2026-03-19 18:30] Price during active festival
 let subsidyDaysLeft = 0;      // [2026-03-19 18:30] Free feed days from govt subsidy event
 let hasGuardDog = false;
+// [2026-06-19] #6/#10 Day-night ambient + sleep state (Arush requests)
+const SKY_CYCLE_MS = 60000; // sky day-night cycle = 60s, decoupled from the 10s economic day so morning/night feel meaningful
+let lastSkyPhase = '';      // 'day' | 'dawn' | 'dusk' | 'night' — drives transition greetings
+let isNight = false;        // animals sleep when true
 
 // Tracking for post-mortem report
 let stats = {
@@ -976,6 +1153,7 @@ let stats = {
   totalMedicineSpent: 0,
   totalVaccinationSpent: 0, // [2026-03-19 17:00] Track vaccination spending
   totalCleaningSpent: 0,
+  broomCleans: 0, // [2026-03-19 24:00] Track broom sweep cleans for badges
   totalFoodSpent: 0,
   totalMaintenanceSpent: 0,
   totalRentSpent: 0,
@@ -1020,6 +1198,10 @@ const BADGES = [
   { id: 'automated',       emoji: '🤖', name: 'Automated',       desc: 'Bought the auto-cleaner' },
   { id: 'ten_k',           emoji: '💎', name: '10K Club',        desc: 'Reached ₹10,000 balance' },
   { id: 'empire',          emoji: '🏰', name: 'Empire Builder',  desc: 'Reached Chicken Empire level' },
+  // [2026-03-19 24:00] Broom cleaning badges — variable ratio reinforcement (1/5/15)
+  { id: 'broom_beginner',  emoji: '🧹', name: 'Broom Beginner',  desc: 'Cleaned the farm yourself for the first time!' },
+  { id: 'broom_pro',       emoji: '🧹', name: 'Broom Pro',       desc: 'Cleaned the farm 5 times with the broom' },
+  { id: 'broom_master',    emoji: '🧹', name: 'Broom Master',    desc: 'Cleaned the farm 15 times with the broom!' },
 ];
 let earnedBadges = new Set();
 let profitStreak = 0;       // consecutive profitable days
@@ -1030,21 +1212,70 @@ let hadLossDay = false;     // tracks if player had a loss day (for comeback bad
 // Load badges from localStorage
 try { const saved = localStorage.getItem('chickenFarmBadges'); if (saved) earnedBadges = new Set(JSON.parse(saved)); } catch(e) {}
 
+// [2026-03-19 24:00] Badge queue — accumulates badges, shows one celebration modal at a time
+let badgeQueue = [];
+let badgeModalOpen = false;
+let wasGamePausedBeforeBadge = false; // [2026-03-19 24:00] Track pre-modal pause state to restore correctly
+
 function earnBadge(id) {
   if (earnedBadges.has(id)) return;
   const badge = BADGES.find(b => b.id === id);
   if (!badge) return;
   earnedBadges.add(id);
   try { localStorage.setItem('chickenFarmBadges', JSON.stringify([...earnedBadges])); } catch(e) {}
-  // Toast notification
-  const toast = document.createElement('div');
-  toast.className = 'badge-toast';
-  toast.innerHTML = '<span class="badge-toast-emoji">' + badge.emoji + '</span>🏆 ' + badge.name + '!<br><span style="font-size:14px;">' + badge.desc + '</span>';
-  document.body.appendChild(toast);
-  sndUpgrade();
-  setTimeout(() => toast.remove(), 3200);
   updateBadgeShelf();
   mpTrack('badge_earned', { badge_id: id, badge_name: badge.name, day: day, total_badges: earnedBadges.size });
+  // [2026-03-19 24:00] Queue badge and show modal if none open
+  badgeQueue.push(badge);
+  if (!badgeModalOpen) showNextBadgeModal();
+}
+
+// [2026-03-19 24:00] Full-screen celebration modal — pauses game, shows one badge at a time
+function showNextBadgeModal() {
+  if (badgeQueue.length === 0) {
+    badgeModalOpen = false;
+    // [2026-03-19 24:00] Resume game only if it wasn't paused before badge modal
+    if (!wasGamePausedBeforeBadge && gameRunning) startDayCycle();
+    return;
+  }
+  const badge = badgeQueue.shift();
+  if (!badgeModalOpen) {
+    // [2026-03-19 24:00] First modal in sequence — pause game and store state
+    wasGamePausedBeforeBadge = paused;
+    if (gameRunning && !paused) clearInterval(dayTimer);
+  }
+  badgeModalOpen = true;
+  sndUpgrade();
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'badge-modal-backdrop';
+  backdrop.innerHTML = '<div class="badge-modal-card">' +
+    '<div class="badge-modal-emoji">' + badge.emoji + '</div>' +
+    '<div style="font-size:16px; color:rgba(255,255,255,0.5);">🏆 BADGE EARNED!</div>' +
+    '<div class="badge-modal-title">' + badge.name + '</div>' +
+    '<div class="badge-modal-desc">' + badge.desc + '</div>' +
+    '<button class="badge-modal-btn" id="badge-modal-accept">AWESOME! 🎉</button>' +
+    '</div>';
+  document.body.appendChild(backdrop);
+
+  // [2026-03-19 24:00] Sparkle particles inside card for celebration feel
+  const card = backdrop.querySelector('.badge-modal-card');
+  for (let i = 0; i < 12; i++) {
+    const s = document.createElement('div');
+    s.className = 'badge-sparkle';
+    s.textContent = ['✨','⭐','💫','🌟'][i % 4];
+    s.style.left = (10 + Math.random() * 80) + '%';
+    s.style.top = (10 + Math.random() * 80) + '%';
+    s.style.setProperty('--sx', (Math.random() * 80 - 40) + 'px');
+    s.style.setProperty('--sy', (Math.random() * 80 - 40) + 'px');
+    s.style.animationDelay = (Math.random() * 0.8) + 's';
+    card.appendChild(s);
+  }
+
+  document.getElementById('badge-modal-accept').onclick = function() {
+    backdrop.remove();
+    showNextBadgeModal(); // [2026-03-19 24:00] Show next queued badge or resume game
+  };
 }
 
 function updateBadgeShelf() {
@@ -1233,6 +1464,92 @@ createClouds();
 createGrass();
 
 // ============================================================
+//  [2026-06-19] #7/#8 LIVING FARM — roaming dog + free-range chickens
+//  Decorative layer only (zero economic effect). Sprites wander via CSS
+//  transitions, the dog plays with the hens, and everyone sleeps at night.
+//  #8 image-swap: each sprite shows an emoji by default; if a real image
+//  URL is set in SPRITE_IMAGES and loads, it replaces the emoji (Rule F).
+//  Parallel art track: drop transparent PNG/GIF URLs in SPRITE_IMAGES later —
+//  no code change needed, and the game still works if a URL is missing/broken.
+// ============================================================
+const SPRITE_IMAGES = {
+  dog: '',       // Shih Tzu — set a transparent image URL here later
+  hen: '',       // realistic hen
+  mongoose: '',  // realistic mongoose
+};
+let roamers = [];
+let roamTimer = null;
+
+function spriteHTML(emoji) { return '<span class="roam-emoji">' + emoji + '</span><img class="roam-img" alt="">'; }
+// [2026-06-19] #8 Swap emoji → real image if one is configured AND loads; otherwise the emoji stays (Rule F)
+function applySprite(el, kind) {
+  const url = SPRITE_IMAGES[kind];
+  if (!url) return;
+  const img = el.querySelector('.roam-img');
+  if (!img) return;
+  img.onload = () => el.classList.add('has-img');
+  img.onerror = () => el.classList.remove('has-img');
+  img.src = url;
+}
+function makeRoamer(kind, emoji) {
+  const layer = document.getElementById('roam-layer');
+  if (!layer) return null;
+  const el = document.createElement('div');
+  el.className = 'roamer ' + kind;
+  el.innerHTML = spriteHTML(emoji);
+  applySprite(el, kind);
+  el.style.left = (10 + Math.random() * 70) + '%';
+  el.style.bottom = (200 + Math.random() * 30) + 'px';
+  if (isNight) el.classList.add('sleeping');
+  layer.appendChild(el);
+  const r = { el, kind, hopTimeout: null };
+  roamers.push(r);
+  return r;
+}
+function startRoaming() {
+  stopRoaming();
+  const layer = document.getElementById('roam-layer');
+  if (layer) layer.innerHTML = '';
+  roamers = [];
+  makeRoamer('hen', '🐔'); makeRoamer('hen', '🐔'); // a couple of free-range hens for life
+  if (hasGuardDog) makeRoamer('dog', '🐕');
+  roamTimer = setInterval(roamTick, 2600);
+  roamTick();
+}
+function stopRoaming() {
+  if (roamTimer) { clearInterval(roamTimer); roamTimer = null; }
+  roamers.forEach(r => { if (r.hopTimeout) clearTimeout(r.hopTimeout); });
+}
+function roamTick() {
+  if (!gameRunning || isNight) return; // [2026-06-19] #10 animals sleep at night
+  roamers.forEach(r => {
+    const newLeft = 6 + Math.random() * 76;
+    const cur = parseFloat(r.el.style.left) || 40;
+    r.el.classList.toggle('flip', newLeft < cur); // face the way they walk
+    r.el.style.left = newLeft + '%';
+    r.el.style.bottom = (198 + Math.random() * 34) + 'px';
+    r.el.classList.add('hop');
+    if (r.hopTimeout) clearTimeout(r.hopTimeout);
+    r.hopTimeout = setTimeout(() => r.el.classList.remove('hop'), 1400);
+  });
+  // [2026-06-19] #7 Dog plays with a chicken — runs up to it, hearts + happy woof
+  const dog = roamers.find(r => r.kind === 'dog');
+  const hen = roamers.find(r => r.kind === 'hen');
+  if (dog && hen && Math.random() < 0.4) {
+    hen.el.style.left = (Math.max(4, Math.min(82, parseFloat(dog.el.style.left) + (Math.random() * 10 - 5)))) + '%';
+    dog.el.classList.add('happy'); hen.el.classList.add('happy');
+    sndBark();
+    setTimeout(() => { dog.el.classList.remove('happy'); hen.el.classList.remove('happy'); }, 1000);
+  }
+}
+// [2026-06-19] #7 Drop the dog into the roaming layer the moment it's adopted
+function addRoamingDog() {
+  if (!document.getElementById('roam-layer')) return;
+  if (roamers.find(r => r.kind === 'dog')) return;
+  makeRoamer('dog', '🐕');
+}
+
+// ============================================================
 //  GAME LOGIC
 // ============================================================
 
@@ -1247,6 +1564,9 @@ function startGame() {
     day = 0;
     money = CONFIG.STARTING_MONEY;
     ensureAudio();
+    ambientStart(); // [2026-06-19] #6 start background soundscape (after user gesture = Start button)
+    lastSkyPhase = ''; isNight = false; ambient.forced = null; // [2026-06-19] #10 reset day-night state
+    { const md = document.getElementById('music-display'); if (md) md.textContent = ambient.on ? 'ON 🔊' : 'OFF 🔇'; }
     farmIndex = 0; farmOwned = true; farmCapacity = FARMS[0].cap;
     updateFarmVisuals();
     moneyHistory = [CONFIG.STARTING_MONEY];
@@ -1258,9 +1578,12 @@ function startGame() {
     lastEventDay = 0; festivalDaysLeft = 0; hasGuardDog = false; // [2026-03-19 12:00] Reset event state
     currentFestival = null; currentFestivalPrice = 0; subsidyDaysLeft = 0; hasColdStorage = false; // [2026-03-19 18:30] Reset festival + subsidy + cold storage
     autoSellInterval = 0; // [2026-03-19 18:00] Reset auto-sell stepper
-    cancelPoopMiniGame(); // [2026-03-19 23:30] Fix: clean up DOM + reset flag (was just flag reset, left orphan elements)
+    cancelBroomClean(); // [2026-03-19 24:00] Clean up broom state on new game
     profitStreak = 0; cleanStreak = 0; prevDayMoney = CONFIG.STARTING_MONEY; hadLossDay = false; // [2026-03-19 22:00] Reset badge tracking
-    updateBadgeShelf(); // [2026-03-19 22:00] Render badge shelf (badges persist across games via localStorage)
+    earnedBadges = new Set(); try { localStorage.removeItem('chickenFarmBadges'); } catch(e) {} // [2026-03-19 23:45] Fix: reset badges on new game
+    badgeQueue = []; badgeModalOpen = false; // [2026-03-19 24:00] Reset badge queue on new game
+    document.querySelectorAll('.badge-modal-backdrop').forEach(el => el.remove()); // [2026-03-19 24:00] Clean up any open badge modal
+    updateBadgeShelf(); // [2026-03-19 22:00] Render badge shelf
     document.getElementById('hen-grid').innerHTML = '';
     document.getElementById('shortcut-bar').style.display = 'flex'; // [2026-03-18 14:10] Show shortcuts bar
     notify("🌟 Welcome to the farm, Arush! Buy a hen to start!");
@@ -1270,6 +1593,7 @@ function startGame() {
     mpGameCount++;
     sessionStorage.setItem('cf_game_count', mpGameCount);
     mpTrack('game_started', { game_number: mpGameCount });
+    startRoaming(); // [2026-06-19] #7 spawn the roaming dog + free-range hens
     startDayCycle();
   } catch(e) { console.error('startGame error:', e); alert('Error starting game: ' + e.message); }
 }
@@ -1318,6 +1642,7 @@ function togglePause() {
 
 function advanceDay() {
   day++;
+  const dayStartMoney = money; // [2026-06-19] #5 capture to show the day's net result as a big float
   sndNewDay();
   clearTodayEvents(); // [2026-03-19 17:00] Reset today's events for new day
 
@@ -1627,9 +1952,15 @@ function advanceDay() {
     return;
   }
 
+  processBirthdays(); // [2026-06-19] #9 trigger any hen birthdays for today
   checkDailyBadges(); // [2026-03-19 22:00] Badge checks after all day processing
   updateHUD();
   drawMoneyGraph();
+
+  // [2026-06-19] #5 Show the day's net result as a big, unmissable floating number
+  const dayNet = Math.round(money - dayStartMoney);
+  if (dayNet > 0) bigFloat('+₹' + dayNet.toLocaleString() + ' 📈', '#4ade80');
+  else if (dayNet < 0) bigFloat('−₹' + Math.abs(dayNet).toLocaleString() + ' 📉', '#ff6666');
 
   // [2026-03-19 12:00] Random events — check after all day processing
   checkForRandomEvent();
@@ -1725,13 +2056,15 @@ function addHenToFarm(x) {
   el.className = 'hen-tile young';
   // [2026-03-19 16:00] Removed ht-age emoji — age communicated via border color (green/orange/red)
   el.innerHTML = '<div class="ht-body">' + svgHen() + '</div><div class="ht-status">' + name + '</div>';
-  el.onclick = () => henInfo(hen);
+  el.onclick = () => henClick(hen); // [2026-06-19] #9 tap → birthday treat if it's their day, else info
   document.getElementById('hen-grid').appendChild(el);
 
   const hen = { id: henId, x: 0, hungryDays: 0, alive: true, bornDay: day,
     name: name, // [2026-03-18 14:20] Hen name for kid-friendly display
     health: 'healthy', // healthy, unwell, sick, healing
-    sickDay: 0, treated: false, vaccinatedUntil: 0, el };
+    sickDay: 0, treated: false, vaccinatedUntil: 0,
+    birthday: Math.floor(Math.random() * BIRTHDAY_CYCLE), lastBirthday: -1, birthdayPending: false, // [2026-06-19] #9 each hen its own birthday
+    el };
   hens.push(hen);
   totalHensOwned++;
   return hen;
@@ -1769,7 +2102,54 @@ function henInfo(hen) {
     layStatus = 'No eggs! Sell for ₹' + CONFIG.OLD_HEN_SELL_PRICE;
   }
   const foodStatus = foodDaysLeft > 0 ? '😊 Fed' : '😰 Hungry (' + hen.hungryDays + '/3)';
-  notify(`🐔 ${ageStatus} | ${layStatus} | ${foodStatus}`);
+  // [2026-06-19] #9 Birthday countdown so kids can look forward to it
+  const bdayIn = hen.birthday != null ? ((hen.birthday - (day % BIRTHDAY_CYCLE) + BIRTHDAY_CYCLE) % BIRTHDAY_CYCLE) : null;
+  const bdayStatus = bdayIn === 0 ? ' | 🎂 Birthday TODAY!' : (bdayIn != null ? ' | 🎂 Birthday in ' + bdayIn + 'd' : '');
+  notify(`🐔 ${hen.name}: ${ageStatus} | ${layStatus} | ${foodStatus}${bdayStatus}`);
+}
+
+// [2026-06-19] #9 Per-hen birthdays — each hen has its own birthday on a 30-day cycle (Arush request)
+const BIRTHDAY_CYCLE = 30;
+const TREAT_COST = 10;
+function processBirthdays() {
+  const today = day % BIRTHDAY_CYCLE;
+  hens.forEach(h => {
+    if (!h.alive) return;
+    if (h.birthday == null) { h.birthday = Math.floor(Math.random() * BIRTHDAY_CYCLE); h.lastBirthday = -1; }
+    if (today === h.birthday && h.lastBirthday !== day) {
+      h.lastBirthday = day;
+      h.birthdayPending = true;
+      h.el.classList.add('birthday');
+      sndBirthday();
+      floatText(h.el, '🎂 Happy Birthday ' + h.name + '!', '#ff6fd8');
+      notify('🎂 It\'s ' + h.name + '\'s birthday! Tap ' + h.name + ' to give a treat 🎁');
+    } else if (today !== h.birthday && h.birthdayPending) {
+      // [2026-06-19] birthday passed without a treat — clear the party state
+      h.birthdayPending = false;
+      h.el.classList.remove('birthday');
+    }
+  });
+}
+// [2026-06-19] #9 Tap a hen — birthday treat if it's their day, otherwise show info
+function henClick(hen) {
+  if (!hen || !hen.alive) return;
+  if (hen.birthdayPending) { giveTreat(hen); return; }
+  henInfo(hen);
+}
+function giveTreat(hen) {
+  if (!hen.alive) return;
+  if (money < TREAT_COST) { sndError(); notify('🎁 A birthday treat costs ₹' + TREAT_COST + ' — sell some eggs first!'); return; }
+  money -= TREAT_COST;
+  hen.birthdayPending = false;
+  hen.el.classList.remove('birthday');
+  sndTreat();
+  // [2026-06-19] Treat reward — a happy hen lays 2 bonus eggs + hearts
+  floatText(hen.el, '🎁🎂 Yummy! +2 eggs', '#4ade80');
+  const heart = document.createElement('div'); heart.textContent = '❤️'; heart.className = 'swept-sparkle'; heart.style.left = '50%'; heart.style.top = '0';
+  hen.el.appendChild(heart); setTimeout(() => heart.remove(), 600);
+  layEgg(hen); layEgg(hen);
+  updateHUD();
+  mpTrack('birthday_treat', { hen: hen.name, day: day, cost: TREAT_COST });
 }
 
 // ============================================================
@@ -1826,14 +2206,14 @@ function updateDirtVisual() {
   // [2026-03-19 23:00] Brown tint scales with dirt level — max 40% opacity at 100% dirt
   const tint = document.getElementById('dirt-tint');
   if (tint) tint.style.background = 'rgba(101,67,33,' + (dirtLevel / 100 * 0.4).toFixed(2) + ')';
-  // Target counts: poop scales with dirt, flies only at filthy
-  const poopTarget = dirtLevel < 15 ? 0 :
+  // [2026-03-19 24:00] Lowered poop visibility threshold from 15 to 5 — earlier feedback loop for kids
+  const poopTarget = dirtLevel < 5 ? 0 :
                      dirtLevel < CONFIG.DIRT_CLEAN_THRESHOLD ? Math.floor(dirtLevel / 10) :
                      dirtLevel < CONFIG.DIRT_FILTHY_THRESHOLD ? Math.floor(dirtLevel / 6) :
                      Math.floor(dirtLevel / 4);
   const flyTarget = dirtLevel >= CONFIG.DIRT_FILTHY_THRESHOLD ? Math.floor((dirtLevel - CONFIG.DIRT_FILTHY_THRESHOLD) / 8) + 2 : 0;
 
-  const existingPoop = overlay.querySelectorAll('.dirt-particle:not(.fly)').length;
+  const existingPoop = overlay.querySelectorAll('.dirt-particle:not(.fly):not(.feather)').length;
   const existingFlies = overlay.querySelectorAll('.dirt-particle.fly').length;
 
   // Add/remove poop
@@ -1848,8 +2228,26 @@ function updateDirtVisual() {
       overlay.appendChild(p);
     }
   } else if (existingPoop > poopTarget) {
-    const poops = overlay.querySelectorAll('.dirt-particle:not(.fly)');
+    const poops = overlay.querySelectorAll('.dirt-particle:not(.fly):not(.feather)');
     for (let i = poopTarget; i < existingPoop; i++) poops[i].remove();
+  }
+
+  // [2026-03-19 24:00] Add/remove feathers — cleanable by broom, appear alongside poops
+  const featherTarget = dirtLevel < 5 ? 0 : Math.floor(dirtLevel / 8);
+  const existingFeathers = overlay.querySelectorAll('.dirt-particle.feather').length;
+  if (existingFeathers < featherTarget) {
+    for (let i = existingFeathers; i < featherTarget; i++) {
+      const f = document.createElement('div');
+      f.className = 'dirt-particle feather';
+      f.textContent = '🪶';
+      f.style.left = (8 + Math.random() * 82) + '%';
+      f.style.top = (8 + Math.random() * 72) + '%';
+      f.style.animationDelay = (Math.random() * 2) + 's';
+      overlay.appendChild(f);
+    }
+  } else if (existingFeathers > featherTarget) {
+    const feathers = overlay.querySelectorAll('.dirt-particle.feather');
+    for (let i = featherTarget; i < existingFeathers; i++) feathers[i].remove();
   }
 
   // Add/remove flies
@@ -1875,83 +2273,137 @@ function getCleaningCost() {
   return Math.round(CONFIG.CLEANING_COST + (dirtLevel / 100) * CONFIG.CLEANING_COST * 4);
 }
 
-// [2026-03-19 22:00] Poop mini-game — tap poop emojis to clean Backyard for free. Effort = time not money.
-let poopMiniGameActive = false;
+// [2026-03-19 24:00] Broom cleaning mechanic — hold-and-sweep, replaces old poop mini-game
+// [2026-06-19] REBUILT for Arush #1/#2/#3 — touch-friendly drag, taps no longer end the broom early
+let broomActive = false;
+let broomEl = null;
+let broomCost = 0; // [2026-03-19 24:00] Cost charged on pickup (0 for Backyard)
+let broomOldDirt = 0;
+let broomDoneBtn = null;     // [2026-06-19] explicit DONE button
+let lastSweepSound = 0;      // [2026-06-19] throttle the swoosh
 
-// [2026-03-19 23:30] Fix: cancel any stuck/abandoned poop mini-game — clears DOM + resets flag
-function cancelPoopMiniGame() {
-  const grid = document.getElementById('hen-grid');
-  if (grid) grid.querySelectorAll('.poop-target').forEach(el => el.remove());
-  poopMiniGameActive = false;
-}
-
-function startPoopMiniGame() {
-  // [2026-03-19 23:30] Fix: if previous mini-game stuck, cancel it and restart instead of silently blocking
-  if (poopMiniGameActive) cancelPoopMiniGame();
-  poopMiniGameActive = true;
-  // [2026-03-19 23:30] Fix: append poops to #hen-grid (not #farm-area) so they aren't hidden behind flex children
-  const grid = document.getElementById('hen-grid');
-  const poopCount = Math.max(3, Math.floor(dirtLevel / 10));
-  let remaining = poopCount;
-  const oldDirt = Math.round(dirtLevel);
-
-  for (let i = 0; i < poopCount; i++) {
-    const p = document.createElement('div');
-    p.className = 'poop-target';
-    p.textContent = '💩';
-    p.style.left = (8 + Math.random() * 80) + '%';
-    p.style.top = (5 + Math.random() * 80) + '%';
-    p.onclick = function() {
-      if (p.classList.contains('popped')) return;
-      p.classList.add('popped');
-      p.textContent = '✨';
-      playTone(600 + Math.random() * 400, 0.08, 'sine', 0.15); // pop sound
-      remaining--;
-      if (remaining <= 0) {
-        // All poops cleared — farm clean!
-        poopMiniGameActive = false;
-        dirtLevel = 0;
-        stats.timesCleanedFarm++;
-        sndBuy();
-        updateDirtVisual();
-        updateHUD();
-        mpTrack('farm_cleaned', { cost: 0, dirt_before: oldDirt, dirt_after: 0, day: day, method: 'poop_minigame' });
-        notify("✨ You cleaned all the poop! Farm is spotless!");
-        addTodayEvent('🧹', 'Cleaned farm (free!)');
-        // Remove all targets after brief delay
-        setTimeout(() => grid.querySelectorAll('.poop-target').forEach(el => el.remove()), 400);
-      }
-    };
-    grid.appendChild(p);
+function cancelBroomClean() {
+  // [2026-03-19 24:00] Cancel broom — remove cursor, detach events
+  if (broomEl) { broomEl.remove(); broomEl = null; }
+  if (broomDoneBtn) { broomDoneBtn.remove(); broomDoneBtn = null; }
+  const farmArea = document.getElementById('farm-area');
+  if (farmArea) {
+    farmArea.removeEventListener('pointermove', broomMove);
+    farmArea.removeEventListener('pointerdown', broomDown);
+    farmArea.style.touchAction = '';
+    farmArea.style.cursor = '';
   }
-  // [2026-03-19 23:30] Fix: auto-cancel after 30 seconds if player doesn't finish — prevents permanent stuck state
-  setTimeout(() => { if (poopMiniGameActive && remaining > 0) { cancelPoopMiniGame(); notify("⏰ Poop cleanup timed out! Try again."); } }, 30000);
-  notify("💩 Tap all the poop to clean your farm!");
+  broomActive = false;
 }
 
+function startBroomClean() {
+  if (broomActive) { cancelBroomClean(); return; }
+  broomOldDirt = Math.round(dirtLevel);
+  // [2026-03-19 24:00] Charge cost on pickup for non-Backyard farms
+  broomCost = (farmIndex === 0) ? 0 : getCleaningCost();
+  if (broomCost > 0) {
+    if (money < broomCost) { sndError(); notify("❌ Need ₹" + broomCost + " for cleaning!"); return; }
+    money -= broomCost;
+    stats.totalCleaningSpent += broomCost;
+  }
+  broomActive = true;
+  // [2026-03-19 24:00] Create broom cursor that follows pointer
+  broomEl = document.createElement('div');
+  broomEl.className = 'broom-cursor';
+  broomEl.textContent = '🧹';
+  document.body.appendChild(broomEl);
+  const farmArea = document.getElementById('farm-area');
+  // [2026-06-19] #3 touch-action:none stops the page from scrolling so drag-sweep works on a tablet
+  farmArea.style.touchAction = 'none';
+  farmArea.style.cursor = 'none';
+  farmArea.addEventListener('pointermove', broomMove);
+  farmArea.addEventListener('pointerdown', broomDown);
+  // [2026-06-19] #1/#3 Big DONE button — so the broom never gets stuck and every poop is reachable
+  broomDoneBtn = document.createElement('button');
+  broomDoneBtn.id = 'broom-done-btn';
+  broomDoneBtn.textContent = '✓ DONE';
+  broomDoneBtn.onclick = (ev) => { ev.stopPropagation(); completeBroomClean(); };
+  farmArea.appendChild(broomDoneBtn);
+  notify("🧹 Sweep ALL the dirt! Drag the broom over every 💩 — then press DONE!");
+}
+
+// [2026-06-19] #3 Shared sweep — clears EVERY particle within radius of a point.
+// Used by mouse-move, touch-drag AND taps, so all poops are always reachable.
+function broomSweepAt(clientX, clientY) {
+  if (broomEl) { broomEl.style.left = clientX + 'px'; broomEl.style.top = clientY + 'px'; broomEl.classList.add('sweeping'); }
+  const overlay = document.getElementById('dirt-overlay');
+  if (!overlay) return;
+  const particles = overlay.querySelectorAll('.dirt-particle');
+  let swept = false;
+  particles.forEach(p => {
+    if (p.dataset.swept) return;
+    const pr = p.getBoundingClientRect();
+    const cx = pr.left + pr.width / 2;
+    const cy = pr.top + pr.height / 2;
+    const dist = Math.hypot(clientX - cx, clientY - cy);
+    if (dist < 55) { // [2026-06-19] #3 radius 35→55px — kids sweep faster than the old radius could catch
+      p.dataset.swept = '1';
+      const sparkle = document.createElement('div');
+      sparkle.className = 'swept-sparkle';
+      sparkle.textContent = '✨';
+      sparkle.style.left = p.style.left;
+      sparkle.style.top = p.style.top;
+      overlay.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 400);
+      p.style.opacity = '0';
+      setTimeout(() => p.remove(), 300);
+      swept = true;
+    }
+  });
+  if (swept) {
+    const t = Date.now();
+    if (t - lastSweepSound > 110) { sndSweep(); lastSweepSound = t; } // [2026-06-19] #2 satisfying throttled swoosh
+    const remaining = overlay.querySelectorAll('.dirt-particle:not([data-swept])').length;
+    if (remaining === 0) completeBroomClean();
+  }
+}
+
+// [2026-06-19] #3 Drag/hover sweep
+function broomMove(e) {
+  if (!broomActive) return;
+  e.preventDefault();
+  broomSweepAt(e.clientX, e.clientY);
+}
+
+// [2026-06-19] #3 A tap also sweeps and does NOT end the broom (the old end-on-pointerdown was the "only 2 of 5" bug)
+function broomDown(e) {
+  if (!broomActive) return;
+  if (e.target && e.target.id === 'broom-done-btn') return; // DONE button has its own handler
+  e.preventDefault();
+  broomSweepAt(e.clientX, e.clientY);
+}
+
+// [2026-03-19 24:00] Finalize broom clean — reset dirt, update stats, check badges
+function completeBroomClean() {
+  cancelBroomClean();
+  dirtLevel = 0;
+  stats.timesCleanedFarm++;
+  stats.broomCleans = (stats.broomCleans || 0) + 1;
+  sndBuy();
+  updateDirtVisual();
+  updateHUD();
+  mpTrack('farm_cleaned', { cost: broomCost, dirt_before: broomOldDirt, dirt_after: 0, day: day, method: 'broom' });
+  const msg = broomCost > 0 ? "✨ Farm swept clean for ₹" + broomCost + "!" : "✨ Farm swept sparkly clean!";
+  notify(msg);
+  addTodayEvent('🧹', broomCost > 0 ? 'Swept farm -₹' + broomCost : 'Swept farm (free!)');
+  // [2026-03-19 24:00] Broom badges — variable ratio reinforcement (1/5/15)
+  if (stats.broomCleans >= 1) earnBadge('broom_beginner');
+  if (stats.broomCleans >= 5) earnBadge('broom_pro');
+  if (stats.broomCleans >= 15) earnBadge('broom_master');
+}
+
+// [2026-03-19 24:00] cleanFarm — now launches broom mechanic for all farm levels
 function cleanFarm() {
   if (!gameRunning) return;
-  // [2026-03-19 17:00] Block manual cleaning when auto-cleaner handles it
   if (hasAutoCleaner) { notify("🤖 Auto-cleaner handles it!"); return; }
+  if (broomActive) { cancelBroomClean(); return; } // [2026-03-19 24:00] Toggle off if already sweeping
   if (dirtLevel <= 5) { notify("✨ Farm is already clean!"); return; }
-  // [2026-03-19 22:00] Backyard = free poop mini-game
-  if (farmIndex === 0) { startPoopMiniGame(); return; }
-  const cost = getCleaningCost();
-  if (money < cost) { sndError(); notify("❌ Need ₹" + cost + " for cleaning!"); return; }
-  money -= cost;
-  stats.timesCleanedFarm++;
-  stats.totalCleaningSpent += cost;
-  const oldDirt = Math.round(dirtLevel);
-  dirtLevel = 0;
-  sndBuy();
-  // [2026-03-19 23:00] Broom sweep animation on manual clean
-  const farmArea = document.getElementById('farm-area');
-  if (farmArea) { const b = document.createElement('div'); b.textContent = '🧹'; b.className = 'broom-anim sweeping'; farmArea.appendChild(b); setTimeout(() => b.remove(), 1300); }
-  updateDirtVisual();
-  mpTrack('farm_cleaned', { cost: cost, dirt_before: oldDirt, dirt_after: 0, day: day }); // [2026-03-19 14:00]
-  notify("✨ Cleaned " + oldDirt + "% dirt for ₹" + cost + "! Clean early = cheaper!");
-  addTodayEvent('🧹', 'Cleaned farm -₹' + cost);
-  updateHUD();
+  startBroomClean();
 }
 
 function giveMedicine() {
@@ -2214,9 +2666,9 @@ function takeLoan() {
   const maxAmt = Math.floor(available / STEP) * STEP || available;
 
   document.getElementById('loan-modal-info').innerHTML =
-    'Interest: <span class="gold">9% per year</span><br>' +
+    'Interest: <span class="gold">9% per year</span> &nbsp;|&nbsp; pay back over <span class="gold">' + CONFIG.LOAN_TENURE_DAYS + ' days</span><br>' +
     (totalDebt > 0 ? 'Current debt: <span class="red">₹' + totalDebt.toLocaleString() + '</span><br>' : '') +
-    'Max: <span class="gold">₹' + available.toLocaleString() + '</span>';
+    'You can borrow up to <span class="gold">₹' + available.toLocaleString() + '</span>';
 
   const btnGrid = document.getElementById('loan-modal-buttons');
   btnGrid.innerHTML = '';
@@ -2225,12 +2677,29 @@ function takeLoan() {
   const minusBtn = document.createElement('button'); minusBtn.className = 'step-btn minus'; minusBtn.textContent = '−';
   const amtEl = document.createElement('div'); amtEl.className = 'step-amount'; amtEl.textContent = '₹' + amt.toLocaleString();
   const plusBtn = document.createElement('button'); plusBtn.className = 'step-btn plus'; plusBtn.textContent = '+';
-  function updateStepper() { amtEl.textContent = '₹' + amt.toLocaleString(); minusBtn.disabled = amt <= STEP; plusBtn.disabled = amt >= maxAmt; }
+  // [2026-06-19] #4 Live daily-repayment breakdown — principal + interest + total + extra interest (Arush request)
+  const breakdown = document.createElement('div');
+  breakdown.className = 'loan-info loan-breakdown';
+  breakdown.style.cssText = 'margin:4px 0 6px; line-height:1.7;';
+  function updateStepper() {
+    amtEl.textContent = '₹' + amt.toLocaleString();
+    minusBtn.disabled = amt <= STEP; plusBtn.disabled = amt >= maxAmt;
+    const emi = calcDailyEMI(amt, DAILY_INTEREST_RATE, CONFIG.LOAN_TENURE_DAYS);
+    const dayInterest = amt * DAILY_INTEREST_RATE;
+    const dayPrincipal = Math.max(0, emi - dayInterest);
+    const totalRepay = emi * CONFIG.LOAN_TENURE_DAYS;
+    const extraInterest = Math.max(0, totalRepay - amt);
+    breakdown.innerHTML =
+      '💳 Pay back <span class="gold">₹' + Math.round(emi).toLocaleString() + ' every day</span><br>' +
+      '<span style="font-size:13px;">↳ loan part <span class="gold">₹' + Math.round(dayPrincipal).toLocaleString() + '/day</span> &nbsp; ↳ interest <span class="red">₹' + Math.round(dayInterest).toLocaleString() + '/day</span></span><br>' +
+      'Total you repay: <span class="red">₹' + Math.round(totalRepay).toLocaleString() + '</span> <span style="font-size:13px;">(₹' + Math.round(extraInterest).toLocaleString() + ' extra interest)</span>';
+  }
   minusBtn.onclick = () => { amt = Math.max(STEP, amt - STEP); updateStepper(); };
   plusBtn.onclick = () => { amt = Math.min(maxAmt, amt + STEP); updateStepper(); };
   updateStepper();
   stepper.append(minusBtn, amtEl, plusBtn);
   btnGrid.appendChild(stepper);
+  btnGrid.appendChild(breakdown);
 
   const confirmBtn = document.createElement('button'); confirmBtn.className = 'loan-btn';
   confirmBtn.textContent = '🏦 BORROW'; confirmBtn.style.marginTop = '8px';
@@ -2335,6 +2804,8 @@ function buyGuardDog() {
   addTodayEvent('🐕', 'Guard dog -₹' + CONFIG.GUARD_DOG_COST);
   document.getElementById('dog-cost').textContent = 'ADOPTED ✅';
   document.getElementById('dog-desc').textContent = '🐕 Guarding your farm!';
+  addRoamingDog(); // [2026-06-19] #7 dog now roams & plays with the chickens
+  sndBark();
   updateHUD();
 }
 
@@ -2385,48 +2856,175 @@ const EVENT_DEFS = [
     }
   },
   {
+    // [2026-03-19 24:00] Mongoose dramatic attack — 3-phase arc, 8-10s, game paused
     id: 'mongoose', emoji: '🦡', title: 'MONGOOSE ATTACK!',
     desc: 'A mongoose is sneaking into your farm!',
     weight: 25,
-    choiceA: null, // auto-resolved based on guard dog
+    choiceA: null,
     choiceB: null,
-    resolve: function(choice) {
+    customEvent: true, // [2026-03-19 24:00] Flag: bypass normal event modal, use dramatic sequence
+    resolve: function() {
       stats.mongooseAttacks++;
-      // [2026-03-19 23:00] Mongoose dash animation
       const farmArea = document.getElementById('farm-area');
-      if (farmArea) {
-        const m = document.createElement('div'); m.textContent = '🦡'; m.className = 'mongoose-anim';
-        farmArea.appendChild(m);
+      const aliveHens = hens.filter(h => h.alive);
+      const aliveEls = aliveHens.map(h => h.el);
+      let victim = aliveHens.length > 0 ? aliveHens[Math.floor(Math.random() * aliveHens.length)] : null;
+      let mongooseEl = null;
+      let dogEl = null;
+      let chirpInterval = null;
+      let chitterInterval = null;
+
+      // [2026-03-19 24:00] Cleanup helper — remove all animation artifacts
+      function cleanupMongoose() {
+        if (mongooseEl) { mongooseEl.remove(); mongooseEl = null; }
+        if (dogEl) { dogEl.remove(); dogEl = null; }
+        if (chirpInterval) { clearInterval(chirpInterval); chirpInterval = null; }
+        if (chitterInterval) { clearInterval(chitterInterval); chitterInterval = null; }
+        aliveEls.forEach(el => { el.classList.remove('hen-scared', 'hen-scatter', 'hen-flash-red'); el.style.transform = ''; });
+        document.querySelectorAll('#roam-layer .roamer').forEach(el => el.classList.remove('hen-scared')); // [2026-06-19] #8 calm the free-range hens
+        ambient.forced = null; // [2026-06-19] #6 release the tense danger ambient
+      }
+
+      // [2026-03-19 24:00] Show outcome modal after animation — reuses badge modal visual pattern
+      function showMongooseOutcome(isSaved) {
+        cleanupMongoose();
+        const backdrop = document.createElement('div');
+        backdrop.className = 'mongoose-modal-backdrop';
+        if (isSaved) {
+          // [2026-03-19 24:00] Triumph — guard dog saved the day
+          backdrop.innerHTML = '<div class="mongoose-modal-card triumph">' +
+            '<div class="mongoose-modal-emoji">🐕</div>' +
+            '<div class="mongoose-modal-title">GOOD BOY!</div>' +
+            '<div class="mongoose-modal-desc">Your guard dog chased the mongoose away!<br>All hens are safe!</div>' +
+            '<button class="mongoose-modal-btn happy">🐕 Good Boy!</button></div>';
+          // [2026-03-19 24:00] Happy ascending chord
+          playTone(220, 0.3, 'sine', 0.12);
+          setTimeout(() => playTone(330, 0.3, 'sine', 0.12), 200);
+          setTimeout(() => playTone(440, 0.4, 'sine', 0.12), 400);
+          // [2026-03-19 24:00] Dog bark
+          setTimeout(() => { playTone(200, 0.12, 'square', 0.1); setTimeout(() => playTone(250, 0.15, 'square', 0.1), 150); }, 600);
+        } else {
+          // [2026-03-19 24:00] Somber — hen was taken
+          const name = victim ? (victim.name || 'A hen') : 'A hen';
+          backdrop.innerHTML = '<div class="mongoose-modal-card">' +
+            '<div class="mongoose-modal-emoji">😢</div>' +
+            '<div class="mongoose-modal-title">' + name + ' was taken</div>' +
+            '<div class="mongoose-modal-desc">The mongoose carried ' + name + ' away...<br>' +
+            '<span style="color:#FFD700;font-size:14px;">A guard dog (₹500) could have saved her</span></div>' +
+            '<button class="mongoose-modal-btn sad">😢 I\'m Sorry</button></div>';
+          // [2026-03-19 24:00] Sad descending chord
+          playTone(440, 0.4, 'triangle', 0.12);
+          setTimeout(() => playTone(330, 0.4, 'triangle', 0.12), 300);
+          setTimeout(() => playTone(220, 0.6, 'triangle', 0.12), 600);
+        }
+        document.body.appendChild(backdrop);
+        backdrop.querySelector('.mongoose-modal-btn').onclick = function() {
+          backdrop.remove();
+          if (!isSaved && victim) {
+            // [2026-03-19 24:00] Kill hen AFTER modal dismiss — child processes loss first
+            victim.alive = false;
+            victim.el.classList.add('dead');
+            stats.hensLostToMongoose++;
+            setTimeout(() => { victim.el.remove(); hens = hens.filter(x => x.id !== victim.id); updateHUD(); }, 500);
+            addTodayEvent('🦡', (victim.name || 'Hen') + ' taken by mongoose');
+          } else if (isSaved) {
+            stats.mongooseBlocked++;
+            addTodayEvent('🐕', 'Guard dog blocked mongoose!');
+          }
+          mpTrack(isSaved ? 'mongoose_blocked' : 'mongoose_kill', { day: day, had_dog: hasGuardDog });
+          // [2026-03-19 24:00] Resume game
+          gameRunning = true;
+          startDayCycle();
+          updateHUD();
+        };
+      }
+
+      // ========== PHASE 1: WARNING (2s) ==========
+      // [2026-03-19 24:00] Mongoose peeks from left, hens tremble, rumble sound
+      mongooseEl = document.createElement('div');
+      mongooseEl.className = 'mongoose-actor';
+      mongooseEl.innerHTML = spriteHTML('🦡'); applySprite(mongooseEl, 'mongoose'); // [2026-06-19] #8 bigger + image-swap ready
+      mongooseEl.style.left = '-50px';
+      if (farmArea) farmArea.appendChild(mongooseEl);
+
+      aliveEls.forEach(el => el.classList.add('hen-scared'));
+      document.querySelectorAll('#roam-layer .roamer.hen').forEach(el => el.classList.add('hen-scared')); // [2026-06-19] #8 free-range hens panic too
+      // [2026-06-19] #8 Distinct DANGER sound + tense ambient when the mongoose appears (Arush request)
+      sndDanger();
+      setTimeout(sndDanger, 700);
+      ambient.forced = 'danger'; ambientSetMood('danger');
+      notify("🦡 A mongoose is sneaking into your farm!");
+
+      // Mongoose peeks in
+      setTimeout(() => { if (mongooseEl) mongooseEl.style.left = '10px'; }, 300);
+
+      // ========== PHASE 2: CHASE (3s, starts at 2s) ==========
+      setTimeout(() => {
+        if (!mongooseEl) return; // cleaned up already
+        // [2026-03-19 24:00] Hens scatter — random offsets
+        aliveEls.forEach(el => {
+          el.classList.remove('hen-scared');
+          el.classList.add('hen-scatter');
+          el.style.transform = 'translate(' + (Math.random() * 30 - 15) + 'px,' + (Math.random() * 20 - 10) + 'px)';
+        });
+        // [2026-03-19 24:00] Target hen flashes red
+        if (victim && victim.el) victim.el.classList.add('hen-flash-red');
+
+        // [2026-03-19 24:00] Hen crying — rapid chirps
+        chirpInterval = setInterval(() => {
+          playTone(800 + Math.random() * 400, 0.08, 'sine', 0.06);
+        }, 180);
+        // [2026-03-19 24:00] Mongoose chittering
+        chitterInterval = setInterval(() => {
+          playTone(300 + Math.random() * 200, 0.06, 'sawtooth', 0.05);
+        }, 140);
+
         if (hasGuardDog) {
-          m.classList.add('chased');
-          const d = document.createElement('div'); d.textContent = '🐕'; d.className = 'mongoose-anim';
-          d.style.top = 'calc(50% + 30px)'; d.classList.add('dash');
-          farmArea.appendChild(d);
-          setTimeout(() => { m.remove(); d.remove(); }, 1600);
+          // [2026-03-19 24:00] Guard dog appears and chases mongoose back
+          dogEl = document.createElement('div');
+          dogEl.className = 'mongoose-actor dog-actor';
+          dogEl.innerHTML = spriteHTML('🐕'); applySprite(dogEl, 'dog'); // [2026-06-19] #8 bigger + image-swap ready
+          dogEl.style.left = 'calc(100% + 40px)';
+          dogEl.style.top = '55%';
+          if (farmArea) farmArea.appendChild(dogEl);
+          // [2026-06-19] #8 Distinct RESCUE sound when the dog charges in (clearly different from the danger sound)
+          sndRescue();
+          // Dog charges in, mongoose retreats
+          setTimeout(() => {
+            if (dogEl) dogEl.style.left = '60px';
+            if (mongooseEl) mongooseEl.style.left = '-80px';
+          }, 300);
+          // [2026-03-19 24:00] Phase 3: triumph after 3s
+          setTimeout(() => showMongooseOutcome(true), 3000);
         } else {
-          m.classList.add('dash');
-          setTimeout(() => m.remove(), 1600);
+          // [2026-03-19 24:00] Mongoose charges toward center
+          if (mongooseEl) mongooseEl.style.left = '45%';
+          // [2026-03-19 24:00] Phase 3: mongoose grabs hen after 2.5s
+          setTimeout(() => {
+            if (chirpInterval) { clearInterval(chirpInterval); chirpInterval = null; }
+            if (chitterInterval) { clearInterval(chitterInterval); chitterInterval = null; }
+            // [2026-03-19 24:00] Mongoose and hen exit left together
+            if (mongooseEl) { mongooseEl.style.transition = 'left 1.5s ease-in'; mongooseEl.style.left = '-80px'; }
+            // [2026-03-19 24:00] Sad death sound
+            sndDeath();
+            // [2026-03-19 24:00] Remaining hens freeze
+            aliveEls.forEach(el => { el.classList.remove('hen-scatter'); el.style.transform = ''; });
+            // [2026-03-19 24:00] Show outcome modal after exit animation
+            setTimeout(() => showMongooseOutcome(false), 1800);
+          }, 2500);
         }
-      }
-      if (hasGuardDog) {
-        stats.mongooseBlocked++;
-        mpTrack('mongoose_blocked', { day: day }); // [2026-03-19 14:00]
-        notify("🐕 Your guard dog chased the mongoose away! Good boy!");
-      } else {
-        const aliveHens = hens.filter(h => h.alive);
-        if (aliveHens.length > 0) {
-          const victim = aliveHens[Math.floor(Math.random() * aliveHens.length)];
-          victim.alive = false;
-          victim.el.classList.add('dead');
-          sndDeath();
-          stats.hensLostToMongoose++;
-          floatText(victim.el, '🦡 Mongoose!', '#ff4444');
-          setTimeout(() => { victim.el.remove(); hens = hens.filter(x => x.id !== victim.id); updateHUD(); }, 2000);
-          notify("🦡 A mongoose killed " + (victim.name || 'a hen') + "! Buy a guard dog (₹500) to protect your farm!");
-        } else {
-          notify("🦡 A mongoose came but found no hens!");
+      }, 2000);
+
+      // [2026-03-19 24:00] Safety timeout — auto-cleanup after 15s in case sequence gets stuck
+      setTimeout(() => {
+        if (mongooseEl || dogEl) {
+          cleanupMongoose();
+          document.querySelectorAll('.mongoose-modal-backdrop').forEach(el => el.remove());
+          gameRunning = true;
+          startDayCycle();
+          updateHUD();
         }
-      }
+      }, 15000);
     }
   }
 ];
@@ -2448,23 +3046,10 @@ function showEvent(eventDef) {
   stats.eventsEncountered++;
   mpTrack('event_shown', { event_id: eventDef.id, day: day });
 
-  // Mongoose with guard dog = auto-resolve, no choices
-  if (eventDef.id === 'mongoose' && hasGuardDog) {
-    document.getElementById('event-desc').textContent = 'A mongoose tried to sneak in... but your guard dog chased it away!';
-    document.getElementById('event-emoji').textContent = '🐕';
-    const btn = document.createElement('button');
-    btn.className = 'event-choice-btn choice-a';
-    btn.textContent = '🐕 Good Boy!';
-    btn.onclick = () => { eventDef.resolve('dog'); closeEventModal(); };
-    choicesDiv.appendChild(btn);
-  } else if (eventDef.id === 'mongoose') {
-    // No guard dog — mongoose attacks, just acknowledge
-    document.getElementById('event-desc').textContent = 'A mongoose attacked your farm! You need a guard dog!';
-    const btn = document.createElement('button');
-    btn.className = 'event-choice-btn choice-a';
-    btn.textContent = '😱 Oh No!';
-    btn.onclick = () => { eventDef.resolve('none'); closeEventModal(); };
-    choicesDiv.appendChild(btn);
+  // [2026-03-19 24:00] Custom events (mongoose) bypass modal — run their own dramatic sequence
+  if (eventDef.customEvent) {
+    eventDef.resolve();
+    return; // [2026-03-19 24:00] Don't show event modal — custom event handles its own UI
   } else {
     // Normal 2-choice event
     const btnA = document.createElement('button');
@@ -2605,8 +3190,8 @@ function updateHUD() {
     if (cleanBtn) { cleanBtn.style.opacity = '0.4'; cleanBtn.style.pointerEvents = 'none'; }
   } else {
     document.getElementById('dirt-display').textContent = dirtDesc + ' (' + Math.round(dirtLevel) + '%)';
-    // [2026-03-19 22:00] Backyard shows "Free 💩" — poop mini-game instead of ₹ cost
-    document.getElementById('clean-cost').textContent = dirtLevel <= 5 ? 'Clean!' : (farmIndex === 0 ? 'Free 💩' : '₹' + getCleaningCost());
+    // [2026-03-19 22:00] Backyard shows "Free 🧹" — poop mini-game instead of ₹ cost
+    document.getElementById('clean-cost').textContent = dirtLevel <= 5 ? 'Clean!' : (farmIndex === 0 ? 'Free 🧹' : '₹' + getCleaningCost());
     if (cleanBtn) { cleanBtn.style.opacity = '1'; cleanBtn.style.pointerEvents = 'auto'; }
   }
   document.getElementById('autocleaner-cost').textContent = hasAutoCleaner ? 'INSTALLED ✅' : '₹' + CONFIG.AUTO_CLEANER_COST.toLocaleString();
@@ -2835,38 +3420,104 @@ function floatText(anchor, text, color) {
   el.style.color = color;
   el.style.fontSize = '20px';
 
-  const rect = anchor.getBoundingClientRect();
-  el.style.left = rect.left + rect.width/2 + 'px';
-  el.style.top = rect.top + 'px';
-
+  let rect = anchor ? anchor.getBoundingClientRect() : null;
+  // [2026-06-19] #5 If the anchor is hidden/zero-size (e.g. the invisible #hud), float over the farm so money changes are visible
+  if (!rect || (rect.width === 0 && rect.height === 0)) {
+    const fa = document.getElementById('farm-area');
+    const r = fa ? fa.getBoundingClientRect() : { left: (window.innerWidth || 800) / 2, top: 120, width: 0, height: 0 };
+    el.style.left = (r.left + r.width / 2) + 'px';
+    el.style.top = (r.top + 60 + Math.random() * 50) + 'px';
+  } else {
+    el.style.left = rect.left + rect.width / 2 + 'px';
+    el.style.top = rect.top + 'px';
+  }
   document.getElementById('game').appendChild(el);
   setTimeout(() => el.remove(), 1200);
 }
 
+// [2026-06-19] #5 Big centered money float — the day's profit/loss is impossible to miss (Arush request)
+function bigFloat(text, color) {
+  const fa = document.getElementById('farm-area');
+  const el = document.createElement('div');
+  el.className = 'float-text big-float';
+  el.textContent = text;
+  el.style.color = color;
+  if (fa) { const r = fa.getBoundingClientRect(); el.style.left = (r.left + r.width / 2) + 'px'; el.style.top = (r.top + r.height * 0.30) + 'px'; }
+  document.getElementById('game').appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+}
+
 function updateDayNight() {
-  // Simple day/night based on sub-position within day cycle
+  // [2026-06-19] #10 Slower 60s sky cycle (decoupled from 10s economic day) — morning/night now feel meaningful
   const now = Date.now();
-  const phase = ((now / DAY_MS) * 2 * Math.PI) % (2 * Math.PI);
+  const phase = ((now / SKY_CYCLE_MS) * 2 * Math.PI) % (2 * Math.PI);
   const nightOverlay = document.getElementById('night-overlay');
   const celestial = document.getElementById('celestial');
-
   const brightness = Math.sin(phase);
-  if (brightness < -0.3) {
-    nightOverlay.className = 'night';
-    celestial.textContent = '🌙';
-  } else if (brightness < 0.3) {
-    nightOverlay.className = 'dawn';
-    celestial.textContent = '🌅';
-  } else {
-    nightOverlay.className = '';
-    celestial.textContent = '☀️';
-  }
 
-  // Move celestial body
+  let skyPhase;
+  if (brightness < -0.3) { skyPhase = 'night'; nightOverlay.className = 'night'; celestial.textContent = '🌙'; }
+  else if (brightness < 0.3) { skyPhase = (Math.cos(phase) > 0) ? 'dawn' : 'dusk'; nightOverlay.className = 'dawn'; celestial.textContent = skyPhase === 'dawn' ? '🌅' : '🌆'; }
+  else { skyPhase = 'day'; nightOverlay.className = ''; celestial.textContent = '☀️'; }
+
+  // Move celestial body across the sky
   const xPct = ((phase / (2 * Math.PI)) * 100);
   const yPct = 10 + 20 * (1 - Math.abs(brightness));
   celestial.style.left = xPct + '%';
   celestial.style.top = yPct + '%';
+
+  // [2026-06-19] #10 Phase-transition greetings + sleep/wake (Claude-written messages)
+  if (skyPhase !== lastSkyPhase) {
+    const prev = lastSkyPhase;
+    lastSkyPhase = skyPhase;
+    if (skyPhase === 'day' && prev) onMorning();
+    else if (skyPhase === 'night' && prev) onNightfall();
+  }
+
+  // [2026-06-19] #6 Ambient mood follows time of day + game state
+  ambientSetMood(computeAmbientMood(skyPhase));
+}
+
+// [2026-06-19] #10 Morning/night greetings — wording chosen by Claude per Arush's request
+const MORNING_GREETINGS = [
+  "🌅 Good morning, Arush! Today's going to be eggcellent!",
+  "☀️ Rise and shine! Your hens slept like babies!",
+  "🌞 A brand-new day — let's make it awesome!",
+  "🐔 Cock-a-doodle-doo! Time to farm!",
+  "✨ Morning! Fresh eggs are on the way!",
+];
+const NIGHT_GREETINGS = [
+  "🌙 Good night! Sweet dreams, little hens 💤",
+  "🌛 The farm is sleeping. Rest well, Arush!",
+  "✨ Stars are out — time to dream of golden eggs!",
+  "😴 Lights out! Everyone's cozy in the coop.",
+  "🌌 Shhh… the hens are snoozing. Sleep tight!",
+];
+function onMorning() {
+  if (!gameRunning) return;
+  isNight = false; setFarmSleeping(false);
+  sndMorning(); setTimeout(sndYawn, 400);
+  notify(MORNING_GREETINGS[Math.floor(Math.random() * MORNING_GREETINGS.length)]);
+}
+function onNightfall() {
+  if (!gameRunning) return;
+  isNight = true; setFarmSleeping(true);
+  sndNight(); setTimeout(sndYawn, 500);
+  notify(NIGHT_GREETINGS[Math.floor(Math.random() * NIGHT_GREETINGS.length)]);
+}
+// [2026-06-19] #10 Toggle sleeping visuals on hen tiles, roaming sprites, and dog
+function setFarmSleeping(sleep) {
+  const grid = document.getElementById('hen-grid');
+  if (grid) grid.classList.toggle('night-sleep', sleep);
+  document.querySelectorAll('.roamer').forEach(r => r.classList.toggle('sleeping', sleep));
+}
+// [2026-06-19] #6 Mood priority: danger (forced) > sad (broke/sick) > happy (rich) > day/night
+function computeAmbientMood(skyPhase) {
+  if (ambient.forced) return ambient.forced;
+  const sickCount = hens.filter(h => h.alive && h.health !== 'healthy').length;
+  if (money < 100 || sickCount > 0) return 'sad';
+  if (money >= 5000) return 'happy';
+  return skyPhase === 'night' ? 'night' : 'day';
 }
 
 function gameOver() {
@@ -2876,6 +3527,7 @@ function gameOver() {
   document.getElementById('shortcut-bar').style.display = 'none'; // [2026-03-18 14:10] Hide shortcuts on game over
   clearInterval(dayTimer);
   clearInterval(tickTimer);
+  stopRoaming(); // [2026-06-19] #7 stop the roaming layer
   sndDeath();
   // [2026-03-18 12:00] Track game over
   mpTrack('game_ended', {
